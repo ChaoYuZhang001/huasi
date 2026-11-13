@@ -104,11 +104,23 @@ body.touch #acts i{display:none}
 #acts{bottom:26px}
 #acts button u{position:absolute;left:50%;bottom:-16px;transform:translateX(-50%);text-decoration:none;font-family:"PingFang SC","Noto Sans SC",sans-serif;font-size:10px;letter-spacing:1px;white-space:nowrap;color:#fff;opacity:.8;text-shadow:0 1px 3px #000}
 #share{margin-top:16px;font-family:inherit;font-size:12px;letter-spacing:4px;color:#fff;background:none;border:0;border-bottom:1px solid rgba(255,255,255,.5);padding:4px 2px;cursor:pointer;opacity:.85}
+#card{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.5);padding:16px}
+#cardIn{background:linear-gradient(#f4e8cc,#e5d2a6);color:#3a2414;border:2px solid #9a2a1e;outline:1px solid #c9a13a;outline-offset:-8px;padding:28px 30px 20px;min-width:230px;max-width:min(88vw,400px);text-align:center;box-shadow:0 12px 44px rgba(0,0,0,.65)}
+#cTitle{font-size:25px;letter-spacing:5px;color:#9a2a1e}
+#cSub{font-size:14px;letter-spacing:4px;margin:6px 0 12px;opacity:.8}
+#cBody p{font-size:20px;letter-spacing:5px;line-height:1.85}
+#cBody small{display:block;font-family:"PingFang SC","Noto Sans SC",sans-serif;font-size:12px;letter-spacing:2px;margin-top:12px;opacity:.75}
+#cOpts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#cOpts button{font-family:inherit;font-size:15px;letter-spacing:3px;padding:10px 6px;background:#9a2a1e;color:#f6e3b0;border:0;border-radius:3px;cursor:pointer}
+#cOpts i{font-style:normal;font-family:ui-monospace,Menlo,monospace;font-size:11px;opacity:.7;margin-right:6px}
+body.touch #cOpts i{display:none}
+#cHint{font-size:11px;letter-spacing:3px;opacity:.6;margin-top:14px}
+#stats{display:none;font-size:13px;letter-spacing:2px;line-height:1.9;margin-bottom:16px;color:#f3e2b0;max-width:92vw}
 #load{position:fixed;left:0;right:0;bottom:18px;text-align:center;font-size:12px;opacity:.6;letter-spacing:2px}
 @media(max-width:760px),(max-height:480px){#ov h1{font-size:clamp(44px,13vw,84px)}#ov h2{margin-bottom:14px;font-size:13px}#ov .seal{font-size:15px;margin-bottom:8px}#steps{font-size:12px;line-height:1.8;margin-bottom:12px}#steps i{margin-left:8px}#thelp{margin-bottom:14px;font-size:12px}#go{font-size:15px;padding:9px 22px 9px 28px}
  #guide{font-size:12px;top:22px}#loc{left:18px;top:16px;font-size:13px}#merit{left:18px;top:46px;max-width:60vw}#banner{font-size:40px;letter-spacing:10px}#breath{bottom:36px}}
 @media(max-height:480px){#ov{padding:10px}#ov h1{font-size:17vh}#ov .seal{display:none}#ov h2{margin:2px 0 8px}#steps,#thelp{margin-bottom:8px;line-height:1.6}#keys{gap:4px 20px;margin-bottom:10px;font-size:12px}#breath{transform:scale(.75);transform-origin:50% 100%;bottom:10px}#tAct{bottom:56px;width:76px;height:76px}#banner{top:16%}}
-@media(max-width:520px){#guide{right:auto;left:18px;top:108px;text-align:left;max-width:62vw}#guide small{display:none}#merit{top:58px;max-width:64vw;font-size:11px;gap:0 9px}#merit b{font-size:13px}#tTod,#tPause{top:16px}#steps{font-size:12px;letter-spacing:2px}#steps span{width:46%;text-align:left}#mix{gap:6px 12px}#mix input[type=range]{width:70px}#prompt{font-size:15px}#tAct{bottom:118px}#banner{top:26%}#breath{bottom:112px}#fish{bottom:92px}}
+@media(max-width:520px){#guide{right:auto;left:18px;top:108px;text-align:left;max-width:62vw}#guide small{display:none}#merit{top:58px;max-width:64vw;font-size:11px;gap:0 9px}#merit b{font-size:13px}#merit .x{display:none}#tTod,#tPause{top:16px}#steps{font-size:12px;letter-spacing:2px}#steps span{width:46%;text-align:left}#mix{gap:6px 12px}#mix input[type=range]{width:70px}#prompt{font-size:15px}#tAct{bottom:118px}#banner{top:26%}#breath{bottom:112px}#fish{bottom:92px}}
 @media(max-height:480px){#acts{bottom:20px}#acts button u{bottom:-14px;font-size:9px}#share{margin-top:6px}}
 </style>
 </head>
@@ -119,7 +131,7 @@ body.touch #acts i{display:none}
   <div id="guide"></div>
   <div id="prompt"><kbd>E</kbd><span id="pl"></span></div>
   <div id="banner" class="kai"></div><div id="msg"></div>
-  <div id="merit"><span id="me">我</span><span>香火<b id="mr">0</b></span><span>礼拜<b id="mb">0</b></span><span>念珠<b id="mk">0</b></span><span>功德<b id="mg">0</b></span><span>静坐<b id="mt">0:00</b></span></div>
+  <div id="merit"><span id="me">我</span><span>香火<b id="mr">0</b></span><span>礼拜<b id="mb">0</b></span><span>念珠<b id="mk">0</b></span><span class="x">功德<b id="mg">0</b></span><span class="x">静坐<b id="mt">0:00</b></span></div>
   <div id="breath"><div id="ring"></div><div id="bt" class="kai">吸气</div><div id="bs"></div></div>
   <div id="keysH">E 互动 · T 时辰 · H 隐藏界面 · 滚轮 远近</div>
   <div id="fish"><svg viewBox="0 0 220 150" width="170" height="116" aria-label="木鱼"><defs><radialGradient id="mgr" cx="38%" cy="30%" r="75%"><stop offset="0" stop-color="#d07a48"/><stop offset=".5" stop-color="#8a3018"/><stop offset="1" stop-color="#3a1108"/></radialGradient></defs>
@@ -131,11 +143,13 @@ body.touch #acts i{display:none}
     <div id="fc">功德 0</div></div>
   <div id="acts"><button data-a="bow"><b>拜</b><i>1</i><u>礼拜</u></button><button data-a="beads"><b>珠</b><i>2</i><u>念珠</u></button><button data-a="fish"><b>鱼</b><i>3</i><u>木鱼</u></button><button data-a="greet"><b>礼</b><i>4</i><u>合十</u></button><button data-a="view"><b>三</b><i>V</i><u>视角</u></button></div>
 </div>
+<div id="card"><div id="cardIn"><div id="cTitle" class="kai"></div><div id="cSub"></div><div id="cBody" class="kai"></div><div id="cOpts"></div><div id="cHint"></div></div></div>
 <div id="touch"><div id="stick"><div id="knob"></div></div><button id="tAct"></button><button id="tTod">时辰</button><button id="tPause">暂歇</button></div>
 <div id="ov">
   <div class="seal kai">西岳</div>
   <h1 id="ttl" class="kai">华山寺</h1>
   <h2 id="sub">山寺 · 上香 · 静坐</h2>
+  <div id="stats"></div>
   <div id="steps"><span><i>一</i>香案请香</span><span><i>二</i>烛台点香</span><span><i>三</i>炉前三拜敬香</span><span><i>四</i>殿内蒲团静坐</span></div>
   <div id="thelp">轻点地面 · 自行前往　拖动画面 · 环顾<br>左下拖动 · 摇杆行走　右下圆钮 · 请香 敬香 静坐</div>
   <div id="keys">
@@ -375,7 +389,7 @@ function hall(x,z,y0,r,Wd,D,o={}){at(x,y0,z,r);
   for(const sx of[-1,1])for(const cz of[zb+3.4,zf-2.6])pc(sx*bw*1.5,cz);
   for(const sx of[-1,1]){B(1.2,1.5,3,sx*(Wd/2-1.2),ph,zb+3,M.woodDark);B(2.6,.9,.9,sx*(Wd/2-4.6),ph,zf-1.2,M.woodDark);}
   plight(0,ph+2.8,zb+4.6,0xffa858,60,20);}
- else{B(3,1,1,0,ph,zb+.9,M.woodDark);B(2,2,.6,0,ph+1,zb+.7,M.wood,false);S(.5,0,ph+2,zb+1.05,M.gold,1,1.3,.7,10,8);B(2.2,.2,.8,0,ph+3,zb+.7,M.gold,false);
+ else{B(3,1,1,0,ph,zb+.9,M.woodDark);if(!o.custom){B(2,2,.6,0,ph+1,zb+.7,M.wood,false);S(.5,0,ph+2,zb+1.05,M.gold,1,1.3,.7,10,8);B(2.2,.2,.8,0,ph+3,zb+.7,M.gold,false);}
   for(const sx of[-1,1]){B(2.6,.9,.9,sx*Wd/3.2,ph,zb+2.6,M.woodDark);B(.9,1.8,2.2,sx*(Wd/2-.8),ph,zf-1.7,M.woodDark);}
   plight(0,ph+2.6,zb+2.5,0xffa858,30,14);}
 }
@@ -435,10 +449,10 @@ for(const s of[-1,1]){rail(s*24,3.3,s*24,-26,1.5);rail(s*24,8.7,s*24,10,1.5);rai
 chain(-30,-69.6,30,-69.6,3.5);
 // halls
 hall(0,-7,1.5,0,24,12,{name:'大雄宝殿',double:true,doors:3,statue:true,ch:4.7,couplet:['云海松风千嶂静','钟声月色一山空']});
-hall(36,-5,0,3,20,9,{name:'观音殿'});
-hall(-36,-5,0,1,20,9,{name:'祖师殿'});
+hall(36,-5,0,3,20,9,{name:'观音殿',custom:true});
+hall(-36,-5,0,1,20,9,{name:'祖师殿',custom:true});
 hall(0,40,0,0,14,6,{name:'华山寺',through:true,porch:0,plat:.3,ch:4.2,empty:true});
-hall(17,-45,3.5,0,12,8,{name:'藏经阁',plat:.6});
+hall(17,-45,3.5,0,12,8,{name:'藏经阁',plat:.6,custom:true});
 // walls
 wall(-44.6,40,-7.1,40);wall(7.1,40,44.6,40);wall(44.6,40,44.6,-69.6);wall(-44.6,40,-44.6,-69.6);wall(30.2,-69.6,44.6,-69.6);wall(-44.6,-69.6,-30.2,-69.6);
 chain(-13.6,42.6,-13.6,59.6,0);chain(13.6,42.6,13.6,59.6,0);chain(-13.6,59.7,13.6,59.7,0);
@@ -477,6 +491,35 @@ at(0,1.5,-7);S(.15,.75,2,-1.3,M.wood,1.25,.9,1,10,8);C(.2,.2,.04,.75,1.85,-1.3,M
 for(const sx of[-10,10]){at(sx,3.5,-67.5);B(1.3,.12,1.3,0,0,0,M.cliff);cushion(sx,3.62,-67.5,0);}
 at(-7,0,57.3);B(1.3,.12,1.3,0,0,0,M.cliff);cushion(-7,.12,57.3,Math.PI);
 at(-19,3.5,-40);cushion(-19,3.86,-38.3,0);
+// —— 殿堂陈设、放生池、花树、祈福架 ——
+const SP={lamps:[],lampIA:[]},wv=(x,y,z)=>{const[a,b]=Wp(x,z);return new V3(a,O.y+y,b);};
+M.jade=mat(T.marble,1.5,{c:0xf4f1e8,r:.45});M.pink=mat(null,1,{c:0xe89ab0,r:.8});M.water=mat(null,1,{c:0x2c5a55,r:.1,m:.35});M.water.transparent=true;M.water.opacity=.8;M.pad=mat(null,1,{c:0x3f6a34,r:.9});M.blossom=mat(T.marble,1.2,{c:0xffa9c6,r:1,e:0x40121f,ei:.6});
+function disc(r,x,y,z,m){const g=new THREE.CylinderGeometry(r,r,.05,24);g.rotateX(Math.PI/2);G(g,m,x,y,z);}
+// 观音殿
+at(36,0,-5,3);(()=>{const ph=.85,zb=-4.5,z=zb+.8;C(.78,.56,.3,0,ph+1,z,M.gold,false,16);for(let i=0;i<10;i++){const a=i*.628;S(.17,Math.cos(a)*.64,ph+1.32,z+Math.sin(a)*.64,M.pink,1,.7,1,6,5);}
+ C(.2,.4,1.5,0,ph+1.3,z,M.jade,false,14);S(.28,0,ph+2.72,z,M.jade,1.05,.75,.8,12,8);S(.19,0,ph+3.04,z,M.jade,1,1.12,1,14,12);C(.07,.13,.24,0,ph+3.22,z,M.gold,false,10);S(.24,0,ph+3.0,z-.06,M.jade,1,1.5,.9,10,8);
+ disc(.66,0,ph+3.02,z-.32,M.gold);S(.07,.2,ph+2.3,z+.27,M.jade,1,1.6,1);C(.012,.012,.3,.2,ph+2.42,z+.27,M.pad,false,4);
+ for(const sx of[-6.25,6.25]){for(let i=0;i<6;i++){const lx=sx-1+(i%3),lz=zb+2.4+Math.floor(i/3)*.4;C(.1,.05,.07,lx,ph+.9,lz,M.pink,false,8);SP.lamps.push(wv(lx,ph+1.03,lz));}SP.lampIA.push(wv(sx,ph+1.1,zb+2.6));}})();
+// 祖师殿
+at(-36,0,-5,1);(()=>{const ph=.85,zb=-4.5,z=zb+.8;B(1.6,.5,1.2,0,ph+1,z,M.woodDark,false);S(.5,0,ph+1.75,z,M.bronze,1.15,.75,.9,12,8);C(.26,.42,.75,0,ph+1.6,z,M.bronze,false,12);S(.36,0,ph+2.3,z,M.bronze,1.2,.5,.8,10,6);S(.2,0,ph+2.68,z,M.bronze,1,1.1,1,12,10);C(.09,.13,.16,0,ph+2.86,z,M.gold,false,8);B(.36,.03,.05,0,ph+2.99,z,M.gold,false);S(.11,0,ph+2.5,z+.2,M.bronze,.8,1.6,.5);
+ disc(.6,0,ph+2.7,z-.42,M.gold);for(const x of[-1.38,-1.08,1.08,1.38]){B(.18,.52,.06,x,ph+1,zb+.9,M.lantern,false);B(.1,.4,.065,x,ph+1.06,zb+.9,M.gold,false);}
+ C(.11,.09,.3,-6.25,ph+.9,zb+2.6,M.wood,false,10);for(let i=0;i<9;i++)C(.006,.006,.36,-6.25+rr(-.06,.06),ph+1,zb+2.6+rr(-.06,.06),M.paper,false,4);
+ SP.qian=wv(-6.25,ph+1.1,zb+2.6);B(.5,.02,.36,6.25,ph+.9,zb+2.6,M.paper,false);})();
+// 藏经阁
+at(17,3.5,-45);(()=>{const ph=.6,zb=-4;for(const sx of[-3.7,3.7]){B(2.7,2.9,.45,sx,ph,zb+.42,M.woodDark);for(let r=0;r<4;r++){B(2.4,.34,.06,sx,ph+.35+r*.66,zb+.66,M.paper,false);for(let k=0;k<7;k++)B(.03,.34,.07,sx-1.05+k*.35,ph+.35+r*.66,zb+.665,M.woodDark,false);}}
+ B(.62,.04,.44,0,ph+1,zb+.95,M.paper,false);B(.02,.05,.44,0,ph+1.01,zb+.95,M.woodDark,false);C(.012,.012,.26,.5,ph+1.02,zb+.95,M.woodDark,false,5);C(.07,.06,.06,-.55,ph+1,zb+.95,M.dark,false,8);
+ SP.book=wv(0,ph+1.2,zb+.95);})();
+// 放生池
+at(13,0,21);(()=>{const h=.62;B(5.8,h,.4,0,0,2.7,M.marble);B(5.8,h,.4,0,0,-2.7,M.marble);B(.4,h,5,2.7,0,0,M.marble);B(.4,h,5,-2.7,0,0,M.marble);B(5,.34,5,0,0,0,M.water,false);
+ for(let k=0;k<9;k++){const x=rr(-2.1,2.1),z=rr(-2.1,2.1);C(rr(.2,.36),.3,.02,x,.34,z,M.pad,false,10);if(k%3===0){S(.1,x,.42,z,M.pink,1,.9,1,6,5);S(.05,x,.5,z,M.gold);}}
+ G(rockGeo(.5,1,.8,1,3),M.rock,-1.2,.3,1.1);SP.pond=wv(0,.2,0);})();
+// 花树
+at(9.5,0,15.5);(()=>{C(.15,.22,1.5,0,0,0,M.bark,true,7);for(const[bx,by,bz]of[[.5,1.9,.2],[-.45,2.1,-.3],[.1,2.4,.5],[-.2,2,.6]]){const g=new THREE.CylinderGeometry(.05,.09,1.3,5);g.rotateZ(-bx*.9);g.rotateX(bz*.9);G(g,M.bark,bx*.6,by-.2,bz*.6);}
+ for(let k=0;k<11;k++){const a=R()*6.28,d=rr(.2,1.7),r=rr(.55,.95);const g=uvs(new THREE.SphereGeometry(r,8,6),2,1.5);g.scale(1,.7,1);G(g,M.blossom,Math.cos(a)*d,rr(2.3,3.5),Math.sin(a)*d);}B(3,.04,3,0,0,0,M.moss,false);SP.blossom=wv(0,3,0);})();
+// 祈福架
+at(-12,0,14.5);(()=>{for(const sx of[-2.1,2.1]){B(.16,2.5,.16,sx,0,0,M.wood,false);B(.4,.2,.4,sx,0,0,M.marble,false);}for(const y of[1.1,1.6,2.1])B(4.2,.08,.08,0,y,0,M.wood,false);B(4.7,.1,.5,0,2.5,0,M.ridge,false);B(4.5,.06,.3,0,2.6,0,M.ridge,false);col(4.3,2.5,.3,0,0,0);
+ for(let k=0;k<26;k++){const x=rr(-1.9,1.9),y=[1.1,1.6,2.1][k%3],z=k%2?-.07:.07;if(y===1.6&&z>0)continue;B(.13,.26,.02,x,y-.3,z,M.lantern,false);B(.13,.04,.025,x,y-.08,z,M.gold,false);B(.012,.06,.012,x,y-.04,z,M.ribbon,false);}
+ SP.wish=wv(0,1.5,.2);SP.wishSlots=[-1.5,-1,-.5,0,.5,1,1.5].map(x=>wv(x,1.32,.09));plaque('祈福',0,2.95,0,{h:.5});})();
 // far peaks + mountain body
 (()=>{at(0,0,0);const g=new THREE.CylinderGeometry(66,120,420,22,10),p=g.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i),k=1+.14*Math.sin(x*.06+y*.03)*Math.cos(z*.05-y*.02)+.06*Math.sin(x*.2+z*.17+y*.08);p.setXYZ(i,x*k,y,z*k);}g.computeVertexNormals();G(uvs(g,30,30),M.rock,0,-211,-12);})();
 [[-190,-130,75,360,58],[170,-230,95,420,105],[-70,-400,130,470,150],[270,30,85,340,36],[-310,90,115,400,84],[100,310,95,340,22],[-150,270,75,320,14],[400,-320,160,560,170],[-440,-280,170,580,185],[40,-640,220,640,225],[-560,-600,240,660,240],[640,-120,230,600,150],[330,330,140,460,60],[-420,420,170,480,70]].forEach(p=>peak(...p));
@@ -607,14 +650,14 @@ const P={pos:new V3(0,0,54),vel:new V3(),yaw:0,pitch:0,onG:true,eye:1.65,camY:0,
  prK:0,prT:0,autoBow:false,greetT:0,greetK:0,avYaw:Math.PI,fish:false,sbT:0};
 if(SV.tod>=0&&SV.tod<TOD.length){tod.i=tod.from=SV.tod|0;$('tod').textContent=TOD[tod.i].n;}
 if(SV.mix&&typeof SV.mix==='object')Object.assign(MIX,SV.mix);
-function save(){window.saveKV&&saveKV({merit:P.merit,sat:Math.floor(P.sat),tod:tod.i,bows:P.bows,gongde:P.gongde,name:P.name,view:P.view,mix:MIX});}
+function save(){window.saveKV&&saveKV({merit:P.merit,sat:Math.floor(P.sat),tod:tod.i,bows:P.bows,gongde:P.gongde,name:P.name,view:P.view,mix:MIX,lamps:P.lamps,laps:P.laps,wishes:P.wishes,qDay:P.qDay,qIdx:P.qIdx,cats:P.cats});}
 setInterval(()=>{if(GS.state==='play')save();},15000);
 addEventListener('pagehide',save);
 const GS={state:'menu'},keys={};let tG=0,tA=0,msgT=0,bannerT=0,guide=0;
 let bowT=0,bowB=null,bowYaw=0,bowK=0,seat=null,sitT=0,breaths=0,hudHide=false;
 function banner(t,sub=''){$('banner').innerHTML=t+(sub?`<small>${sub}</small>`:'');$('banner').style.opacity=1;bannerT=4.5;}
 function msg(t){$('msg').textContent=t;$('msg').style.opacity=1;msgT=2.6;}
-const GUIDE=['前往前院香案 · 请香','到烛台前 · 点燃清香','立于香炉前 · 三拜敬香','入大雄宝殿 · 蒲团静坐','随喜游览 · 拜佛 拨珠 敲木鱼 · 与香客合十'];
+const GUIDE=['前往前院香案 · 请香','到烛台前 · 点燃清香','立于香炉前 · 三拜敬香','入大雄宝殿 · 蒲团静坐','随喜游览 · 求签 供灯 祈福 绕塔 · 逗逗寺猫'];
 function setGuide(n){if(n>guide)guide=n;$('guide').innerHTML='<small>指引</small>'+GUIDE[guide];}
 const turn=(a,b,k)=>{let d=b-a;while(d>Math.PI)d-=6.2832;while(d<-Math.PI)d+=6.2832;return a+d*Math.min(1,k);};
 
@@ -648,7 +691,7 @@ function mkFigure(o){const g=new THREE.Group(),rm=o.robe,add=(geo,m,x,y,z,par)=>
  const upper=new THREE.Group();upper.position.y=.95;g.add(upper);
  add(FG.torso,rm,0,0,0,upper).castShadow=true;add(FG.sash,FM.sash,0,.02,0,upper);add(FG.neck,FM.skin,0,.6,0,upper);
  const head=new THREE.Group();head.position.y=.74;upper.add(head);const hd=add(FG.head,FM.skin,0,0,0,head);hd.scale.set(1,1.1,1);hd.castShadow=true;
- add(FG.hair,FM.hair,0,.02,-.008,head).rotation.x=-.25;if(o.bun)add(FG.bun,FM.hair,0,.1,-.08,head);
+ if(!o.bald)add(FG.hair,FM.hair,0,.02,-.008,head).rotation.x=-.25;if(o.bun)add(FG.bun,FM.hair,0,.1,-.08,head);
  if(o.hat){add(FG.hat,FM.straw,0,.13,0,head).castShadow=true;add(FG.hatTop,FM.straw,0,.22,0,head);}
  const arm=s=>{const a=new THREE.Group();a.position.set(s*.2,.5,0);upper.add(a);add(FG.sleeve,rm,0,0,0,a);add(FG.hand,FM.skin,0,-.52,0,a);return a;};
  const armR=arm(1),armL=arm(-1);
@@ -673,6 +716,7 @@ function pickPoi(q){let np=q.poi;for(let k=0;k<6&&np===q.poi;k++)np=pois[Math.ra
 function updNpc(q,dt){const f=q.f;let walking=false,tb=0,tp=0;
  if(q.gd>0){q.gd-=dt;if(q.gd<=0)q.greetT=2.2;}
  if(q.greetT>0){q.greetT-=dt;const k=clamp(Math.min((2.2-q.greetT)/.3,q.greetT/.4),0,1);tp=k;tb=k*.35;q.yaw=turn(q.yaw,q.gy,dt*6);}
+ else if(q.fixed){q.t+=dt;f.swing=Math.sin(q.t*2.4)*.5;q.yaw=q.y0+Math.sin(q.t*.6)*.6;}
  else if(q.st==='walk'){
   if(q.tx<0){const fl=q.poi.f;if(q.ci===q.poi.c)q.st='app';else{let best=-1,bf=fl[q.ci];for(const m of(nb[q.ci]||[])){const v=fl[m]+(npcs.some(o=>o!==q&&(o.ci===m||o.tx===m))?1.5:0);if(v<bf){bf=v;best=m;}}if(best<0)pickPoi(q);else q.tx=best;}}
   if(q.tx>=0){const tx=cellX(q.tx)+q.ox*.5,tz=cellZ(q.tx)+q.oz*.5,dx=tx-q.p.x,dz=tz-q.p.z,d=Math.hypot(dx,dz),sp=1.15*dt;
@@ -695,11 +739,11 @@ IA.push({p:new V3(25,1.8,28.6),r:3.2,label:()=>'击鼓',act(){sfx.drum();setTime
 IA.push({p:new V3(.75,3.5,-8.3),r:2,label:()=>'敲木鱼',act(){knock();}});
 IA.push({p:new V3(-.75,3.45,-8.3),r:2,label:()=>'击磬',act(){sfx.bowl(.2);}});
 let curIA=null;const _f=new V3(),_v=new V3(),_o=new V3();
-function findIA(){curIA=null;if(P.mode!=='walk'||BEADS.isOpen())return;const third=P.view==='third';
+function findIA(){curIA=null;if(P.mode!=='walk'||BEADS.isOpen()||cardOpen)return;const third=P.view==='third';
  if(third){_o.set(P.pos.x,P.pos.y+1.4,P.pos.z);_f.set(Math.sin(P.avYaw),0,Math.cos(P.avYaw));}else{_o.copy(camera.position);camera.getWorldDirection(_f);}
  let best=.62;for(const a of IA){const l=a.label();if(!l)continue;_v.copy(a.p).sub(_o);const d=_v.length();if(d>a.r)continue;let s;
   if(third){const h=Math.hypot(_v.x,_v.z)||1;s=(_v.x*_f.x+_v.z*_f.z)/h-d*.06;}else s=_v.dot(_f)/d-d*.06;if(s>best){best=s;curIA=a;a._l=l;}}}
-function interact(){if(GS.state!=='play'||BEADS.isOpen())return;if(P.mode==='sit'){standUp();return;}if(P.mode==='walk'&&curIA)curIA.act();}
+function interact(){if(GS.state!=='play'||BEADS.isOpen())return;if(cardOpen){if(!cardOpen.opts)closeCard();return;}if(P.mode==='sit'){standUp();return;}if(P.mode==='walk'&&curIA)curIA.act();}
 function sitOn(c){seat=c;P.mode='sit';sitT=0;breaths=0;P.vel.set(0,0,0);sfx.bowl();$('vig').style.opacity=.75;$('breath').style.opacity=1;setGuide(4);}
 function standUp(){P.mode='walk';P.autoBow=false;save();$('vig').style.opacity=0;$('breath').style.opacity=0;const s=Math.floor(sitT);msg(`静坐 ${Math.floor(s/60)} 分 ${s%60} 秒 · 呼吸 ${breaths} 次`);sfx.bowl(.1);}
 function onBow(){sfx.thud();if(P.bows%108===0){sfx.bowl(.22);banner('百八礼毕',`累计礼拜 ${P.bows}`);}else sfx.bowl(.05);if(P.bows%6===0)save();}
@@ -718,6 +762,95 @@ function greet(){if(GS.state!=='play'||P.greetT>0||P.mode==='bow'||BEADS.isOpen(
 function toggleView(){if(GS.state!=='play')return;P.view=P.view==='third'?'first':'third';save();msg(P.view==='third'?'第三人称视角':'第一人称视角');}
 const BLESS=['心诚则灵','福慧双增','平安喜乐','诸事顺遂','身心安泰','云开见月','清净自在','吉祥如意'];
 function yawTo(t,k){P.yaw=turn(P.yaw,t,k);}
+
+/* ---------- cards ---------- */
+let cardOpen=null;
+function showCard(o){cardOpen=o;$('cTitle').textContent=o.title||'';$('cSub').textContent=o.sub||'';$('cBody').innerHTML=o.body||'';const el=$('cOpts');el.innerHTML='';
+ (o.opts||[]).forEach((t,i)=>{const b=document.createElement('button');b.innerHTML=`<i>${i+1}</i>${t}`;const f=e=>{e.preventDefault();e.stopPropagation();pickCard(i);};b.addEventListener('touchstart',f,{passive:false});b.addEventListener('click',f);el.appendChild(b);});
+ $('cHint').textContent=o.opts?(TOUCH?'轻触选择 · 点空白处取消':'按数字键选择 · Esc 取消'):(TOUCH?'轻触收起':'按 E 或点击收起');$('card').style.display='flex';P.vel.x=P.vel.z=0;stopWalk();}
+function closeCard(){cardOpen=null;$('card').style.display='none';}
+function pickCard(i){const o=cardOpen;if(!o||!o.opts||i<0||i>=o.opts.length)return;closeCard();o.onPick(i);}
+$('card').addEventListener('click',e=>{e.stopPropagation();if(cardOpen&&(e.target.id==='card'||!cardOpen.opts))closeCard();});
+const lines=s=>s.split(/[，。；]/).filter(Boolean).map(t=>`<p>${t}</p>`).join('');
+
+/* ---------- new rituals ---------- */
+Object.assign(P,{lamps:SV.lamps|0,laps:SV.laps|0,wishes:Array.isArray(SV.wishes)?SV.wishes.filter(n=>n>=0&&n<7).slice(-7):[],qDay:SV.qDay|0,qIdx:SV.qIdx|0,cats:SV.cats|0});
+sfx.rattle=()=>{for(let i=0;i<9;i++)nz(.05,.2,'bandpass',mr(1800,3200),0,0,4,i*.13+mr(0,.03));};
+sfx.purr=()=>{for(let i=0;i<14;i++)nz(.06,.11,'lowpass',170,0,0,.7,.35+i*.08);tone(720,.07,.32,0,470,'triangle',.15);};
+const CN='一二三四五六七八九十',cnum=n=>n<=10?CN[n-1]:'十'+CN[n-11];
+const QIAN=[
+ ['上上','云开见月','久雨初晴见远山，一轮明月照松关。但行好事心常定，自有清风送客还。','阴霾将散，守正则诸事渐明。'],
+ ['上吉','春风入户','东风昨夜到柴门，草色新添一寸痕。莫问花期迟与早，耕耘自有满园春。','勤勉不辍，时至自成。'],
+ ['上吉','松鹤长年','苍松不改四时青，白鹤来巢伴月明。心地宽时天地阔，无忧无虑即长生。','身心安泰，宜静养，宜宽怀。'],
+ ['中吉','渡口待舟','江头风定水初平，欲渡还须待早晴。不必焦心催去棹，潮来自有一帆轻。','时机未至，稍安勿躁。'],
+ ['中吉','灯下读书','一盏青灯伴夜长，窗前细雨润书香。今朝字字皆辛苦，他日声名自远扬。','学业事业，功不唐捐。'],
+ ['中平','山路回环','山重水复路迢迢，转过前峰见石桥。脚下但能行稳处，何愁云外不逍遥。','道路曲折，稳步可达。'],
+ ['中平','守拙','檐前燕子自来还，不与群莺斗巧言。守得平常心一片，是非不到白云间。','少言慎行，平安是福。'],
+ ['上吉','远信','鸿雁南来带信回，故人千里寄寒梅。且将旧事从头说，一笑春风入酒杯。','故人有讯，宜修好，宜团圆。'],
+ ['中吉','种竹','新竹初栽未及墙，三年不见笋成行。一朝春雨连宵足，节节凌云向日长。','厚积薄发，贵在坚持。'],
+ ['中平','止水','风过疏林不系声，雁飞寒水影还清。事来随分从容应，事去依然一镜明。','放下执念，心静自明。'],
+ ['上上','晨钟','晨钟一杵破云烟，万壑松涛起暮天。福自心田勤种得，花开时节月团圆。','福缘具足，所求可成。'],
+ ['中吉','归舟','暮色苍茫起远汀，归舟一叶趁潮生。家中灯火依然在，莫向天涯问客程。','宜归家，宜顾念身边人。']];
+const today=()=>{const d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();};
+function showQian(again){const q=QIAN[P.qIdx%QIAN.length];showCard({title:`第${cnum(P.qIdx%QIAN.length+1)}签 · ${q[0]}`,sub:q[1],body:lines(q[2])+`<small>解曰：${q[3]}</small>`+(again?'<small>一日一签 · 此为今日之签</small>':'')});}
+function drawQian(){if(P.qDay===today()){showQian(true);return;}P.qDay=today();P.qIdx=Math.random()*QIAN.length|0;save();sfx.rattle();msg('摇动签筒…');setTimeout(()=>{if(GS.state==='play'){sfx.fish();showQian(false);}},1350);}
+const JING=[['色不异空，空不异色；色即是空，空即是色。','《心经》'],['心无挂碍，无挂碍故，无有恐怖。','《心经》'],['一切有为法，如梦幻泡影，如露亦如电，应作如是观。','《金刚经》'],['应无所住，而生其心。','《金刚经》'],
+ ['上善若水。水善利万物而不争。','《道德经》'],['致虚极，守静笃。','《道德经》'],['知人者智，自知者明。','《道德经》'],['千里之行，始于足下。','《道德经》'],['大音希声，大象无形。','《道德经》'],
+ ['菩提本无树，明镜亦非台。本来无一物，何处惹尘埃。','《六祖坛经》']];
+let jingI=Math.random()*JING.length|0;
+const WISH=['平安顺遂','身体康健','学业有成','事业顺利','阖家团圆','良缘美满','财源广进'];
+const lampM=new THREE.MeshBasicMaterial({color:0xffc060}),lampMs=SP.lamps.map(p=>{const m=new THREE.Mesh(tipG,lampM);m.scale.set(4,6.5,4);m.position.copy(p);m.visible=false;scene.add(m);return m;});
+function showLamps(){lampMs.forEach((m,i)=>m.visible=i<P.lamps);}showLamps();
+const wishMs=[];
+function renderWishes(){wishMs.forEach(m=>{scene.remove(m);m.material.map.dispose();m.material.dispose();});wishMs.length=0;
+ P.wishes.forEach((w,k)=>{const c=document.createElement('canvas');c.width=64;c.height=176;const g=c.getContext('2d');g.fillStyle='#b3261c';g.fillRect(0,0,64,176);g.strokeStyle='#e8c45a';g.lineWidth=3;g.strokeRect(4,4,56,168);g.fillStyle='#f6dc8c';g.font='bold 34px "Kaiti SC","STKaiti","KaiTi","Songti SC",serif';g.textAlign='center';g.textBaseline='middle';for(let i=0;i<4;i++)g.fillText(WISH[w][i],32,30+i*39);
+  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;const m=new THREE.Mesh(new THREE.PlaneGeometry(.2,.55),new THREE.MeshStandardMaterial({map:t,roughness:.7,side:THREE.DoubleSide}));m.position.copy(SP.wishSlots[k]);m.userData.k=k;scene.add(m);wishMs.push(m);});}
+renderWishes();
+SP.lampIA.forEach(p=>IA.push({p,r:2.4,label:()=>'供灯',act(){P.lamps++;save();showLamps();sfx.light();sfx.bowl(.08);msg(P.lamps<=12?`供灯一盏 · 心灯常明（第 ${P.lamps} 盏）`:`再供一盏 · 累计 ${P.lamps} 盏`);}}));
+IA.push({p:SP.qian,r:2.4,label:()=>P.qDay===today()?'看今日签文':'求签',act:drawQian});
+IA.push({p:SP.book,r:2.4,label:()=>'阅经',act(){const j=JING[jingI++%JING.length];sfx.take();showCard({title:'藏经',sub:j[1],body:lines(j[0])});}});
+IA.push({p:SP.wish,r:2.8,label:()=>'挂祈福牌',act(){showCard({title:'祈福',sub:'择一心愿 · 系于架上',opts:WISH,onPick(i){P.wishes.push(i);if(P.wishes.length>7)P.wishes.shift();save();renderWishes();sfx.bowl(.1);banner(WISH[i],'祈福牌已系上');}});}});
+// pagoda circling
+let circA=0,circLast=null,circHint=false;
+function updCirc(){const dx=P.pos.x,dz=P.pos.z+51,d=Math.hypot(dx,dz);if(P.pos.y<3.2||d<5.8||d>14||P.mode!=='walk'){circLast=null;return;}
+ const a=Math.atan2(dx,dz);if(circLast!==null){let da=a-circLast;if(da>Math.PI)da-=6.2832;if(da<-Math.PI)da+=6.2832;circA+=da;}circLast=a;
+ if(!circHint){circHint=true;msg('绕塔而行 · 三匝为礼');}
+ if(Math.abs(circA)>=6.2832){circA=0;P.laps++;save();sfx.bowl(.12);if(P.laps%3===0)banner('绕塔三匝',`累计 ${P.laps} 圈`);else msg(`绕塔 第 ${P.laps%3} 匝`);}}
+
+/* ---------- characters: faces, tags, monk, cats, koi ---------- */
+const eyeM=new THREE.MeshBasicMaterial({color:0x1a1411}),blushM=new THREE.MeshBasicMaterial({color:0xe8867a,transparent:true,opacity:.45}),whiteM=mat(null,1,{c:0xf2ede2,r:1});
+const eyeG=new THREE.SphereGeometry(.017,8,6),blushG=new THREE.SphereGeometry(.024,8,6),collarG=new THREE.TorusGeometry(.078,.017,6,14),hemG=new THREE.CylinderGeometry(.336,.34,.06,14),smileG=new THREE.TorusGeometry(.022,.005,4,8,Math.PI);
+function charm(f){f.head.scale.setScalar(1.24);const add=(g,m,x,y,z,par)=>{const me=new THREE.Mesh(g,m);me.position.set(x,y,z);par.add(me);return me;};
+ for(const s of[-1,1]){add(eyeG,eyeM,s*.043,.008,.104,f.head).scale.set(1,1.35,.6);add(blushG,blushM,s*.07,-.03,.088,f.head).scale.set(1,.6,.35);}
+ add(smileG,eyeM,0,-.038,.108,f.head).rotation.z=Math.PI;add(collarG,whiteM,0,.585,.01,f.upper).rotation.x=Math.PI/2-.3;add(hemG,FM.sash,0,.03,0,f.skirt);return f;}
+function tag(f,text,gold){const c=document.createElement('canvas');c.width=256;c.height=64;const g=c.getContext('2d');g.font='30px "Kaiti SC","STKaiti","KaiTi","PingFang SC",sans-serif';g.textAlign='center';g.textBaseline='middle';g.shadowColor='rgba(0,0,0,.9)';g.shadowBlur=6;g.fillStyle=gold?'#f0cf6a':'#ffffff';g.fillText(text,128,34);g.fillText(text,128,34);
+ const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthWrite:false}));s.scale.set(1.25,.31,1);s.position.y=2.2;f.g.add(s);f.tag=s;}
+charm(av);tag(av,'我 · '+P.name,true);
+const pool=NAMES.filter(n=>n!==P.name);
+npcs.forEach((q,i)=>{charm(q.f);q.f.g.scale.setScalar(.93+((i*37)%10)/90);tag(q.f,pool[i%pool.length]);});
+(()=>{const f=charm(mkFigure({robe:M.robe,bald:true,mala:true}));scene.add(f.g);tag(f,'扫地僧');const b=new THREE.Group();b.position.set(0,-.5,.05);b.rotation.x=.9;f.armR.add(b);
+ const st=new THREE.Mesh(new THREE.CylinderGeometry(.014,.014,1.5,6),FM.straw);st.position.y=-.35;b.add(st);const br=new THREE.Mesh(new THREE.ConeGeometry(.16,.4,8),FM.straw);br.position.y=-1.25;br.rotation.x=Math.PI;b.add(br);
+ const p=new V3(8,0,36.2),c=cellOf(p.x,p.z);npcs.push({f,p,ci:c,tx:-1,poi:pois[0],st:'fixed',fixed:true,t:0,dur:1e9,yaw:2.4,y0:2.4,ox:0,oz:0,gd:0,greetT:0,gy:0});})();
+const cats=[];
+function mkCat(x,y,z,yaw,c1,c2){const g=new THREE.Group(),m1=new THREE.MeshStandardMaterial({color:c1,roughness:1}),m2=new THREE.MeshStandardMaterial({color:c2,roughness:1}),add=(geo,m,px,py,pz,par)=>{const me=new THREE.Mesh(geo,m);me.position.set(px,py,pz);(par||g).add(me);me.castShadow=true;return me;};
+ add(new THREE.SphereGeometry(.15,12,10),m1,0,.17,0).scale.set(1,1.15,1.1);add(new THREE.SphereGeometry(.09,10,8),m2,0,.14,.1).scale.set(1,1.2,.7);
+ for(const s of[-1,1])add(new THREE.CylinderGeometry(.03,.035,.16,6),m2,s*.06,.08,.13);
+ const head=new THREE.Group();head.position.set(0,.4,.05);g.add(head);add(new THREE.SphereGeometry(.105,12,10),m1,0,0,0,head).scale.set(1.08,.95,1);add(new THREE.SphereGeometry(.05,8,6),m2,0,-.03,.075,head).scale.set(1.2,.8,.7);
+ for(const s of[-1,1]){const e=add(new THREE.ConeGeometry(.04,.075,4),m1,s*.065,.095,0,head);e.rotation.z=-s*.25;add(eyeG,eyeM,s*.042,.012,.092,head).scale.set(1.1,1.5,.6);}
+ add(new THREE.SphereGeometry(.012,6,5),blushM,0,-.022,.108,head);
+ const tail=new THREE.Group();tail.position.set(0,.04,-.12);g.add(tail);const tg=new THREE.TorusGeometry(.16,.024,6,12,2.3);tg.rotateX(Math.PI/2);add(tg,m1,0,0,0,tail);
+ g.position.set(x,y,z);g.rotation.y=yaw;scene.add(g);const c={g,head,tail,p:new V3(x,y,z),yaw,pet:0};cats.push(c);
+ IA.push({p:new V3(x,y+.35,z),r:2,label:()=>'摸猫',act(){c.pet=2.2;P.cats++;save();sfx.purr();msg(['寺猫眯起了眼','它蹭了蹭你的手','呼噜呼噜…','它翻了个身，露出肚皮'][Math.random()*4|0]);}});}
+mkCat(15.9,.62,22.3,-1.9,0xd98a3c,0xf3e6d0);mkCat(-7.4,1.5,8.7,2.6,0x8f8f8c,0xe9e6df);
+function updCats(dt){for(const c of cats){c.tail.rotation.y=Math.sin(tA*1.6+c.yaw)*.35;const dx=P.pos.x-c.p.x,dz=P.pos.z-c.p.z,d=Math.hypot(dx,dz);let ty=Math.sin(tA*.25+c.yaw)*.7;
+  if(d<5){let a=Math.atan2(dx,dz)-c.yaw;while(a>Math.PI)a-=6.2832;while(a<-Math.PI)a+=6.2832;ty=clamp(a,-1.2,1.2);}c.head.rotation.y+=(ty-c.head.rotation.y)*Math.min(1,dt*3);
+  if(c.pet>0){c.pet-=dt;c.head.rotation.z=Math.sin(tA*9)*.12;c.g.scale.y=1-.06*Math.sin(Math.min(1,c.pet)*Math.PI);if(Math.random()<dt*5){_h.set(c.p.x+mr(-.15,.15),c.p.y+.55,c.p.z+mr(-.15,.15));puff(_h,0,.35,0,1.1,.07,0xff8fa8,.8,.6);}}else{c.head.rotation.z*=.9;c.g.scale.y=1;}}}
+const koiG=new THREE.SphereGeometry(.07,8,6),koi=[0xe8672a,0xf2efe6,0xd9482a,0xf0b03a].map((col,i)=>{const m=new THREE.Mesh(koiG,new THREE.MeshStandardMaterial({color:col,roughness:.4}));m.scale.set(1,.6,2.7);scene.add(m);return{m,r:.8+i*.38,s:(i%2?1:-1)*(.35+i*.07),o:i*1.7};});
+let petalT=0;
+function updLife(dt){for(const k of koi){const a=tA*k.s+k.o,r=k.r+Math.sin(tA*.4+k.o)*.2;k.m.position.set(SP.pond.x+Math.cos(a)*r,.22+Math.sin(tA*.7+k.o)*.03,SP.pond.z+Math.sin(a)*r);k.m.rotation.y=-a+(k.s>0?0:Math.PI);}
+ petalT-=dt;if(petalT<=0){petalT=.4;_h.set(SP.blossom.x+mr(-1.8,1.8),SP.blossom.y+mr(-.4,.6),SP.blossom.z+mr(-1.8,1.8));puff(_h,mr(-.1,.1),-.28,mr(-.1,.1),6,.05,0xffc4d8,.95,0);}
+ const cp=camera.position;for(const q of npcs)if(q.f.tag)q.f.tag.visible=q.p.distanceTo(cp)<18;if(av.tag)av.tag.visible=false;updCats(dt);
+ for(const m of wishMs)m.rotation.y=Math.sin(tA*1.3+m.userData.k)*.25;}
 
 /* ---------- tap-to-walk ---------- */
 const PORT=()=>innerHeight>innerWidth*1.15;
@@ -756,7 +889,7 @@ function updPlayer(dt){
   if(bowT>=6.2){P.mode='walk';bowK=0;}P.eye+=(1.65-P.eye)*Math.min(1,dt*6);return;}
  if(P.mode==='sbow'){P.sbT+=dt;bowK=Math.pow(Math.sin(Math.PI*Math.min(1,P.sbT/1.8)),2);P.vel.x=P.vel.z=0;if(P.sbT>=1.8){P.mode='walk';bowK=0;P.bows++;onBow();}return;}
  bowK=0;P.eye+=(1.65-P.eye)*Math.min(1,dt*5);
- let f=(keys.KeyW?1:0)-(keys.KeyS?1:0),s=(keys.KeyD?1:0)-(keys.KeyA?1:0);if(Math.hypot(joy.x,joy.y)>.15){f-=joy.y;s+=joy.x;}if(BEADS.isOpen()||P.greetT>1.4){f=0;s=0;}
+ let f=(keys.KeyW?1:0)-(keys.KeyS?1:0),s=(keys.KeyD?1:0)-(keys.KeyA?1:0);if(Math.hypot(joy.x,joy.y)>.15){f-=joy.y;s+=joy.x;}if(BEADS.isOpen()||cardOpen||P.greetT>1.4){f=0;s=0;}
  const fast=((keys.ShiftLeft||keys.ShiftRight)&&f>0)||Math.hypot(joy.x,joy.y)>.96;
  const sp=fast?5.4:3.1,l=Math.max(1,Math.hypot(f,s));f/=l;s/=l;const sy=Math.sin(P.yaw),cyw=Math.cos(P.yaw);let wx=(-sy*f+cyw*s)*sp,wz=(-cyw*f-sy*s)*sp;if(walkF){if(f||s||BEADS.isOpen())stopWalk();else{const w=autoWalk(dt);if(w){wx=w[0];wz=w[1];}}}const acc=Math.min(1,dt*(P.onG?10:2));
  P.vel.x+=(wx-P.vel.x)*acc;P.vel.z+=(wz-P.vel.z)*acc;P.vel.y-=18*dt;if(keys.Space&&P.onG){P.vel.y=5.4;P.onG=false;keys.Space=false;}
@@ -805,13 +938,14 @@ function updHud(dt){hudT-=dt;if(hudT<=0){hudT=.25;$('locn').textContent=locName(
 /* ---------- input ---------- */
 const cv=renderer.domElement,joy={x:0,y:0,id:-1,ox:0,oy:0},lookT={id:-1,x:0,y:0};let dragMode=false,lockFails=0,lastFail=0,wAcc=0;
 function enterPlay(){if(GS.state==='play')return;if(GS.state==='menu'){setGuide(0);banner('华山寺',`山门已开 · ${P.name} 请随缘礼拜`);sfx.bell();}GS.state='play';$('ov').style.display='none';$('hud').style.display='block';if(TOUCH){$("touch").style.display="block";if(!hinted){hinted=true;setTimeout(()=>msg("轻点地面即可前往 · 拖动环顾"),5200);}}wake();}
-function pause(){if(GS.state!=="play")return;unwake();stopWalk();if(BEADS.isOpen())BEADS.close();GS.state='pause';for(const k in keys)keys[k]=false;joy.x=joy.y=0;joy.id=lookT.id=-1;$('stick').style.display='none';save();$('ttl').textContent='暂歇';$('sub').textContent='山风未止 · 钟声未歇';$('go').textContent=TOUCH?'轻触继续':'点击继续';$('ov').style.display='flex';$('touch').style.display='none';}
+function pause(){if(GS.state!=="play")return;unwake();stopWalk();closeCard();{const s=Math.floor(P.sat);$("stats").textContent=`香火 ${P.merit} · 礼拜 ${P.bows} · 念珠 ${BEADS.total} · 功德 ${P.gongde} · 供灯 ${P.lamps} · 绕塔 ${P.laps} · 静坐 ${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;$("stats").style.display="block";}if(BEADS.isOpen())BEADS.close();GS.state='pause';for(const k in keys)keys[k]=false;joy.x=joy.y=0;joy.id=lookT.id=-1;$('stick').style.display='none';save();$('ttl').textContent='暂歇';$('sub').textContent='山风未止 · 钟声未歇';$('go').textContent=TOUCH?'轻触继续':'点击继续';$("ov").style.display="flex";$("touch").style.display="none";$("hud").style.display="none";}
 function toDrag(){dragMode=true;enterPlay();msg('按住鼠标左键拖动以环顾 · Esc 暂停');}
 function lockFail(){const n=performance.now();if(n-lastFail<400)return;lastFail=n;if(document.pointerLockElement===cv)return;if(++lockFails>=2)toDrag();else $('go').textContent='请再点击一次';}
 function addLook(dx,dy,k){P.yaw-=dx*k;const th=P.view==='third';P.pitch=clamp(P.pitch-dy*k,th?-1.15:-1.45,th?.85:1.45);}
 addEventListener('keydown',e=>{if(GS.state!=='play')return;
- if(e.code==='Escape'){if(BEADS.isOpen()&&document.pointerLockElement!==cv){BEADS.close();return;}if(dragMode)pause();return;}
+ if(e.code==='Escape'){if(cardOpen){closeCard();return;}if(BEADS.isOpen()&&document.pointerLockElement!==cv){BEADS.close();return;}if(dragMode)pause();return;}
  if(['Space','Tab','ArrowUp','ArrowDown'].includes(e.code))e.preventDefault();
+ if(cardOpen){e.preventDefault();if(cardOpen.opts){if(e.code.startsWith('Digit'))pickCard(+e.code.slice(5)-1);}else if(!e.repeat)closeCard();return;}
  if(BEADS.isOpen()){if(['Space','ArrowDown','ArrowUp','KeyJ','KeyW','KeyS'].includes(e.code))BEADS.step();else if(!e.repeat&&['Digit2','KeyE','KeyQ','KeyF'].includes(e.code))BEADS.close();return;}
  if(e.repeat)return;
  if(e.code==='Space'&&P.fish){knock();return;}
@@ -820,7 +954,7 @@ addEventListener('keydown',e=>{if(GS.state!=='play')return;
   case'Digit1':bowKey();break;case'Digit2':openBeads();break;case'Digit3':toggleFish();break;case'Digit4':greet();break;case'KeyV':toggleView();break;}});
 addEventListener('keyup',e=>{keys[e.code]=false;});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;});
-addEventListener('mousedown',e=>{if(GS.state!=='play'||e.button!==0||document.pointerLockElement!==cv)return;if(BEADS.isOpen())BEADS.step();else if(P.fish)knock();else if(P.mode==='walk')interact();});
+addEventListener('mousedown',e=>{if(GS.state!=='play'||e.button!==0||document.pointerLockElement!==cv)return;if(cardOpen){if(!cardOpen.opts)closeCard();}else if(BEADS.isOpen())BEADS.step();else if(P.fish)knock();else if(P.mode==='walk')interact();});
 addEventListener("contextmenu",e=>e.preventDefault());
 let mdn=null;cv.addEventListener("mousedown",e=>{mdn=e.button===0?{x:e.clientX,y:e.clientY}:null;});cv.addEventListener("mouseup",e=>{if(mdn&&dragMode&&document.pointerLockElement!==cv&&Math.hypot(e.clientX-mdn.x,e.clientY-mdn.y)<5)tapWalk(e.clientX,e.clientY);mdn=null;});
 addEventListener('mousemove',e=>{if(GS.state!=='play')return;const locked=document.pointerLockElement===cv;if(BEADS.isOpen()){if(locked)BEADS.drag(-e.movementY);return;}if(P.mode==='bow')return;if(!locked&&!(dragMode&&(e.buttons&1)))return;addLook(e.movementX,e.movementY,locked?.002:.0032);});
@@ -855,12 +989,12 @@ function frame(){requestAnimationFrame(frame);const raw=clock.getDelta(),dt=Math
  if(GS.state==="play"&&!document.hidden&&raw<.5){fpsT+=raw;fpsN++;if(fpsT<0)fpsN=0;if(fpsT>=4){const fps=fpsN/fpsT;fpsT=0;fpsN=0;if(fps<25)lowerQ();}}
  if(ring.visible){const k=1+.14*Math.sin(tA*6);ring.scale.set(k,k,k);}
  if(tod.k<1){tod.k=Math.min(1,tod.k+dt/5);applyTod();}
- if(GS.state==='play'){tG+=dt;updPlayer(dt);for(const q of npcs)updNpc(q,dt);updCamera(dt);findIA();updHud(dt);
+ if(GS.state==='play'){tG+=dt;updPlayer(dt);for(const q of npcs)updNpc(q,dt);updCamera(dt);findIA();updHud(dt);updCirc();updLife(dt);
   bellT-=dt;if(bellT<=0){bellT=mr(70,120);sfx.bell(.12);}
   birdT-=dt;if(birdT<=0){birdT=mr(2.5,9);if(tod.stars>.6)sfx.cricket();else if(P.mode!=='bow')sfx.bird();}
   if(AC&&droneG){const inHall=P.pos.y>2.2&&Math.abs(P.pos.x)<12&&P.pos.z<-3&&P.pos.z>-13;droneG.gain.setTargetAtTime(P.mode==='sit'?.035:inHall?.02:0,AC.currentTime,1.2);
    const cl=MIX.chantOn?chantLevel():0;chantDist.gain.setTargetAtTime(cl,AC.currentTime,.8);if(cl>.01)scheduleChant();}}
- else if(GS.state==='menu'){menuA+=dt*.045;const a=menuA+.5;camera.position.set(Math.sin(a)*62,22+Math.sin(menuA*2)*4,8+Math.cos(a)*74);camera.lookAt(0,7,-14);camera.fov=PORT()?82:58;camera.updateProjectionMatrix();for(const q of npcs)updNpc(q,dt);}
+ else if(GS.state==='menu'){menuA+=dt*.045;const a=menuA+.5;camera.position.set(Math.sin(a)*62,22+Math.sin(menuA*2)*4,8+Math.cos(a)*74);camera.lookAt(0,7,-14);camera.fov=PORT()?82:58;camera.updateProjectionMatrix();for(const q of npcs)updNpc(q,dt);updLife(dt);}
  sky2.position.copy(camera.position);
  smokeT-=dt;if(smokeT<=0){smokeT=.2;for(const b of burners)puff(b,mr(-.1,.1),mr(.45,.75),mr(-.1,.1),mr(4,6.5),.35,0xcfd2d6,.16,6);
   for(let k=0;k<7&&offered.length;k++){const o=offered[Math.random()*offered.length|0];puff(o,mr(-.02,.02),mr(.3,.5),mr(-.02,.02),mr(2.5,4),.04,0xe2e4e8,.28,9);}}
