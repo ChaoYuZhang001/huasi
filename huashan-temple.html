@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>华山寺 · 上香静坐</title>
-<meta name="description" content="一座在浏览器里打开的山中寺院：上香、静坐、礼拜、拨念珠、敲木鱼。无需安装，无需注册。">
+<meta name="description" content="一座在浏览器里打开的山中寺院：上香、静坐、拜财神、文昌阁祈学业、拨念珠、敲木鱼。无需安装，无需注册。">
 <meta property="og:title" content="华山寺 · 山寺 · 上香 · 静坐">
-<meta property="og:description" content="山中有座寺，可以上香、静坐、礼拜、拨念珠、敲木鱼。无需安装，无需注册。">
+<meta property="og:description" content="山中有座寺，可以上香、静坐、拜财神、祈学业、拨念珠、敲木鱼。无需安装，无需注册。">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#0b0d10">
 <meta name="mobile-web-app-capable" content="yes">
@@ -259,7 +259,7 @@ const sunDir=new V3(80,58,66).normalize();
 const sun=new THREE.DirectionalLight(0xffe0b0,3.3);
 sun.position.copy(sunDir).multiplyScalar(220).add(new V3(0,0,-5));sun.target.position.set(0,0,-5);
 sun.castShadow=true;sun.shadow.mapSize.set(TOUCH?2048:4096,TOUCH?2048:4096);
-Object.assign(sun.shadow.camera,{left:-88,right:88,top:88,bottom:-88,near:20,far:460});
+Object.assign(sun.shadow.camera,{left:-102,right:102,top:102,bottom:-102,near:20,far:480});
 sun.shadow.bias=-0.0003;sun.shadow.normalBias=0.06;
 scene.add(sun,sun.target,new THREE.HemisphereLight(0xb7cdf2,0x6a5a4a,1.0));
 const vmSun=new THREE.DirectionalLight(0xffe0b0,2.6);vmScene.add(vmSun,new THREE.HemisphereLight(0xc6d6f2,0x6a5a4a,1.3));
@@ -345,11 +345,14 @@ function roofGeo(Wd,D,H,up){const a=Wd/2,b=D/2,m=Math.min(a,b);
 function roof(Wd,D,H,up,x,y,z){const{g,f,a,b,m}=roofGeo(Wd,D,H,up);G(g,M.tile,x,y,z);
  B(Wd-1.3,.28,D-1.3,x,y-.28,z,M.eave,false);
  for(const sx of[-1,1])for(const sz of[-1,1]){const pts=[];for(let i=0;i<=8;i++){const s=i/8,px=sx*((a-m)+s*m),pz=sz*((b-m)+s*m);pts.push(new V3(px,f(px,pz)+.1,pz));}
-  G(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),12,.14,5),M.ridge,x,y,z);S(.2,x+sx*a,y+f(a,b)+.22,z+sz*b,M.ridge,1,1.6,1);}
+  G(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),12,.14,5),M.ridge,x,y,z);S(.2,x+sx*a,y+f(a,b)+.22,z+sz*b,M.ridge,1,1.6,1);for(const i of[5,6,7])S(.085,x+pts[i].x,y+pts[i].y+.2,z+pts[i].z,M.ridge,1,1.5,1,6,5);C(.05,.08,.14,x+sx*a,y+f(a,b)-.2,z+sz*b,M.gold,false,6);}
  if(Wd-D>.2){B(Wd-D+.9,.42,.32,x,y+H-.08,z,M.ridge,false);for(const sx of[-1,1]){B(.4,.95,.42,x+sx*((Wd-D)/2+.45),y+H-.08,z,M.ridge,false);B(.22,.4,.3,x+sx*((Wd-D)/2+.2),y+H+.75,z,M.gold,false);}}
  else{C(.1,.3,.5,x,y+H-.1,z,M.ridge,false,8);S(.26,x,y+H+.55,z,M.gold);C(.02,.1,.7,x,y+H+.7,z,M.gold,false,6);}
  col(Wd,.4,D,x,y-.28,z);col(Wd-m*.9,H*.5,D-m*.9,x,y+.1,z);col(Math.max(.6,Wd-m*1.6),H*.42,Math.max(.6,D-m*1.6),x,y+H*.5,z);}
-const extras=[];
+const extras=[],LG=[],NL=[];
+function lg(x,y,z){const[a,b]=Wp(x,z);LG.push(a,O.y+y,b);}
+function wpv(x,y,z){const[a,b]=Wp(x,z);return new V3(a,O.y+y,b);}
+function ix(g){if(!g.index){const n=g.attributes.position.count,a=new Uint32Array(n);for(let i=0;i<n;i++)a[i]=i;g.setIndex(new THREE.BufferAttribute(a,1));}return g;}
 function plaque(text,x,y,z,o={}){const v=o.vertical,n=text.length,cw=v?108:96*n+70,chh=v?96*n+50:156;const c=document.createElement('canvas');c.width=cw;c.height=chh;const g=c.getContext('2d');
  g.fillStyle=o.bg||'#10224a';g.fillRect(0,0,cw,chh);if(!o.noframe){g.strokeStyle='#c9a13a';g.lineWidth=9;g.strokeRect(7,7,cw-14,chh-14);}
  g.fillStyle=o.fg||'#ecc95e';g.font='bold 84px "Kaiti SC","STKaiti","KaiTi","Songti SC","SimSun",serif';g.textAlign='center';g.textBaseline='middle';
@@ -375,12 +378,14 @@ function hall(x,z,y0,r,Wd,D,o={}){at(x,y0,z,r);
  bays(zf,true);if(o.through)bays(-D/2,true);else B(Wd,ch,.3,0,ph,-D/2,M.red);
  B(Wd+.5,.55,.3,0,ph+ch-.55,D/2,M.paint,false);B(Wd+.5,.55,.3,0,ph+ch-.55,-D/2,M.paint,false);B(.3,.55,D+.5,-Wd/2,ph+ch-.55,0,M.paint,false);B(.3,.55,D+.5,Wd/2,ph+ch-.55,0,M.paint,false);
  B(Wd+1.2,.5,D+1.2,0,ph+ch,0,M.paint);
+ {const n=Math.round((Wd+1)/1.15),m=Math.round((D+1)/1.15);for(const s of[-1,1]){for(let i=0;i<=n;i++){const xc=-Wd/2-.5+i*(Wd+1)/n;B(.24,.16,.5,xc,ph+ch+.06,s*(D/2+.8),M.wood,false);B(.5,.13,.2,xc,ph+ch+.26,s*(D/2+.98),M.wood,false);B(.1,.1,.03,xc,ph+ch+.09,s*(D/2+1.06),M.gold,false);}
+  for(let j=1;j<m;j++){const zc=-D/2-.5+j*(D+1)/m;B(.5,.16,.24,s*(Wd/2+.8),ph+ch+.06,zc,M.wood,false);B(.2,.13,.5,s*(Wd/2+.98),ph+ch+.26,zc,M.wood,false);}}}
  const yR=ph+ch+.5;
  if(o.double){roof(Wd+5.4,D+5.4,2.1,1,0,yR,0);B(Wd-2,2.1,D-2,0,yR,0,M.red,false);B(Wd-1.5,.6,D-1.5,0,yR+2.1,0,M.paint,false);roof(Wd+2.4,D+2.4,(D+2.4)*.37,1.1,0,yR+2.7,0);plaque(o.name,0,yR+1.55,D/2-.9,{h:1.15,tilt:.12});}
  else{roof(Wd+4.6,D+4.6,(D+4.6)*.36,1,0,yR,0);plaque(o.name,0,ph+ch+.2,D/2+.75,{h:.95,tilt:.2});}
- if(o.double)plaque('佛光普照',0,ph+ch-.15,zf+.3,{h:.8,bg:'#3a0d0a'});
+ if(o.double)plaque(o.inner||'佛光普照',0,ph+ch-.15,zf+.3,{h:.8,bg:'#3a0d0a'});
  if(o.couplet){plaque(o.couplet[0],bw/2,ph+2.35,D/2+.27,{vertical:true,h:2.9,bg:'#0d0d0d'});plaque(o.couplet[1],-bw/2,ph+2.35,D/2+.27,{vertical:true,h:2.9,bg:'#0d0d0d'});}
- for(let i=0;i<nx;i++){const xc=-Wd/2+(i+.5)*bw;if(i===(nx-1)/2&&!o.double)continue;B(.02,.5,.02,xc,ph+ch-.45,D/2+1.3,M.iron,false);S(.3,xc,ph+ch-.75,D/2+1.3,M.lantern,1,.82,1,10,8);C(.14,.14,.07,xc,ph+ch-.53,D/2+1.3,M.gold,false,8);C(.12,.12,.07,xc,ph+ch-1.03,D/2+1.3,M.gold,false,8);}
+ for(let i=0;i<nx;i++){const xc=-Wd/2+(i+.5)*bw;if(i===(nx-1)/2&&!o.double)continue;B(.02,.5,.02,xc,ph+ch-.45,D/2+1.3,M.iron,false);S(.3,xc,ph+ch-.75,D/2+1.3,M.lantern,1,.82,1,10,8);lg(xc,ph+ch-.75,D/2+1.3);C(.14,.14,.07,xc,ph+ch-.53,D/2+1.3,M.gold,false,8);C(.12,.12,.07,xc,ph+ch-1.03,D/2+1.3,M.gold,false,8);}
  if(o.empty)return;
  const zb=-D/2;
  if(o.statue){B(6,1.1,2.6,0,ph,zb+1.7,M.ashlar);B(5,ch-1.6,.12,0,ph+1.1,zb+.3,M.paint,false);
@@ -390,7 +395,7 @@ function hall(x,z,y0,r,Wd,D,o={}){at(x,y0,z,r);
   plight(0,ph+2.8,zb+4.6,0xffa858,60,20);}
  else{B(3,1,1,0,ph,zb+.9,M.woodDark);if(!o.custom){B(2,2,.6,0,ph+1,zb+.7,M.wood,false);S(.5,0,ph+2,zb+1.05,M.gold,1,1.3,.7,10,8);B(2.2,.2,.8,0,ph+3,zb+.7,M.gold,false);}
   for(const sx of[-1,1]){B(2.6,.9,.9,sx*Wd/3.2,ph,zb+2.6,M.woodDark);B(.9,1.8,2.2,sx*(Wd/2-.8),ph,zf-1.7,M.woodDark);}
-  plight(0,ph+2.6,zb+2.5,0xffa858,30,14);}
+  if(o.nolight)NL.push(wpv(0,ph+2.6,zb+2.5));else plight(0,ph+2.6,zb+2.5,0xffa858,30,14);}
 }
 function wall(x1,z1,x2,z2){at(0,0,0);const L=Math.hypot(x2-x1,z2-z1),ax=Math.abs(x2-x1)>Math.abs(z2-z1),cx=(x1+x2)/2,cz=(z1+z2)/2,q=(w,h,d,y,m,s)=>ax?B(L,h,d,cx,y,cz,m,s):B(d,h,L,cx,y,cz,m,s);
  q(L,3,.5,0,M.red,true);q(L,.55,.62,0,M.ashlar,false);q(L,.2,.95,3,M.ridge,false);q(L,.16,.5,3.2,M.ridge,false);}
@@ -412,7 +417,7 @@ function boulder(x,y,z,r){at(x,y,z);G(rockGeo(r,rr(.8,1.3),rr(.6,.9),rr(.8,1.3),
 function peak(x,z,rad,h,top){at(0,0,0);const g=new THREE.CylinderGeometry(rad*.32,rad,h,20,12),p=g.attributes.position;
  for(let i=0;i<p.count;i++){const px=p.getX(i),py=p.getY(i),pz=p.getZ(i),n=Math.sin(px*.045+py*.021+x)*Math.cos(pz*.04-py*.017+z)+.5*Math.sin(px*.12+pz*.1+py*.045+x);const k=1+n*.24;p.setXYZ(i,px*k,py+(py>h*.3?n*h*.05:0),pz*k);}
  g.computeVertexNormals();G(uvs(g,rad/3,h/14),M.rock,x,top-h/2,z);}
-function lantern(x,y,z){at(x,y,z);B(.6,.2,.6,0,0,0,M.cliff,false);C(.13,.16,1,0,.2,0,M.cliff,true,8);B(.5,.1,.5,0,1.2,0,M.cliff,false);B(.36,.36,.36,0,1.3,0,M.cliff,false);B(.38,.2,.2,0,1.38,0,M.glow,false);B(.2,.2,.38,0,1.38,0,M.glow,false);
+function lantern(x,y,z){at(x,y,z);lg(0,1.4,0);B(.6,.2,.6,0,0,0,M.cliff,false);C(.13,.16,1,0,.2,0,M.cliff,true,8);B(.5,.1,.5,0,1.2,0,M.cliff,false);B(.36,.36,.36,0,1.3,0,M.cliff,false);B(.38,.2,.2,0,1.38,0,M.glow,false);B(.2,.2,.38,0,1.38,0,M.glow,false);
  const g=new THREE.ConeGeometry(.5,.35,4);g.rotateY(Math.PI/4);G(g,M.cliff,0,1.84,0);S(.08,0,2.05,0,M.cliff);}
 const burners=[];
 function burner(x,y,z){at(x,y,z);B(2.2,.4,2.2,0,0,0,M.ashlar);for(let i=0;i<3;i++){const a=i*2.094+.5;C(.1,.14,.6,Math.cos(a)*.55,.4,Math.sin(a)*.55,M.bronze,false,8);}
@@ -453,7 +458,7 @@ hall(-36,-5,0,1,20,9,{name:'祖师殿',custom:true});
 hall(0,40,0,0,14,6,{name:'华山寺',through:true,porch:0,plat:.3,ch:4.2,empty:true});
 hall(17,-45,3.5,0,12,8,{name:'藏经阁',plat:.6,custom:true});
 // walls
-wall(-44.6,40,-7.1,40);wall(7.1,40,44.6,40);wall(44.6,40,44.6,-69.6);wall(-44.6,40,-44.6,-69.6);wall(30.2,-69.6,44.6,-69.6);wall(-44.6,-69.6,-30.2,-69.6);
+wall(-44.6,40,-7.1,40);wall(7.1,40,44.6,40);for(const s of[-1,1]){wall(s*44.6,40,s*44.6,22.6);wall(s*44.6,17.4,s*44.6,-69.6);}wall(30.2,-69.6,44.6,-69.6);wall(-44.6,-69.6,-30.2,-69.6);
 chain(-13.6,42.6,-13.6,59.6,0);chain(13.6,42.6,13.6,59.6,0);chain(-13.6,59.7,13.6,59.7,0);
 // towers
 tower(-25,25,'钟楼',true);tower(25,25,'鼓楼',false);
@@ -472,17 +477,17 @@ for(const s of[-1,1]){lantern(s*4.5,0,17);lantern(s*4.5,0,31);lantern(s*8.5,1.5,
  at(s*5,0,44.6);B(1.3,1,1.7,0,0,0,M.ashlar);S(.55,0,1.5,0,M.marble,.9,1,1.25,10,8);S(.42,0,2.15,.42,M.marble,1,1,1,10,8);S(.2,0,1.25,.75,M.marble);}
 at(8.5,0,53);B(1.6,.5,.8,0,0,0,M.cliff);B(1.2,2.6,.4,0,.5,0,M.cliff);at(8.5,0,53,3);plaque('华山',0,1.8,.22,{vertical:true,h:2.1,bg:'#9c968b',fg:'#b3261c',noframe:true,side:0x9c968b});
 [[-13,0,21,7.5],[14,0,33,8.5],[-33,0,13,9],[33,0,17,8],[-38,0,33,10],[38,0,31,9],[39,0,-24,8],[-39,0,-30,9],[38,0,-52,10],[-37,0,-58,8.5],[-24,3.5,-62,9],[25,3.5,-63,10],[-9,3.5,-34,7],[-10,0,48,7],[10.5,0,57,6.5],[-21,1.5,6,6]].forEach(p=>pine(...p));
-[[-28,0,31,1.6],[30,0,35,1.3],[-40,0,20,1.2],[40,0,-40,1.7],[-41,0,-45,1.4],[-11,0,56,1.1],[22,3.5,-33,1.2],[-26,3.5,-52,1.5],[16,0,14,1.0]].forEach(p=>boulder(...p));
+[[-28,0,31,1.6],[30,0,35,1.3],[-40,0,13,1.2],[40,0,-40,1.7],[-41,0,-45,1.4],[-11,0,56,1.1],[22,3.5,-33,1.2],[-26,3.5,-52,1.5],[16,0,14,1.0]].forEach(p=>boulder(...p));
 // —— 礼佛陈设：香案、烛台、蒲团、僧人、法器 ——
 M.cushion=mat(T.marble,.4,{c:0xc79a4a,r:1});M.robe=mat(null,1,{c:0x6f6a60,r:1});M.robe2=mat(null,1,{c:0xa8641e,r:1});M.skin=mat(null,1,{c:0xc79a78,r:.8});M.stick=mat(null,1,{c:0x9a2a1e,r:.9});M.paper=mat(null,1,{c:0xe6c84e,r:.9});
-const cushions=[],tables=[],candles=[];
+const cushions=[],tables=[],candles=[],candles2=[];
 function cushion(x,y,z,yaw,reg=true){at(x,y,z);C(.4,.42,.13,0,0,0,M.cushion,false,14);C(.3,.4,.04,0,.13,0,M.cushion,false,14);if(reg)cushions.push({p:new V3(x,y,z),yaw});}
 function incTable(x,y,z){at(x,y,z);B(1.7,.08,.75,0,.8,0,M.woodDark,false);for(const sx of[-.75,.75])for(const sz of[-.3,.3])B(.08,.8,.08,sx,0,sz,M.woodDark,false);col(1.7,.88,.75,0,0,0);B(1.72,.5,.02,0,.3,.38,M.lantern,false);B(1.4,.06,.02,0,.52,.395,M.gold,false);
  for(let i=0;i<5;i++){B(.1,.08,.44,-.6+i*.24,.88,0,M.stick,false);B(.105,.085,.1,-.6+i*.24,.88,0,M.paper,false);}C(.13,.1,.22,.62,.88,-.15,M.bronze,false,10);for(let i=0;i<7;i++)C(.004,.004,.3,.62+rr(-.06,.06),1,-.15+rr(-.06,.06),M.stick,false,4);
  tables.push(new V3(x,y+1,z));}
-function candleStand(x,y,z){at(x,y,z);for(const sx of[-.7,.7])for(const sz of[-.2,.2])B(.05,1.25,.05,sx,0,sz,M.iron,false);B(1.5,.05,.5,0,.92,0,M.iron,false);B(1.5,.05,.28,0,1.2,-.11,M.iron,false);B(1.5,.3,.03,0,1.25,-.25,M.iron,false);col(1.5,1.3,.5,0,0,0);
+function candleStand(x,y,z,light=true){at(x,y,z);lg(0,1.3,0);for(const sx of[-.7,.7])for(const sz of[-.2,.2])B(.05,1.25,.05,sx,0,sz,M.iron,false);B(1.5,.05,.5,0,.92,0,M.iron,false);B(1.5,.05,.28,0,1.2,-.11,M.iron,false);B(1.5,.3,.03,0,1.25,-.25,M.iron,false);col(1.5,1.3,.5,0,0,0);
  for(let i=0;i<7;i++){C(.022,.026,.17,-.6+i*.2,.97,.12,M.lantern,false,6);S(.026,-.6+i*.2,1.17,.12,M.glow,1,1.6,1,6,5);}for(let i=0;i<6;i++){C(.022,.026,.17,-.5+i*.2,1.25,-.1,M.lantern,false,6);S(.026,-.5+i*.2,1.45,-.1,M.glow,1,1.6,1,6,5);}
- candles.push(new V3(x,y+1.35,z));}
+ (light?candles:candles2).push(new V3(x,y+1.35,z));}
 function monk(x,y,z,m){cushion(x,y,z,0,false);}
 incTable(4.2,0,26);candleStand(-4.2,0,26);incTable(4.6,1.5,7.2);candleStand(-4.6,1.5,7.2);
 for(const x of[-1.3,0,1.3])cushion(x,2.35,-5.1,0);monk(-3.3,2.35,-5.3,M.robe);monk(3.3,2.35,-5.3,M.robe2);
@@ -549,10 +554,108 @@ at(9.5,0,15.5);(()=>{C(.15,.22,1.5,0,0,0,M.bark,true,7);for(const[bx,by,bz]of[[.
 at(-12,0,14.5);(()=>{for(const sx of[-2.1,2.1]){B(.16,2.5,.16,sx,0,0,M.wood,false);B(.4,.2,.4,sx,0,0,M.marble,false);}for(const y of[1.1,1.6,2.1])B(4.2,.08,.08,0,y,0,M.wood,false);B(4.7,.1,.5,0,2.5,0,M.ridge,false);B(4.5,.06,.3,0,2.6,0,M.ridge,false);col(4.3,2.5,.3,0,0,0);
  for(let k=0;k<26;k++){const x=rr(-1.9,1.9),y=[1.1,1.6,2.1][k%3],z=k%2?-.07:.07;if(y===1.6&&z>0)continue;B(.13,.26,.02,x,y-.3,z,M.lantern,false);B(.13,.04,.025,x,y-.08,z,M.gold,false);B(.012,.06,.012,x,y-.04,z,M.ribbon,false);}
  SP.wish=wv(0,1.5,.2);SP.wishSlots=[-1.5,-1,-.5,0,.5,1,1.5].map(x=>wv(x,1.32,.09));plaque('祈福',0,2.95,0,{h:.5});})();
+// —— 东院 · 财神院 / 西院 · 文昌院 ——
+M.gilt=mat(null,1,{c:0xf2c448,r:.26,m:.9,e:0x4a2c00});M.ginkgo=mat(T.marble,1.2,{c:0xf4b82c,r:1,e:0x4a3000,ei:.55});M.bamboo=mat(null,1,{c:0x6a9440,r:.55});M.redc=mat(null,1,{c:0xb3261c,r:.75});M.clay=mat(null,1,{c:0x6b3a2a,r:.5});
+function lion(x,y,z,r=0){at(x,y,z,r);B(1.3,1,1.7,0,0,0,M.ashlar);S(.55,0,1.5,0,M.marble,.9,1,1.25,10,8);S(.42,0,2.15,.42,M.marble,1,1,1,10,8);S(.2,0,1.25,.75,M.marble);
+ for(const s of[-1,1]){S(.12,s*.3,2.5,.35,M.marble,1,1.2,.7);S(.16,s*.34,1.05,.6,M.marble,1,.8,1.3);}for(let k=0;k<7;k++)S(.13,Math.sin(k*.9-2.7)*.4,2.2+Math.cos(k*.9-2.7)*.38,.2,M.marble);}
+function ingot(x,y,z,r,m){m=m||M.gilt;S(r,x,y,z,m,1.5,.5,.85,12,8);S(r*.55,x,y+r*.32,z,m,1,.9,1,10,8);for(const s of[-1,1])S(r*.5,x+s*r*1.15,y+r*.3,z,m,.7,1,.9,8,6);}
+function shrub(x,y,z,r,fm){at(x,y,z);const g=uvs(new THREE.SphereGeometry(r,8,6),2,1.5);g.scale(1,.72,1);G(g,M.leaf,0,r*.5,0);
+ if(fm)for(let k=0;k<7;k++){const a=R()*6.28,e=rr(.2,1.2);S(r*.13,Math.cos(a)*Math.sin(e)*r*.98,r*.5+Math.cos(e)*r*.7,Math.sin(a)*Math.sin(e)*r*.98,fm,1,1,1,6,5);}col(r*1.2,r,r*1.2,0,0,0);}
+function bamboo(x,y,z){at(x,y,z);for(let k=0;k<6;k++){const bx=rr(-.7,.7),bz=rr(-.7,.7),h=rr(4.5,7),lean=rr(-.06,.06);const g=uvs(new THREE.CylinderGeometry(.03,.045,h,5),1,1);g.rotateZ(lean);G(g,M.bamboo,bx,h/2,bz);
+  for(let j=0;j<3;j++){const l=uvs(new THREE.SphereGeometry(rr(.45,.8),6,4),2,1);l.scale(1,.3,1);G(l,M.leaf,bx+rr(-.4,.4)-lean*h*.5,h*rr(.6,1),bz+rr(-.4,.4));}}col(1.2,3,1.2,0,0,0);}
+function lstring(x1,z1,x2,z2,y,n){at(0,0,0);C(.07,.1,y+.2,x1,0,z1,M.wood,true,8);C(.07,.1,y+.2,x2,0,z2,M.wood,true,8);const pts=[];
+ for(let i=0;i<=n+1;i++){const t=i/(n+1),px=lerp(x1,x2,t),pz=lerp(z1,z2,t),py=y-1.2*4*t*(1-t);pts.push(new V3(px,py,pz));
+  if(i&&i<=n){C(.008,.008,.25,px,py-.25,pz,M.iron,false,4);S(.27,px,py-.5,pz,M.lantern,1,.85,1,10,8);C(.12,.12,.06,px,py-.3,pz,M.gold,false,8);C(.1,.1,.06,px,py-.74,pz,M.gold,false,8);lg(px,py-.5,pz);}}
+ G(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),n*3,.012,4),M.iron,0,0,0);}
+function ginkgo(x,y,z,h){at(x,y,z);C(.3,.48,h*.5,0,0,0,M.bark,true,9);
+ for(let k=0;k<5;k++){const a=k*1.257+rr(-.3,.3),g=uvs(new THREE.CylinderGeometry(.07,.16,h*.5,6),1,2);g.translate(0,h*.25,0);g.rotateZ(.7);g.rotateY(a);G(g,M.bark,0,h*.42,0);}
+ for(let k=0;k<16;k++){const a=R()*6.28,d=rr(.3,h*.42),r=rr(1,1.7);const g=uvs(new THREE.SphereGeometry(r,8,6),2,1.5);g.scale(1,.72,1);G(g,M.ginkgo,Math.cos(a)*d,h*rr(.55,1),Math.sin(a)*d);}
+ C(h*.5,h*.5,.03,0,0,0,M.ginkgo,false,18);return wv(0,h*.8,0);}
+for(const s of[-1,1]){const X=s*65.5;at(0,0,0);B(40.9,70,49,s*65.45,-70.3,16,M.cliff);B(40.9,.3,49,s*65.45,-.3,16,M.paving);
+ B(4.6,.03,23,X,0,19.5,M.marble,false);B(17.5,.03,3.2,s*54.2,0,20,M.marble,false);B(15,.03,3.2,s*36.5,0,20,M.marble,false);
+ wall(s*44.9,-8.25,s*85.9,-8.25);rail(s*85.6,-8,s*85.6,40.2,0);rail(s*45.2,40.2,s*85.6,40.2,0);
+ at(s*44.6,0,20,s>0?3:1);B(.7,3.4,.9,-2.75,0,0,M.red);B(.7,3.4,.9,2.75,0,0,M.red);B(6.2,.5,.7,0,3.4,0,M.paint,false);roof(8.4,3.6,1.5,.6,0,3.9,0);plaque(s>0?'财神院':'文昌院',0,3,.42,{h:.7});
+ for(const k of[-1,1]){S(.26,k*1.9,2.75,.6,M.lantern,1,.85,1,10,8);lg(k*1.9,2.75,.6);}
+ burner(X,0,12.5);incTable(X+s*4,0,15);candleStand(X-s*4,0,15,false);lion(X-3.5,0,9.4);lion(X+3.5,0,9.4);
+ lstring(s*47,16.6,s*84.3,16.6,5.6,11);pine(s*49,0,-4.5,8);}
+SP.gk=[ginkgo(55,0,31,8),ginkgo(-55,0,31,8)];
+// 财神殿
+hall(65.5,0,0,0,16,9,{name:'财神殿',custom:true,nolight:true,couplet:['和气生财千家乐','勤心积福万事兴']});
+at(65.5,0,0);(()=>{const ph=.85,zb=-4.5,z=zb+1,s=.62,b=ph+1.5;
+ B(3.6,3,.14,0,ph+1,zb+.34,M.redc,false);disc(1.2,0,ph+3,zb+.46,M.gold2);B(2.1,.5,1.3,0,ph+1,z,M.woodDark,false);
+ seatedFig(0,b,z,s,M.gilt,{noLotus:true,beard:true,trim:M.redc});
+ C(.3*s,.34*s,.3*s,0,b+2.78*s,z,M.dark,false,10);B(.5*s,.42*s,.2*s,0,b+2.9*s,z-.16*s,M.dark,false);
+ for(const k of[-1,1]){B(.8*s,.13*s,.04*s,k*.72*s,b+3*s,z-.16*s,M.dark,false);B(.8*s,.03*s,.045*s,k*.72*s,b+3.13*s,z-.16*s,M.gold,false);}
+ S(.07*s,0,b+2.95*s,z+.32*s,M.redc);ingot(0,b+.8*s,z+.8*s,.3*s);
+ standFig(-2.5,ph,zb+1.5,1.05,M.bronze,{lotusM:M.bronze});standFig(2.5,ph,zb+1.5,1.05,M.bronze,{lotusM:M.bronze});
+ B(2.4,.9,.8,0,ph,zb+2.5,M.woodDark);C(.26,.18,.3,0,ph+.9,zb+2.5,M.bronze,false,10);for(const k of[-.8,.8]){C(.16,.1,.05,k,ph+.9,zb+2.5,M.gold,false,10);for(let j=0;j<3;j++)S(.065,k+Math.cos(j*2.1)*.07,ph+1,zb+2.5+Math.sin(j*2.1)*.07,M.paper);}
+ for(const k of[-1.25,1.25]){C(.05,.05,.4,k,ph+1,zb+1.25,M.lantern,false,6);S(.06,k,ph+1.46,zb+1.25,M.glow);}
+ for(const ox of[4.3,5,5.7])ingot(ox,ph+1,zb+2.6,.2);ingot(4.65,ph+1.2,zb+2.6,.2);ingot(5.35,ph+1.2,zb+2.6,.2);ingot(5,ph+1.4,zb+2.6,.2);
+ for(let k=0;k<3;k++){S(.2,-5.6+k*.6,ph+1.08,zb+2.6,M.redc,1,.95,1,8,6);S(.07,-5.6+k*.6,ph+1.3,zb+2.6,M.gold);}
+ SP.cai=wv(0,ph+1.9,zb+1.6);SP.bag=wv(-5,ph+1.3,zb+2.6);})();
+cushion(64.5,.85,-.8,0);cushion(66.5,.85,-.8,0);
+// 聚宝池
+at(65.5,0,22);(()=>{const h=.55;B(6.6,h,.4,0,0,3.1,M.marble);B(6.6,h,.4,0,0,-3.1,M.marble);B(.4,h,5.8,3.1,0,0,M.marble);B(.4,h,5.8,-3.1,0,0,M.marble);B(5.8,.32,5.8,0,0,0,M.water,false);
+ C(.55,.8,1.05,0,0,0,M.ashlar,false,8);C(1,.55,.5,0,1.05,0,M.bronze,false,16);C(1.05,1.05,.08,0,1.5,0,M.bronze,false,16);S(.85,0,1.5,0,M.gilt,1,.3,1,14,6);
+ S(.3,0,1.82,0,M.gilt,1.15,.75,1.3,10,8);for(const k of[-1,1]){S(.09,k*.15,2.02,.24,M.gilt);S(.14,k*.3,1.7,.2,M.gilt,1,.6,1.4);}
+ for(let k=0;k<8;k++){const x=rr(-2.4,2.4),z=rr(-2.4,2.4);if(Math.hypot(x,z)<1.3)continue;C(rr(.2,.34),.3,.02,x,.32,z,M.pad,false,10);if(k%2===0)S(.1,x,.4,z,M.pink,1,.9,1,6,5);}
+ for(const[cx,cz]of[[-3.1,-3.1],[3.1,-3.1],[-3.1,3.1],[3.1,3.1]]){B(.5,.9,.5,cx,0,cz,M.marble,false);S(.2,cx,1.05,cz,M.marble);}
+ SP.pool=wv(0,1.62,0);})();
+// 钱眼
+at(65.5,0,31);(()=>{const sh=new THREE.Shape();for(let i=0;i<44;i++){const a=i/44*6.2832;i?sh.lineTo(Math.cos(a)*2.5,Math.sin(a)*2.5):sh.moveTo(2.5,0);}sh.closePath();const ho=new THREE.Path();ho.moveTo(-.85,-1.05);ho.lineTo(.85,-1.05);ho.lineTo(.85,1.05);ho.lineTo(-.85,1.05);ho.closePath();sh.holes.push(ho);
+ const g=new THREE.ExtrudeGeometry(sh,{depth:.3,bevelEnabled:true,bevelSize:.05,bevelThickness:.06,bevelSegments:2,curveSegments:36});g.translate(0,0,-.15);G(ix(g),M.gilt,0,1.65,0);
+ B(6,.6,1.6,0,0,0,M.ashlar);col(1.65,3.6,.5,-1.675,.6,0);col(1.65,3.6,.5,1.675,.6,0);col(1.7,1.5,.5,0,2.7,0);
+ const po={bg:'#c79a2c',fg:'#5a2408',noframe:true,side:0xc79a2c};
+ for(const r of[0,2]){at(65.5,0,31,r);stairs(0,.8,2.2,0,.6);plaque('招财',-1.67,1.7,.24,{...po,vertical:true,h:1.25});plaque('进宝',1.67,1.7,.24,{...po,vertical:true,h:1.25});plaque('福',0,3.4,.24,{...po,h:.62});}})();
+// 福字照壁
+at(65.5,0,37.8,2);B(9,3.6,.7,0,0,0,M.red);B(9.5,.55,.9,0,0,0,M.ashlar,false);B(9.6,.2,1.2,0,3.6,0,M.ridge,false);B(9.2,.16,.7,0,3.8,0,M.ridge,false);plaque('福',0,1.95,.4,{h:2.3,bg:'#a3221a',fg:'#f2cf63',side:0xa3221a});SP.fu=wv(0,1.8,.6);
+// 金元宝
+at(76.5,0,11);B(2,.8,1.5,0,0,0,M.ashlar);B(2.2,.12,1.7,0,.8,0,M.marble,false);ingot(0,1.36,0,.85);SP.ingot=wv(0,1.5,0);
+// 月老祠
+hall(79,25,0,3,9,7,{name:'月老祠',custom:true,nolight:true});
+at(79,0,25,3);(()=>{const ph=.85,zb=-3.5,z=zb+.85,b=ph+1.5;B(1.5,.5,1.2,0,ph+1,z,M.woodDark,false);seatedFig(0,b,z,.5,M.bronze,{noLotus:true,beard:true,beardM:M.white});
+ S(.11,0,b+1.5,z-.02,M.white,1,.8,1);S(.09,0,b+.4,z+.4,M.redc);disc(.55,0,ph+2.75,z-.4,M.gold);
+ for(let k=0;k<14;k++){const x=rr(-3.6,3.6),l=rr(.4,1);B(.02,l,.02,x,ph+4.2-l,rr(-1.5,.4),M.ribbon,false);}
+ SP.yue=wv(0,ph+1.7,zb+1.8);})();
+// 姻缘树
+at(74.5,0,35.5);(()=>{C(.16,.24,1.6,0,0,0,M.bark,true,7);for(const[bx,by,bz]of[[.5,2,.2],[-.45,2.2,-.3],[.1,2.5,.5],[-.2,2.1,.6]]){const g=new THREE.CylinderGeometry(.05,.09,1.3,5);g.rotateZ(-bx*.9);g.rotateX(bz*.9);G(g,M.bark,bx*.6,by-.2,bz*.6);}
+ for(let k=0;k<12;k++){const a=R()*6.28,d=rr(.2,1.8),r=rr(.6,1);const g=uvs(new THREE.SphereGeometry(r,8,6),2,1.5);g.scale(1,.7,1);G(g,M.blossom,Math.cos(a)*d,rr(2.4,3.7),Math.sin(a)*d);}
+ B(3.4,.04,3.4,0,0,0,M.moss,false);SP.rib=[];for(let k=0;k<12;k++){const a=k*.5236+.2,d=rr(.8,1.6);SP.rib.push(wv(Math.cos(a)*d,rr(1.8,2.1),Math.sin(a)*d));}SP.bloom2=wv(0,3,0);})();
+at(74.5,0,35.5,2);B(.08,.5,.08,0,0,1.9,M.woodDark,false);plaque('姻缘树',0,.7,1.9,{h:.42,bg:'#3a0d0a'});
+pine(83,0,5,8);pine(82.5,0,37,7);
+// 文昌阁
+hall(-65.5,0,0,0,14,9,{name:'文昌阁',double:true,inner:'文运昌隆',custom:true,nolight:true,couplet:['书山有路勤为径','学海无涯苦作舟']});
+at(-65.5,0,0);(()=>{const ph=.85,zb=-4.5,z=zb+1,s=.6,b=ph+1.5;
+ B(3.4,3,.14,0,ph+1,zb+.34,M.paint,false);B(2,.5,1.3,0,ph+1,z,M.woodDark,false);seatedFig(0,b,z,s,M.bronze,{noLotus:true,beard:true});
+ C(.3*s,.33*s,.26*s,0,b+2.8*s,z,M.dark,false,10);B(.9*s,.05*s,.6*s,0,b+3.07*s,z,M.dark,false);for(const k of[-1,1])B(.03*s,.5*s,.03*s,k*.3*s,b+2.35*s,z-.44*s,M.redc,false);
+ shape(new THREE.CylinderGeometry(.06*s,.06*s,.9*s,8),M.white,0,b+.8*s,z+.78*s,1,1,1,0,0,Math.PI/2);
+ B(2.4,.9,.8,0,ph,zb+2.5,M.woodDark);C(.26,.18,.3,0,ph+.9,zb+2.5,M.bronze,false,10);
+ for(const k of[-1,1]){B(.5,.15,.5,k*2.3,ph,zb+1.2,M.woodDark,false);C(.06,.06,2.3,k*2.3,ph+.15,zb+1.2,M.wood,false,8);G(new THREE.ConeGeometry(.12,.55,8),M.dark,k*2.3,ph+2.72,zb+1.2);}
+ for(let k=0;k<5;k++){C(.012,.012,.4,-4.9+k*.25,ph+.9,zb+2.6,M.woodDark,false,5);S(.022,-4.9+k*.25,ph+1.32,zb+2.6,M.dark,1,1.8,1);}B(.3,.05,.2,-3.7,ph+.9,zb+2.6,M.dark,false);
+ B(.7,.012,.45,4.375,ph+.9,zb+2.6,M.white,false);B(.3,.05,.2,5.1,ph+.9,zb+2.6,M.dark,false);
+ SP.wen=wv(0,ph+1.9,zb+1.6);})();
+cushion(-66.5,.85,-.8,0);cushion(-64.5,.85,-.8,0);
+// 泮池 · 状元桥
+at(-65.5,0,22);(()=>{for(const s of[-1,1]){B(10.6,.5,.3,0,0,s*1.5,M.marble);B(.3,.5,3.3,s*5.15,0,0,M.marble);B(.16,.75,2.6,s*1.22,.9,0,M.marble);}
+ B(10,.3,2.7,0,0,0,M.water,false);B(2.6,.25,2.6,0,.65,0,M.ashlar);
+ for(let k=0;k<6;k++){const x=rr(-4.5,4.5);if(Math.abs(x)<1.6)continue;C(rr(.2,.3),.26,.02,x,.3,rr(-.9,.9),M.pad,false,10);}})();
+for(const r of[0,2]){at(-65.5,0,22,r);stairs(0,1.3,2.2,0,.9);}
+// 禅茶寮
+hall(-79,25,0,1,9,7,{name:'禅茶',custom:true,nolight:true});
+at(-79,0,25,1);(()=>{const ph=.85,zb=-3.5;plaque('茶',0,ph+2.7,zb+.24,{h:1.2,bg:'#e9e2cf',fg:'#1c1a18',noframe:true,side:0x3a2a1c});
+ S(.13,0,ph+1.11,zb+1,M.clay,1,.85,1,10,8);C(.03,.05,.05,0,ph+1.21,zb+1,M.clay,false,8);shape(new THREE.CylinderGeometry(.015,.025,.16,6),M.clay,.16,ph+1.14,zb+1,1,1,1,0,0,-1);shape(new THREE.TorusGeometry(.06,.012,5,10),M.clay,-.15,ph+1.12,zb+1);
+ for(const cx of[-.6,-.35,.4,.65])C(.04,.03,.05,cx,ph+1,zb+1.15,M.white,false,8);B(.9,.02,.5,-.9,ph+1,zb+.85,M.bamboo,false);
+ SP.tea=wv(0,ph+1.25,zb+1);SP.teaC=[wv(-.75,ph,zb+2.6),wv(.75,ph,zb+2.6)];SP.teaM=wv(-2.2,ph,zb+1.7);})();
+SP.teaC.forEach(v=>cushion(v.x,v.y,v.z,Math.PI/2));cushion(SP.teaM.x,SP.teaM.y,SP.teaM.z,0,false);
+at(-74.5,0,35.5);B(1.5,.4,.8,0,0,0,M.cliff);B(1.1,2.5,.35,0,.4,0,M.cliff);at(-74.5,0,35.5,2);plaque('厚积薄发',0,1.7,.2,{vertical:true,h:2,bg:'#9c968b',fg:'#b3261c',noframe:true,side:0x9c968b});
+for(const z of[-5,-1.5,2,5.5,9,12.5])bamboo(-83.6,0,z);bamboo(-80,0,-6.4);bamboo(-77,0,-6.5);bamboo(-83.5,0,35.5);bamboo(-83.5,0,38.6);bamboo(-80,0,38.7);pine(-50,0,37,7);
+[[-43,0,36,.8,M.pink],[43,0,36,.8,M.pink],[-43,0,12,.7,M.white],[43,0,12.5,.7,M.white],[-30,0,38.6,.7,M.blossom],[30.5,0,38.7,.7,M.blossom],[-18.5,0,38.7,.6,null],[18.5,0,38.7,.6,null],[-43,0,-20,.8,M.pink],[43,0,-20,.8,M.white],
+ [47.5,0,38.6,.8,M.pink],[53,0,38.8,.7,M.white],[79,0,38.6,.8,M.pink],[83.6,0,33,.7,M.blossom],[47,0,5,.8,M.white],[47,0,-2,.7,M.pink],[83.6,0,12,.7,M.white],
+ [-47.5,0,38.6,.8,M.pink],[-59,0,38.8,.7,M.white],[-47,0,5,.8,M.white],[-47,0,-2,.7,M.pink],[-70,0,38.7,.7,M.blossom]].forEach(p=>shrub(...p));
 // far peaks + mountain body
-(()=>{at(0,0,0);const g=new THREE.CylinderGeometry(66,120,420,22,10),p=g.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i),k=1+.14*Math.sin(x*.06+y*.03)*Math.cos(z*.05-y*.02)+.06*Math.sin(x*.2+z*.17+y*.08);p.setXYZ(i,x*k,y,z*k);}g.computeVertexNormals();G(uvs(g,30,30),M.rock,0,-211,-12);})();
+(()=>{at(0,0,0);const g=new THREE.CylinderGeometry(66,120,420,22,10),p=g.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i),k=1+.14*Math.sin(x*.06+y*.03)*Math.cos(z*.05-y*.02)+.06*Math.sin(x*.2+z*.17+y*.08);p.setXYZ(i,x*k,y,z*k);}g.computeVertexNormals();g.scale(1.45,1,1);G(uvs(g,30,30),M.rock,0,-211,-12);})();
 [[-190,-130,75,360,58],[170,-230,95,420,105],[-70,-400,130,470,150],[270,30,85,340,36],[-310,90,115,400,84],[100,310,95,340,22],[-150,270,75,320,14],[400,-320,160,560,170],[-440,-280,170,580,185],[40,-640,220,640,225],[-560,-600,240,660,240],[640,-120,230,600,150],[330,330,140,460,60],[-420,420,170,480,70]].forEach(p=>peak(...p));
-[[-52,-30,7,-6],[53,10,8,-8],[-50,30,6,-5],[49,-55,7,-7],[20,-78,7,-6],[-25,-77,6,-8],[20,64,5,-7],[-19,56,4,-6]].forEach(([x,z,r,y])=>{at(x,y,z);G(rockGeo(r,1,1.8,1,x),M.rock,0,0,0);});
+[[-52,-30,7,-6],[95,8,9,-10],[-95,22,8,-10],[49,-55,7,-7],[90,-15,7,-9],[-90,-15,7,-9],[92,40,6,-10],[-92,42,6,-10],[66,49,6,-10],[-64,49,6,-10],[20,-78,7,-6],[-25,-77,6,-8],[20,64,5,-7],[-19,56,4,-6]].forEach(([x,z,r,y])=>{at(x,y,z);G(rockGeo(r,1,1.8,1,x),M.rock,0,0,0);});
 
 // merge
 for(const[m,arr]of buckets){const g=mergeGeometries(arr,false);const me=new THREE.Mesh(g,m);me.castShadow=me.receiveShadow=true;me.matrixAutoUpdate=false;scene.add(me);arr.forEach(a=>a.dispose());}
@@ -572,7 +675,7 @@ function ray(ox,oy,oz,dx,dy,dz,maxT){let best=maxT,bn=-1;if(!dx)dx=1e-9;if(!dy)d
   a=(c.y0-oy)*iy;b=(c.y1-oy)*iy;if(a>b){t=a;a=b;b=t;}if(a>tn){tn=a;ax=1;}if(b<tf)tf=b;if(tn>tf)continue;
   a=(c.z0-oz)*iz;b=(c.z1-oz)*iz;if(a>b){t=a;a=b;b=t;}if(a>tn){tn=a;ax=2;}if(b<tf)tf=b;if(tn>tf||tn<0||tn>=best)continue;best=tn;bn=ax;}
  return{t:best,ax:bn};}
-const NX=90,NZ=130,NX0=-45,NZ0=-70,navH=new Float32Array(NX*NZ).fill(NaN),nb=[],navList=[];
+const NX=174,NZ=130,NX0=-87,NZ0=-70,navH=new Float32Array(NX*NZ).fill(NaN),nb=[],navList=[];
 const cellX=i=>NX0+(i%NX)+.5,cellZ=i=>NZ0+((i/NX)|0)+.5;
 const cellOf=(x,z)=>{const i=Math.floor(x-NX0),j=Math.floor(z-NZ0);return(i<0||j<0||i>=NX||j>=NZ)?-1:j*NX+i;};
 (()=>{const s=cellOf(0,54);navH[s]=0;const q=[s];while(q.length){const c=q.pop(),h=navH[c],ci=c%NX,cj=(c/NX)|0;
@@ -679,14 +782,14 @@ const P={pos:new V3(0,0,54),vel:new V3(),yaw:0,pitch:0,onG:true,eye:1.65,camY:0,
  prK:0,prT:0,autoBow:false,greetT:0,greetK:0,avYaw:Math.PI,fish:false,sbT:0};
 if(SV.tod>=0&&SV.tod<TOD.length){tod.i=tod.from=SV.tod|0;$('tod').textContent=TOD[tod.i].n;}
 if(SV.mix&&typeof SV.mix==='object')Object.assign(MIX,SV.mix);
-function save(){window.saveKV&&saveKV({merit:P.merit,sat:Math.floor(P.sat),tod:tod.i,bows:P.bows,gongde:P.gongde,name:P.name,view:P.view,mix:MIX,lamps:P.lamps,laps:P.laps,wishes:P.wishes,qDay:P.qDay,qIdx:P.qIdx,cats:P.cats});}
+function save(){window.saveKV&&saveKV({merit:P.merit,sat:Math.floor(P.sat),tod:tod.i,bows:P.bows,gongde:P.gongde,name:P.name,view:P.view,mix:MIX,lamps:P.lamps,laps:P.laps,wishes:P.wishes,qDay:P.qDay,qIdx:P.qIdx,cats:P.cats,cai:P.cai,coins:P.coins,yuan:P.yuan,tea:P.tea,wen:P.wen,fuDay:P.fuDay,fuI:P.fuI});}
 setInterval(()=>{if(GS.state==='play')save();},15000);
 addEventListener('pagehide',save);
 const GS={state:'menu'},keys={};let tG=0,tA=0,msgT=0,bannerT=0,guide=0;
 let bowT=0,bowB=null,bowYaw=0,bowK=0,seat=null,sitT=0,breaths=0,hudHide=false;
 function banner(t,sub=''){$('banner').innerHTML=t+(sub?`<small>${sub}</small>`:'');$('banner').style.opacity=1;bannerT=4.5;}
 function msg(t){$('msg').textContent=t;$('msg').style.opacity=1;msgT=2.6;}
-const GUIDE=['前往前院香案 · 请香','到烛台前 · 点燃清香','立于香炉前 · 三拜敬香','入大雄宝殿 · 蒲团静坐','随喜游览 · 求签 供灯 祈福 绕塔 · 逗逗寺猫'];
+const GUIDE=['前往前院香案 · 请香','到烛台前 · 点燃清香','立于香炉前 · 三拜敬香','入大雄宝殿 · 蒲团静坐','随喜游览 · 东院拜财神 · 西院文昌阁 · 求签 供灯 绕塔'];
 function setGuide(n){if(n>guide)guide=n;$('guide').innerHTML='<small>指引</small>'+GUIDE[guide];}
 const turn=(a,b,k)=>{let d=b-a;while(d>Math.PI)d-=6.2832;while(d<-Math.PI)d+=6.2832;return a+d*Math.min(1,k);};
 
@@ -714,31 +817,36 @@ const FM={skin:mat(null,1,{c:0xc99d7c,r:.8}),hair:mat(null,1,{c:0x1b1815,r:.9}),
 const FG={skirt:new THREE.CylinderGeometry(.19,.33,.95,14).translate(0,.475,0),foot:new THREE.BoxGeometry(.1,.07,.2),torso:new THREE.CylinderGeometry(.17,.2,.56,12).translate(0,.28,0),sash:new THREE.CylinderGeometry(.205,.205,.08,12),neck:new THREE.CylinderGeometry(.05,.055,.1,8),
  head:new THREE.SphereGeometry(.115,14,12),hair:new THREE.SphereGeometry(.122,14,10,0,6.2832,0,1.45),bun:new THREE.SphereGeometry(.055,10,8),hat:new THREE.ConeGeometry(.38,.17,20),hatTop:new THREE.SphereGeometry(.04,8,6),
  sleeve:new THREE.CylinderGeometry(.065,.1,.5,10).translate(0,-.25,0),hand:new THREE.SphereGeometry(.045,8,6),mala:new THREE.TorusGeometry(.16,.014,6,24)};
+Object.assign(FM,{lapel:mat(null,1,{c:0xf2ede2,r:1}),bagM:mat(null,1,{c:0xd9b23a,r:1})});Object.assign(FG,{shoulder:new THREE.SphereGeometry(.2,12,8),lapel:new THREE.BoxGeometry(.034,.3,.02),cuff:new THREE.CylinderGeometry(.104,.11,.06,10),bag:new THREE.BoxGeometry(.07,.19,.17),strap:new THREE.TorusGeometry(.2,.011,5,16)});
 function mkFigure(o){const g=new THREE.Group(),rm=o.robe,add=(geo,m,x,y,z,par)=>{const me=new THREE.Mesh(geo,m);me.position.set(x,y,z);(par||g).add(me);return me;};
- const skirt=add(FG.skirt,rm,0,0,0);skirt.castShadow=true;
+ const skirt=add(FG.skirt,o.skirt||rm,0,0,0);skirt.castShadow=true;
  const feet=new THREE.Group();g.add(feet);add(FG.foot,FM.shoe,-.08,.035,.07,feet);add(FG.foot,FM.shoe,.08,.035,.07,feet);
  const upper=new THREE.Group();upper.position.y=.95;g.add(upper);
- add(FG.torso,rm,0,0,0,upper).castShadow=true;add(FG.sash,FM.sash,0,.02,0,upper);add(FG.neck,FM.skin,0,.6,0,upper);
+ add(FG.torso,rm,0,0,0,upper).castShadow=true;add(FG.shoulder,rm,0,.5,0,upper).scale.set(1.22,.38,.85);for(const s of[-1,1]){const l=add(FG.lapel,FM.lapel,s*.05,.42,.176,upper);l.rotation.z=-s*.42;l.rotation.x=-.05;}add(FG.sash,FM.sash,0,.02,0,upper);add(FG.neck,FM.skin,0,.6,0,upper);
  const head=new THREE.Group();head.position.y=.74;upper.add(head);const hd=add(FG.head,FM.skin,0,0,0,head);hd.scale.set(1,1.1,1);hd.castShadow=true;
- if(!o.bald)add(FG.hair,FM.hair,0,.02,-.008,head).rotation.x=-.25;if(o.bun)add(FG.bun,FM.hair,0,.1,-.08,head);
+ if(!o.bald)add(FG.hair,FM.hair,0,.02,-.008,head).rotation.x=-.25;if(o.bun)add(FG.bun,FM.hair,0,.1,-.08,head);if(o.long){add(FG.bun,FM.hair,0,-.07,-.075,head).scale.set(1.9,2.6,1.1);add(FG.hatTop,M.gold,.07,.1,-.085,head).scale.set(.45,.45,1.7);}
+ if(o.bag){add(FG.bag,FM.bagM,-.235,.02,.03,upper);const st=add(FG.strap,FM.sash,0,.3,0,upper);st.rotation.order='ZYX';st.rotation.x=Math.PI/2;st.rotation.z=-.7;st.scale.set(1,1.15,1);}
  if(o.hat){add(FG.hat,FM.straw,0,.13,0,head).castShadow=true;add(FG.hatTop,FM.straw,0,.22,0,head);}
- const arm=s=>{const a=new THREE.Group();a.position.set(s*.2,.5,0);upper.add(a);add(FG.sleeve,rm,0,0,0,a);add(FG.hand,FM.skin,0,-.52,0,a);return a;};
+ const arm=s=>{const a=new THREE.Group();a.position.set(s*.2,.5,0);upper.add(a);add(FG.sleeve,rm,0,0,0,a);add(FG.cuff,FM.lapel,0,-.49,0,a);add(FG.hand,FM.skin,0,-.52,0,a);return a;};
  const armR=arm(1),armL=arm(-1);
  if(o.mala){const m=add(FG.mala,FM.bead,0,.36,.07,upper);m.rotation.x=1.2;}
  const inc=new THREE.Group();inc.position.set(0,.4,.45);upper.add(inc);inc.visible=false;const tips=[];
  for(let i=-1;i<=1;i++){const s=add(stickG,stickM,i*.03,.17,0,inc);s.rotation.z=-i*.08;const t=add(tipG,tipM,i*.044,.35,0,inc);t.visible=false;tips.push(t);}
- return{g,upper,armL,armR,skirt,feet,head,inc,tips,sit:0,bow:0,palms:0,swing:0,bob:0,w:Math.random()*6};}
+ return{g,upper,armL,armR,skirt,feet,head,inc,tips,sit:0,bow:0,palms:0,swing:0,bob:0,w:Math.random()*6,bk:Math.random()*4};}
 function poseFig(f){const s=f.sit,p=f.palms;f.skirt.scale.set(1+s*.4,1-s*.5,1+s*.4);f.feet.visible=s<.5;
  f.upper.position.y=.95-s*.45+f.bob;f.upper.rotation.x=f.bow*(s>.5?1.15:.75);
- f.armR.rotation.set(lerp(f.swing,-1.3,p),0,lerp(0,-.45,p));f.armL.rotation.set(lerp(-f.swing,-1.3,p),0,lerp(0,.45,p));}
-const av=mkFigure({robe:mat(null,1,{c:0x9c7c4c,r:1}),hat:true,mala:true});scene.add(av.g);av.g.visible=false;
-const robeMs=[0x6e6a63,0x7c5b3e,0x3f4b5e,0x5a5f4e,0x8b8478,0x4e3d33].map(c=>mat(null,1,{c,r:1}));
+ f.armR.rotation.set(lerp(f.swing,-1.3,p),0,lerp(0,-.45,p));f.armL.rotation.set(lerp(-f.swing,-1.3,p),0,lerp(0,.45,p));
+ const fc=f.feet.children,sw=f.swing*(1-s);fc[0].position.z=.07+sw*.32;fc[1].position.z=.07-sw*.32;fc[0].position.y=.035+Math.max(0,sw)*.09;fc[1].position.y=.035+Math.max(0,-sw)*.09;
+ f.head.rotation.z=Math.sin(tA*.7+f.bk)*.03;if(f.eyes){const b=(tA*1.1+f.bk)%4.2<.13?.15:1.35;f.eyes[0].scale.y=f.eyes[1].scale.y=b;}}
+const av=mkFigure({robe:mat(null,1,{c:0x9c7c4c,r:1}),hat:true,mala:true,bag:true});scene.add(av.g);av.g.visible=false;
+const robeMs=[0x6e6a63,0x7c5b3e,0x3f4b5e,0x5a5f4e,0x8b8478,0x4e3d33,0xb58d8d,0x8fa3b5,0x9db08a,0xc4ae84].map(c=>mat(null,1,{c,r:1})),skirtMs=[0x3a3f52,0x5a3a34,0x44503c].map(c=>mat(null,1,{c,r:1}));
 const POI=[{p:[0,27.4],face:Math.PI,act:'bow'},{p:[0,8.6],face:Math.PI,act:'bow'},{p:[-4,-3.6],face:Math.PI,act:'bow'},{p:[4,-3.6],face:Math.PI,act:'bow'},{p:[0,-43.8],face:Math.PI,act:'bow'},
- {p:[29.2,-5],face:Math.PI/2,act:'bow'},{p:[-29.2,-5],face:-Math.PI/2,act:'bow'},{p:[-7,-67],face:Math.PI,act:'gaze'},{p:[7,-67],face:Math.PI,act:'gaze'},{p:[4,57.5],face:0,act:'gaze'},{p:[-22,31.5],face:0,act:'gaze'},{p:[-19,-36.4],face:Math.PI,act:'gaze'},{p:[12,14],face:Math.PI/2,act:'gaze'}];
+ {p:[29.2,-5],face:Math.PI/2,act:'bow'},{p:[-29.2,-5],face:-Math.PI/2,act:'bow'},{p:[-7,-67],face:Math.PI,act:'gaze'},{p:[7,-67],face:Math.PI,act:'gaze'},{p:[4,57.5],face:0,act:'gaze'},{p:[-22,31.5],face:0,act:'gaze'},{p:[-19,-36.4],face:Math.PI,act:'gaze'},{p:[12,14],face:Math.PI/2,act:'gaze'},
+ {p:[65.5,16.2],face:Math.PI,act:'bow'},{p:[60.6,22.5],face:Math.PI/2,act:'gaze'},{p:[71.8,25.5],face:Math.PI/2,act:'bow'},{p:[56.5,26],face:0,act:'gaze'},{p:[-65.5,16.2],face:Math.PI,act:'bow'},{p:[-59.2,25.2],face:-Math.PI/2,act:'gaze'},{p:[-72,25.5],face:-Math.PI/2,act:'gaze'}];
 function fieldFrom(c){const f=new Int16Array(NX*NZ).fill(32000);f[c]=0;const q=[c];let h=0;while(h<q.length){const a=q[h++],d=f[a]+1,l=nb[a]||[];for(const n of l)if(f[n]>d){f[n]=d;q.push(n);}}return f;}
 const pois=POI.map(o=>({...o,c:cellOf(o.p[0],o.p[1])})).filter(o=>o.c>=0&&!isNaN(navH[o.c]));pois.forEach(o=>{o.f=fieldFrom(o.c);o.y=navH[o.c];});
 const npcs=[];
-for(let i=0;i<9&&pois.length;i++){const po=pois[(i*5+3)%pois.length],f=mkFigure({robe:robeMs[i%robeMs.length],hat:i%3===0,bun:i%3===1});scene.add(f.g);
+for(let i=0;i<13&&pois.length;i++){const po=pois[(i*7+3)%pois.length],f=mkFigure({robe:robeMs[i%robeMs.length],hat:i%3===0,bun:i%3===1,long:i%4===2,bag:i%2===0,skirt:i%3===2?skirtMs[i%3]:null});scene.add(f.g);
  const q={f,p:new V3(po.p[0],po.y,po.p[1]),ci:po.c,tx:-1,poi:po,st:'act',t:Math.random()*5,dur:mr(6,12),yaw:po.face,ox:mr(-.35,.35),oz:mr(-.35,.35),gd:0,greetT:0,gy:0};
  q.p.x+=q.ox*.8;q.p.z+=q.oz*.8;npcs.push(q);}
 function pickPoi(q){let np=q.poi;for(let k=0;k<6&&np===q.poi;k++)np=pois[Math.random()*pois.length|0];q.poi=np;q.st='walk';q.tx=-1;const c=cellOf(q.p.x,q.p.z);if(c>=0&&!isNaN(navH[c]))q.ci=c;}
@@ -760,7 +868,7 @@ function updNpc(q,dt){const f=q.f;let walking=false,tb=0,tp=0;
 /* ---------- interactions ---------- */
 const IA=[];
 tables.forEach(p=>IA.push({p,r:2.6,label:()=>P.inc?null:'请香',act(){P.inc=1;sfx.take();msg('请得清香三炷');setGuide(1);}}));
-candles.forEach(p=>IA.push({p,r:2.6,label:()=>P.inc===1?'点香':null,act(){P.inc=2;sfx.light();msg('香已点燃 · 青烟袅袅');setGuide(2);}}));
+[...candles,...candles2].forEach(p=>IA.push({p,r:2.6,label:()=>P.inc===1?'点香':null,act(){P.inc=2;sfx.light();msg('香已点燃 · 青烟袅袅');setGuide(2);}}));
 burners.forEach(b=>IA.push({p:b.clone().setY(b.y-.7),r:3.4,label:()=>P.inc===2?'敬香':P.inc===1?'香尚未点燃':null,act(){if(P.inc!==2){msg('请先到烛台点燃清香');return;}P.mode='bow';bowT=0;bowB=b;bowYaw=Math.atan2(-(b.x-P.pos.x),-(b.z-P.pos.z));P.vel.set(0,0,0);}}));
 cushions.forEach(c=>IA.push({p:c.p.clone().setY(c.p.y+.25),r:2.3,label:()=>'静坐',act(){sitOn(c);}}));
 IA.push({p:new V3(-25,1.8,28.6),r:3.2,label:()=>'撞钟',act(){sfx.bell(.3);msg('钟声悠扬 · 回荡群山');}});
@@ -850,7 +958,7 @@ function updCirc(){const dx=P.pos.x,dz=P.pos.z+51,d=Math.hypot(dx,dz);if(P.pos.y
 const eyeM=new THREE.MeshBasicMaterial({color:0x1a1411}),blushM=new THREE.MeshBasicMaterial({color:0xe8867a,transparent:true,opacity:.45}),whiteM=mat(null,1,{c:0xf2ede2,r:1});
 const eyeG=new THREE.SphereGeometry(.017,8,6),blushG=new THREE.SphereGeometry(.024,8,6),collarG=new THREE.TorusGeometry(.078,.017,6,14),hemG=new THREE.CylinderGeometry(.336,.34,.06,14),smileG=new THREE.TorusGeometry(.022,.005,4,8,Math.PI);
 function charm(f){f.head.scale.setScalar(1.24);const add=(g,m,x,y,z,par)=>{const me=new THREE.Mesh(g,m);me.position.set(x,y,z);par.add(me);return me;};
- for(const s of[-1,1]){add(eyeG,eyeM,s*.043,.008,.104,f.head).scale.set(1,1.35,.6);add(blushG,blushM,s*.07,-.03,.088,f.head).scale.set(1,.6,.35);}
+ f.eyes=[];for(const s of[-1,1]){const e=add(eyeG,eyeM,s*.043,.008,.104,f.head);e.scale.set(1,1.35,.6);f.eyes.push(e);add(blushG,blushM,s*.07,-.03,.088,f.head).scale.set(1,.6,.35);}
  add(smileG,eyeM,0,-.038,.108,f.head).rotation.z=Math.PI;add(collarG,whiteM,0,.585,.01,f.upper).rotation.x=Math.PI/2-.3;add(hemG,FM.sash,0,.03,0,f.skirt);return f;}
 function tag(f,text,gold){const c=document.createElement('canvas');c.width=256;c.height=64;const g=c.getContext('2d');g.font='30px "Kaiti SC","STKaiti","KaiTi","PingFang SC",sans-serif';g.textAlign='center';g.textBaseline='middle';g.shadowColor='rgba(0,0,0,.9)';g.shadowBlur=6;g.fillStyle=gold?'#f0cf6a':'#ffffff';g.fillText(text,128,34);g.fillText(text,128,34);
  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthWrite:false}));s.scale.set(1.25,.31,1);s.position.y=2.2;f.g.add(s);f.tag=s;}
@@ -886,7 +994,7 @@ function updLife(dt){for(const k of koi){const a=tA*k.s+k.o,r=k.r+Math.sin(tA*.4
  es.add(new THREE.Mesh(new THREE.SphereGeometry(20,16,8),bm(0x3a2a1c,1)));
  const p=(w,h,x,y,z,rx,ry,c,i)=>{const me=new THREE.Mesh(new THREE.PlaneGeometry(w,h),bm(c,i));me.position.set(x,y,z);me.rotation.set(rx,ry,0);es.add(me);};
  p(14,14,0,12,0,Math.PI/2,0,0xffe2b0,5);p(8,10,-12,2,6,0,Math.PI/2,0xffb060,4);p(8,10,12,3,6,0,-Math.PI/2,0xfff0d8,3);p(10,6,0,2,14,0,Math.PI,0xffd9a0,2.5);p(20,20,0,-8,0,-Math.PI/2,0,0x5a3a20,1);
- const env=pm.fromScene(es,.03).texture;for(const m of[M.gold,M.gold2,M.bronze,M.jade]){m.envMap=env;m.envMapIntensity=m===M.jade?.45:1.1;m.needsUpdate=true;}pm.dispose();})();
+ const env=pm.fromScene(es,.03).texture;for(const m of[M.gold,M.gold2,M.bronze,M.jade,M.gilt]){m.envMap=env;m.envMapIntensity=m===M.jade?.45:1.1;m.needsUpdate=true;}pm.dispose();})();
 const kasM=mat(null,1,{c:0x7a3b1e,r:1}),kasG=new THREE.TorusGeometry(.215,.04,6,18),kasG2=new THREE.TorusGeometry(.222,.012,5,18),drapeG=new THREE.SphereGeometry(.1,8,6);
 function kasaya(f,m,trim){const ring=(g,mm)=>{const t=new THREE.Mesh(g,mm);t.position.set(0,.3,0);t.rotation.order='ZYX';t.rotation.x=Math.PI/2;t.rotation.z=.7;t.scale.set(1,1.15,1);f.upper.add(t);};ring(kasG,m||kasM);if(trim)ring(kasG2,trim);
  const d=new THREE.Mesh(drapeG,m||kasM);d.position.set(-.17,.5,0);d.scale.set(1,.6,1.15);f.upper.add(d);}
@@ -907,6 +1015,63 @@ let teachI=Math.random()*TEACH.length|0;
  const p=new V3(-7,1.5,3.5),q={f,p,ci:cellOf(p.x,p.z),tx:-1,poi:pois[0],st:'fixed',fixed:true,t:0,dur:1e9,yaw:0,y0:0,ox:0,oz:0,gd:0,greetT:0,gy:0,
   upd(q){const dx=P.pos.x-q.p.x,dz=P.pos.z-q.p.z;q.yaw=turn(q.yaw,Math.hypot(dx,dz)<7?Math.atan2(dx,dz):q.y0,.05);f.bob=Math.sin(q.t*.9)*.006;return[0,0];}};npcs.push(q);
  IA.push({p:new V3(p.x,p.y+1.4,p.z),r:3.2,label:()=>'请教方丈',act(){q.greetT=2.2;q.gy=Math.atan2(P.pos.x-p.x,P.pos.z-p.z);sfx.bowl(.08);showCard({title:'方丈开示',sub:'合十 · 谛听',body:lines(TEACH[teachI++%TEACH.length])});}});})();
+
+/* ---------- east & west courts: rituals, glow, wildlife ---------- */
+Object.assign(P,{cai:SV.cai|0,coins:SV.coins|0,yuan:SV.yuan|0,tea:SV.tea|0,wen:SV.wen|0,fuDay:SV.fuDay|0,fuI:SV.fuI|0});
+sfx.coin=()=>{[2093,2637,3136].forEach((f,i)=>tone(f*mr(.98,1.02),.11,.55,i*.06,0,'sine',.4));nz(.03,.1,'highpass',6000);};
+sfx.pour=()=>{nz(1.1,.08,'bandpass',1500,0,0,2);nz(.9,.05,'bandpass',2600,0,0,3,.15);};
+sfx.chime=()=>{const b=mr(1500,2100),pan=mr(-.8,.8);BUS=ambBus;[1,1.5,2.02].forEach((m,i)=>tone(b*m,.025,2.2,i*.09,0,'sine',.5,pan));BUS=null;};
+function sparkle(p,n=14,c=0xffd76a){for(let i=0;i<n;i++){_h.set(p.x+mr(-.5,.5),p.y+mr(-.4,.4),p.z+mr(-.5,.5));puff(_h,mr(-.25,.25),mr(.3,.9),mr(-.25,.25),mr(.7,1.3),.1,c,.9,.4);}}
+function bowTo(p,fn){const dx=p.x-P.pos.x,dz=p.z-P.pos.z;P.avYaw=Math.atan2(dx,dz);if(P.view!=='third')P.yaw=Math.atan2(-dx,-dz);P.mode='sbow';P.sbT=0;P.vel.set(0,0,0);setTimeout(()=>{if(GS.state==='play')fn();},1800);}
+const CAI=[['和气生财','待人以和，财自远来。'],['勤能致富','一分耕耘，一分收获。'],['取之有道','君子爱财，取之有道。'],['知足常乐','知足者富，心宽者安。'],['积善余庆','积善之家，必有余庆。'],['开源节流','量入为出，细水长流。'],['诚信为本','人无信不立，业无信不兴。'],['根深叶茂','把手上的事做好，便是招财。']];
+const WEN=[['学而时习','温故而知新。'],['厚积薄发','博观而约取，厚积而薄发。'],['业精于勤','业精于勤，荒于嬉。'],['静能生慧','心静下来，书才读得进去。'],['不耻下问','敏而好学，不耻下问。'],['持之以恒','不积跬步，无以至千里。']];
+const FU=['今日宜：早起一刻，把最难的事先做了。','今日宜：给久未联系的朋友，道一声好。','今日宜：少说一句，多听一句。','今日宜：把桌面收拾干净，心也清爽。','今日宜：好好吃一顿饭，不看手机。','今日宜：走一段路，看一看天。','今日宜：谢谢身边的一个人。','今日宜：把一件拖了很久的小事做完。','今日宜：早些休息，明日再出发。','今日宜：存下一点点，积少成多。'];
+const TEA=[['一盏清茶','水沸了，就泡茶；茶凉了，就放下。'],['吃茶去','来的都是客，先喝了这盏茶。'],['茶烟轻起','忙里偷闲，喝的是茶，歇的是心。'],['七分满','茶倒七分满，留三分作余地。']];
+const YUAN=['良缘早至','相守白头','知己常伴','阖家和睦'];
+let caiI=Math.random()*CAI.length|0,wenI=Math.random()*WEN.length|0,teaI=Math.random()*TEA.length|0;
+IA.push({p:SP.cai,r:3.8,label:()=>'拜财神',act(){bowTo(SP.cai,()=>{P.cai++;save();const c=CAI[caiI++%CAI.length];sfx.coin();sparkle(SP.cai,18);banner(c[0],c[1]);});}});
+IA.push({p:SP.bag,r:2.4,label:()=>P.fuDay===today()?'看今日福语':'请今日福袋',act(){const again=P.fuDay===today();if(!again){P.fuDay=today();P.fuI=Math.random()*FU.length|0;save();sfx.take();}showCard({title:'今日福袋',sub:'一日一福 · 财从勤中来',body:lines(FU[P.fuI%FU.length])+(again?'<small>一日一袋 · 此为今日福语</small>':'')});}});
+IA.push({p:SP.ingot,r:2.6,label:()=>'摸元宝',act(){sfx.coin();sparkle(SP.ingot);msg(['摸摸金元宝 · 财运亨通','元宝沉甸甸 · 好事成双','沾沾喜气 · 万事顺意'][Math.random()*3|0]);}});
+IA.push({p:SP.fu,r:2.8,label:()=>'摸福字',act(){sfx.bowl(.07);sparkle(SP.fu,10,0xffb0a0);msg(['摸一摸福字 · 福气满满','福到了','五福临门 · 平安喜乐'][Math.random()*3|0]);}});
+const coinM=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,.012,12),M.gilt),coinA=new V3(),coinB=new V3();coinM.visible=false;scene.add(coinM);let coinT=-1,coinHit=false;
+IA.push({p:SP.pool.clone().setY(1.1),r:5.6,label:()=>coinT<0?'投福币':null,act(){coinA.set(P.pos.x,P.pos.y+1.3,P.pos.z);coinHit=Math.random()<.4;coinB.copy(SP.pool);if(!coinHit){const a=Math.random()*6.28,d=mr(1.4,2.4);coinB.set(SP.pool.x+Math.cos(a)*d,.34,SP.pool.z+Math.sin(a)*d);}coinT=0;coinM.visible=true;P.coins++;sfx.take();}});
+const ribM=new THREE.MeshStandardMaterial({color:0xc81e1e,roughness:.8,side:THREE.DoubleSide}),ribG=new THREE.PlaneGeometry(.06,.6).translate(0,-.3,0),ribs=SP.rib.map((p,k)=>{const m=new THREE.Mesh(ribG,ribM);m.position.copy(p);m.rotation.y=k*1.3;m.visible=false;scene.add(m);return m;});
+function showRibs(){ribs.forEach((m,i)=>m.visible=i<P.yuan);}showRibs();
+IA.push({p:SP.yue,r:3,label:()=>'系红绳',act(){showCard({title:'月老祠',sub:'择一心愿 · 系红绳于姻缘树',opts:YUAN,onPick(i){P.yuan++;save();showRibs();sfx.bowl(.1);banner(YUAN[i],'红绳已系上姻缘树');}});}});
+IA.push({p:SP.wen,r:3.8,label:()=>'祈学业',act(){bowTo(SP.wen,()=>{P.wen++;save();const c=WEN[wenI++%WEN.length];sfx.bowl(.12);sparkle(SP.wen,12,0xcfe6ff);banner(c[0],c[1]);});}});
+IA.push({p:SP.tea,r:2.6,label:()=>'饮一盏茶',act(){P.tea++;save();sfx.pour();const c=TEA[teaI++%TEA.length];showCard({title:c[0],sub:'禅茶一味',body:lines(c[1])});}});
+(()=>{const f=monkFig({robe:M.robe2});tag(f,'知客 · 广善');const p=new V3(49.5,0,22.8),q={f,p,ci:cellOf(p.x,p.z),tx:-1,poi:pois[0],st:'fixed',fixed:true,t:0,dur:1e9,yaw:-1.57,y0:-1.57,ox:0,oz:0,gd:0,greetT:0,gy:0,
+  upd(q){const dx=P.pos.x-p.x,dz=P.pos.z-p.z,n=Math.hypot(dx,dz)<6;q.yaw=turn(q.yaw,n?Math.atan2(dx,dz):q.y0,.05);return[n?1:0,0];}};npcs.push(q);
+ IA.push({p:new V3(p.x,1.4,p.z),r:3,label:()=>'问讯知客',act(){q.greetT=2.2;q.gy=Math.atan2(P.pos.x-p.x,P.pos.z-p.z);sfx.bowl(.06);showCard({title:'财神院',sub:'知客僧 · 广善',body:'<p>正殿拜财神 · 请今日福袋</p><p>聚宝池投福币 · 摸金元宝</p><p>钻一钻钱眼 · 摸一摸福字</p><p>东侧月老祠 · 可系红绳</p><small>财从勤中来 · 福自善中生</small>'});}});
+ const g=monkFig({robe:M.robe});g.sit=1;tag(g,'茶头 · 清和');g.tag.position.y=1.7;const tp=SP.teaM.clone();tp.y+=.12;const ty=Math.atan2(SP.tea.x-tp.x,SP.tea.z-tp.z);
+ npcs.push({f:g,p:tp,ci:cellOf(tp.x,tp.z),tx:-1,poi:pois[0],st:'fixed',fixed:true,t:0,dur:1e9,yaw:ty,y0:ty,ox:0,oz:0,gd:0,greetT:0,gy:0,upd(q){q.yaw=turn(q.yaw,q.y0,.05);g.bob=Math.sin(q.t*.8)*.01;return[0,0];}});})();
+// lantern halos, fireflies, cranes, roaming hall light
+const haloM=new THREE.PointsMaterial({map:softT,color:0xff8a3a,size:2.4,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending});
+const halo=new THREE.Points(new THREE.BufferGeometry().setAttribute('position',new THREE.Float32BufferAttribute(LG,3)),haloM);halo.frustumCulled=false;scene.add(halo);
+const FF=[];for(const[ax,az]of[[-38,28],[38,28],[-37.5,-49],[37.5,-49],[55,31],[-55,31],[-80,6],[74.5,35.5]])for(let k=0;k<6;k++)FF.push([ax+mr(-4,4),mr(.5,2.6),az+mr(-4,4),Math.random()*6.28]);
+const ffM=new THREE.PointsMaterial({map:softT,color:0xd4ff7a,size:.3,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending}),ffP=new THREE.Float32BufferAttribute(new Float32Array(FF.length*3),3),ffG=new THREE.BufferGeometry().setAttribute('position',ffP);
+const ff=new THREE.Points(ffG,ffM);ff.frustumCulled=false;ff.visible=false;scene.add(ff);
+const cranes=[];(()=>{const wm=new THREE.MeshBasicMaterial({color:0xf6f4ee,side:THREE.DoubleSide}),wg=new THREE.PlaneGeometry(1.6,.55).translate(.8,0,0).rotateX(-Math.PI/2),bg=new THREE.SphereGeometry(.2,6,5);
+ for(let i=0;i<7;i++){const g=new THREE.Group(),b=new THREE.Mesh(bg,wm);b.scale.set(.7,.7,3.4);g.add(b);const l=new THREE.Group(),r=new THREE.Group();l.add(new THREE.Mesh(wg,wm));r.add(new THREE.Mesh(wg,wm));r.scale.x=-1;g.add(l,r);g.scale.setScalar(2.4);scene.add(g);
+  const n=Math.ceil(i/2);cranes.push({g,l,r,lat:(i%2?1:-1)*n*7,back:n*6,o:i*.9});}})();
+const nearL=new THREE.PointLight(0xffa858,0,17,1.8);scene.add(nearL);let nearI=-1;
+let gkT=0,chimeT=25,steamT=0,holeS=0,onQiao=false;
+function updNew(dt){haloM.opacity=clamp(tod.lamp*.42-.03,0,.9);
+ const fo=clamp((tod.stars-.25)*1.4,0,.9);ff.visible=fo>0;if(fo>0){ffM.opacity=fo*(.75+.25*Math.sin(tA*3));const a=ffP.array;for(let i=0;i<FF.length;i++){const f=FF[i];a[i*3]=f[0]+Math.sin(tA*.5+f[3])*1.6;a[i*3+1]=f[1]+Math.sin(tA*.8+f[3]*2)*.5;a[i*3+2]=f[2]+Math.cos(tA*.4+f[3])*1.6;}ffP.needsUpdate=true;}
+ const day=tod.stars<.5,ca=tA*.035,cx=Math.sin(ca)*170,cz=-30+Math.cos(ca)*170,yaw=Math.atan2(Math.cos(ca),-Math.sin(ca)),sy=Math.sin(yaw),cy=Math.cos(yaw);
+ for(const c of cranes){c.g.visible=day;if(!day)continue;c.g.position.set(cx+cy*c.lat-sy*c.back,58+Math.sin(tA*.3+c.o)*2,cz-sy*c.lat-cy*c.back);c.g.rotation.y=yaw;const fl=Math.sin(tA*2.6+c.o)*.55;c.l.rotation.z=fl;c.r.rotation.z=-fl;}
+ let bi=-1,bd=1e9;for(let i=0;i<NL.length;i++){const d=NL[i].distanceTo(P.pos);if(d<bd){bd=d;bi=i;}}
+ if(bi>=0){if(bi!==nearI){nearI=bi;nearL.position.copy(NL[bi]);}nearL.intensity=GS.state==='play'?28*(.6+tod.lamp*.5)*clamp(1-(bd-11)/6,0,1):0;}
+ if(GS.state!=='play')return;
+ if(coinT>=0){coinT+=dt/.95;const k=Math.min(1,coinT);coinM.position.lerpVectors(coinA,coinB,k);coinM.position.y+=Math.sin(Math.PI*k)*2.2;coinM.rotation.x=tA*17;coinM.rotation.z=tA*11;
+  if(k>=1){coinT=-1;coinM.visible=false;if(coinHit){sfx.coin();sparkle(coinB,16);banner('正中聚宝盆',`好彩头 · 已投福币 ${P.coins} 枚`);}else{nz(.25,.12,'bandpass',900,0,0,.8);for(let i=0;i<6;i++)puff(coinB,mr(-.4,.4),mr(.6,1.3),mr(-.4,.4),.6,.12,0xe8f4f4,.6,1.5);msg('福币落入池中 · 心诚则灵');}save();}}
+ const hz=P.pos.z-31;if(P.pos.y>.45&&Math.abs(P.pos.x-65.5)<.9&&Math.abs(hz)<1.3){const s=hz>0?1:-1;if(holeS&&s!==holeS){sfx.coin();sparkle(_o.set(65.5,2,31),16);banner('钻过钱眼','财源滚滚 · 脚踏实地');}holeS=s;}else holeS=0;
+ const bx=Math.abs(P.pos.x+65.5),bz=Math.abs(P.pos.z-22);if(bx<1.3&&bz<1.1&&P.pos.y>.8){if(!onQiao){onQiao=true;sfx.bowl(.07);msg('走过状元桥 · 步步高升');}}else if(bz>4||bx>4)onQiao=false;
+ ribs.forEach((m,k)=>{if(m.visible)m.rotation.z=Math.sin(tA*1.5+k)*.2;});
+ gkT-=dt;if(gkT<=0){gkT=.35;for(const p of SP.gk){_h.set(p.x+mr(-3,3),p.y+mr(-1.5,1),p.z+mr(-3,3));puff(_h,mr(-.15,.15),-.42,mr(-.15,.15),6,.07,0xf2c230,.95,0);}
+  _h.set(SP.bloom2.x+mr(-1.8,1.8),SP.bloom2.y+mr(-.4,.6),SP.bloom2.z+mr(-1.8,1.8));puff(_h,mr(-.1,.1),-.28,mr(-.1,.1),6,.05,0xffc4d8,.95,0);}
+ steamT-=dt;if(steamT<=0){steamT=.3;if(SP.tea.distanceTo(P.pos)<14)puff(SP.tea,mr(-.02,.02),mr(.15,.25),mr(-.02,.02),2.2,.06,0xf0f0f0,.3,5);}
+ chimeT-=dt;if(chimeT<=0){chimeT=mr(14,32);sfx.chime();}}
 
 /* ---------- tap-to-walk ---------- */
 const PORT=()=>innerHeight>innerWidth*1.15;
@@ -980,7 +1145,7 @@ function updCamera(dt){const hs=Math.hypot(P.vel.x,P.vel.z),bobA=P.mode==='walk'
   if(P.inc===2){incT-=dt;if(incT<=0){incT=.07;camera.getWorldDirection(_f);_r.crossVectors(_f,camera.up).normalize();_u.crossVectors(_r,_f);_h.copy(camera.position).addScaledVector(_f,.62).addScaledVector(_u,lerp(.02,.12,handK)).addScaledVector(_r,mr(-.02,.02));puff(_h,mr(-.03,.03),mr(.25,.4),mr(-.03,.03),mr(1.6,2.6),.035,0xdfe2e6,.3,7);}}}
  const pk=Math.max(P.greetK,P.mode==='sit'&&P.autoBow?1:0);palms.visible=!third&&P.inc===0&&pk>.02;if(palms.visible)palms.position.set(0,-.33+pk*.15,-.36);
  vmSun.position.copy(curDir).applyQuaternion(camera.quaternion.clone().invert());}
-function locName(){const{x,y,z}=P.pos;if(z>41)return'山门外 · 苍龙岭';if(z>37)return'山门';if(y>3.2&&z<-26)return Math.hypot(x,z+51)<9?'镇岳塔':x<-14&&z>-45?'听松亭':x>10&&z>-50&&z<-40&&y>3.9?'藏经阁':z<-64?'舍身崖 · 观云台':'塔院';
+function locName(){const{x,y,z}=P.pos;if(x>45)return z<8.5&&y>.5?'财神殿':x>74&&z>19&&z<31&&y>.5?'月老祠':'财神院';if(x<-45)return z<8.5&&y>.5?'文昌阁':x<-74&&z>19&&z<31&&y>.5?'禅茶寮':Math.abs(x+65.5)<3&&Math.abs(z-22)<4?'状元桥':'文昌院';if(z>41)return'山门外 · 苍龙岭';if(z>37)return'山门';if(y>3.2&&z<-26)return Math.hypot(x,z+51)<9?'镇岳塔':x<-14&&z>-45?'听松亭':x>10&&z>-50&&z<-40&&y>3.9?'藏经阁':z<-64?'舍身崖 · 观云台':'塔院';
  if(y>2.2&&Math.abs(x)<12.2&&z<-3&&z>-13.2)return'大雄宝殿';if(y>1.3&&Math.abs(x)<24.2&&z<10.2)return'月台';if(Math.abs(x)>31&&z>-15&&z<5&&y>.5)return x>0?'观音殿':'祖师殿';if(z>10)return x<-19&&z>20&&z<31?'钟楼':x>19&&z>20&&z<31?'鼓楼':'前院';return'松径';}
 let hudT=0;const actBtn=a=>document.querySelector(`#acts [data-a=${a}]`);
 function updHud(dt){hudT-=dt;if(hudT<=0){hudT=.25;$('locn').textContent=locName();$('me').textContent='我 · '+P.name;$('mr').textContent=P.merit;$('mb').textContent=P.bows;$('mk').textContent=BEADS.total;$('mg').textContent=P.gongde;$('fc').textContent='功德 '+P.gongde;
@@ -994,7 +1159,7 @@ function updHud(dt){hudT-=dt;if(hudT<=0){hudT=.25;$('locn').textContent=locName(
 /* ---------- input ---------- */
 const cv=renderer.domElement,joy={x:0,y:0,id:-1,ox:0,oy:0},lookT={id:-1,x:0,y:0};let dragMode=false,lockFails=0,lastFail=0,wAcc=0;
 function enterPlay(){if(GS.state==='play')return;if(GS.state==='menu'){setGuide(0);banner('华山寺',`山门已开 · ${P.name} 请随缘礼拜`);sfx.bell();}GS.state='play';$('ov').style.display='none';$('hud').style.display='block';if(TOUCH){$("touch").style.display="block";if(!hinted){hinted=true;setTimeout(()=>msg("轻点地面即可前往 · 拖动环顾"),5200);}}wake();}
-function pause(){if(GS.state!=="play")return;unwake();stopWalk();closeCard();{const s=Math.floor(P.sat);$("stats").textContent=`香火 ${P.merit} · 礼拜 ${P.bows} · 念珠 ${BEADS.total} · 功德 ${P.gongde} · 供灯 ${P.lamps} · 绕塔 ${P.laps} · 静坐 ${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;$("stats").style.display="block";}if(BEADS.isOpen())BEADS.close();GS.state='pause';for(const k in keys)keys[k]=false;joy.x=joy.y=0;joy.id=lookT.id=-1;$('stick').style.display='none';save();$('ttl').textContent='暂歇';$('sub').textContent='山风未止 · 钟声未歇';$('go').textContent=TOUCH?'轻触继续':'点击继续';$("ov").style.display="flex";$("touch").style.display="none";$("hud").style.display="none";}
+function pause(){if(GS.state!=="play")return;unwake();stopWalk();closeCard();{const s=Math.floor(P.sat);$("stats").textContent=`香火 ${P.merit} · 礼拜 ${P.bows} · 念珠 ${BEADS.total} · 功德 ${P.gongde} · 供灯 ${P.lamps} · 绕塔 ${P.laps} · 财神 ${P.cai} · 福币 ${P.coins} · 静坐 ${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;$("stats").style.display="block";}if(BEADS.isOpen())BEADS.close();GS.state='pause';for(const k in keys)keys[k]=false;joy.x=joy.y=0;joy.id=lookT.id=-1;$('stick').style.display='none';save();$('ttl').textContent='暂歇';$('sub').textContent='山风未止 · 钟声未歇';$('go').textContent=TOUCH?'轻触继续':'点击继续';$("ov").style.display="flex";$("touch").style.display="none";$("hud").style.display="none";}
 function toDrag(){dragMode=true;enterPlay();msg('按住鼠标左键拖动以环顾 · Esc 暂停');}
 function lockFail(){const n=performance.now();if(n-lastFail<400)return;lastFail=n;if(document.pointerLockElement===cv)return;if(++lockFails>=2)toDrag();else $('go').textContent='请再点击一次';}
 function addLook(dx,dy,k){P.yaw-=dx*k;const th=P.view==='third';P.pitch=clamp(P.pitch-dy*k,th?-1.15:-1.45,th?.85:1.45);}
@@ -1055,10 +1220,10 @@ function frame(){requestAnimationFrame(frame);const raw=clock.getDelta(),dt=Math
  smokeT-=dt;if(smokeT<=0){smokeT=.2;for(const b of burners)puff(b,mr(-.1,.1),mr(.45,.75),mr(-.1,.1),mr(4,6.5),.35,0xcfd2d6,.16,6);
   for(let k=0;k<7&&offered.length;k++){const o=offered[Math.random()*offered.length|0];puff(o,mr(-.02,.02),mr(.3,.5),mr(-.02,.02),mr(2.5,4),.04,0xe2e4e8,.28,9);}}
  candleL.forEach((l,i)=>l.intensity=(7+Math.sin(tA*13+i*2)*1.2+Math.sin(tA*31+i)*.8)*(.6+tod.lamp*.5));
- updFx(dt);clouds.forEach((t,i)=>{t.offset.x+=dt*.0016*(i+1);t.offset.y+=dt*.0007*(i+1);});
+ updFx(dt);updNew(dt);clouds.forEach((t,i)=>{t.offset.x+=dt*.0016*(i+1);t.offset.y+=dt*.0007*(i+1);});
  renderer.clear();renderer.render(scene,camera);if(GS.state!=='menu'&&P.view==='first'){renderer.clearDepth();renderer.render(vmScene,vmCam);}}
 $('load').style.display='none';
-window.__g={tapWalk,get QL(){return QL;},get walking(){return !!walkF;},GS,P,camera,renderer,nextTod,interact,IA,tod,npcs,pois,bowKey,openBeads,toggleFish,greet,toggleView,knock,cushions};
+window.__g={tapWalk,get QL(){return QL;},get walking(){return !!walkF;},GS,P,camera,renderer,nextTod,interact,IA,tod,npcs,pois,bowKey,openBeads,toggleFish,greet,toggleView,knock,cushions,SP,cols,navH,cellOf};
 window.engineReady&&window.engineReady(TOUCH);
 frame();
 </script>
