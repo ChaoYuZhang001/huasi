@@ -29,10 +29,17 @@ export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     if (url.pathname === '/health') return new Response('ok');
-    if (req.headers.get('Upgrade') !== 'websocket') return new Response('huashan nearby relay', { status: 426 });
+    // Anything that is not a websocket upgrade on /ws is the website itself.
+    if (url.pathname !== '/ws' || req.headers.get('Upgrade') !== 'websocket') {
+      return env.ASSETS ? env.ASSETS.fetch(req) : new Response('huashan nearby relay', { status: 426 });
+    }
 
+    // Same-origin pages are always allowed; other origins must be on the list.
+    const origin = req.headers.get('Origin') || '';
+    let sameHost = false;
+    try { sameHost = !!origin && new URL(origin).host === url.host; } catch (_) {}
     const allowed = (env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
-    if (allowed.length && !allowed.includes(req.headers.get('Origin') || '')) return new Response('forbidden', { status: 403 });
+    if (!sameHost && allowed.length && !allowed.includes(origin)) return new Response('forbidden', { status: 403 });
 
     // City-level position from the connecting IP. Good enough to pick a routing
     // cell; NOT accurate to 3 km. Visitors who grant browser location send exact

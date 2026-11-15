@@ -1,0 +1,15 @@
+{
+  // One Worker serves the site (static assets) and the nearby-pilgrims relay (/ws).
+  // Files that match a static asset are answered by the assets layer without
+  // running worker code; only /ws and /health reach server/worker.js.
+  "name": "huasi",
+  "main": "server/worker.js",
+  "compatibility_date": "2025-06-01",
+  "assets": { "directory": ".", "binding": "ASSETS" },
+  "durable_objects": { "bindings": [{ "name": "ROOMS", "class_name": "Room" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }],
+  "vars": {
+    // Other-origin pages allowed to open /ws. Same-origin is always allowed.
+    "ALLOWED_ORIGINS": "https://sansitemple.com,https://www.sansitemple.com,https://chaoyuzhang001.github.io"
+  }
+}

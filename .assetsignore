@@ -1,0 +1,13 @@
+.git
+.github
+.gitignore
+.assetsignore
+.wrangler
+.claude
+.DS_Store
+node_modules
+server
+art
+wrangler.jsonc
+wrangler.toml
+README.md

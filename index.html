@@ -1544,15 +1544,17 @@ function frame(){requestAnimationFrame(frame);const raw=clock.getDelta(),dt=Math
 $('load').style.display='none';
 
 /* ---------- nearby pilgrims: optional shared hall ----------
-   Off unless a server URL is configured (window.HUASHAN_MP, see server/README.md).
+   Connects on its own when served from the project's Cloudflare Worker (relay at /ws on the
+   same host); elsewhere it stays off unless window.HUASHAN_MP is set (see server/README.md).
    The server matches people within 3 km; coordinates go to the server only and are
    never relayed to other visitors - peers receive a name and a pose, nothing else. */
 const MP=(()=>{
  const local=/^(localhost|127\.0\.0\.1)$/.test(location.hostname);let url=window.HUASHAN_MP||'';
+ if(!url){if(/(^|\.)(workers\.dev|sansitemple\.com)$/.test(location.hostname))url='wss://'+location.host+'/ws';else if(location.hostname==='chaoyuzhang001.github.io')url='wss://huasi.zhangchaoyu123456.workers.dev/ws';}
  if(local){const q=new URLSearchParams(location.search).get('mp');if(q)url=q;}
  if(!/^wss?:\/\/[^\s]+$/.test(url))url='';
  const peers=new Map(),btn=$('mpBtn'),chip=$('mpN'),MAXP=24;
- let ws=null,on=false,ever=false,sendT=0,retry=0,rT=null,geo=null,n=0,precise=false,want=SV.mp!==0;
+ let ws=null,on=false,ever=false,sendT=0,lastK='',lastS=-9,retry=0,rT=null,geo=null,n=0,precise=false,want=SV.mp!==0;
  const lbl=()=>{if(btn)btn.textContent=tr(want?'附近的人 · 开':'附近的人 · 关');if(chip){chip.style.display=want&&url&&(on||ever)?'inline':'none';chip.textContent=!on?tr('附近 3km · 连接中'):tr((precise?'附近 3km · ':'同城 · ')+n+' 人');}};
  function drop(id){const q=peers.get(id);if(!q)return;scene.remove(q.f.g);if(q.f.tag){q.f.tag.material.map.dispose();q.f.tag.material.dispose();}peers.delete(id);}
  function add(id,name,k){if(peers.has(id)||peers.size>=MAXP)return;k=k|0;const f=mkFigure({robe:robeMs[k%robeMs.length],hat:k%3===0,bun:k%3===1,long:k%4===2,bag:k%2===0});
@@ -1567,7 +1569,7 @@ const MP=(()=>{
  function close(){clearTimeout(rT);if(ws){ws.onclose=ws.onmessage=ws.onerror=null;try{ws.close();}catch(_){}}ws=null;on=false;n=0;[...peers.keys()].forEach(drop);lbl();}
  function open(){if(!url||!want||ws)return;let u=url;if(geo)u+=(u.includes('?')?'&':'?')+'c='+Math.floor(geo[0]*2)+'_'+Math.floor(geo[1]*2);
   try{ws=new WebSocket(u);}catch(_){ws=null;return;}
-  ws.onopen=()=>{const h={t:'hi',name:P.name,k:(P.name.charCodeAt(0)+P.name.length*7)%60};if(geo){h.lat=geo[0];h.lon=geo[1];}ws.send(JSON.stringify(h));};
+  ws.onopen=()=>{lastK='';const h={t:'hi',name:P.name,k:(P.name.charCodeAt(0)+P.name.length*7)%60};if(geo){h.lat=geo[0];h.lon=geo[1];}ws.send(JSON.stringify(h));};
   ws.onmessage=onMsg;ws.onclose=()=>{ws=null;on=false;[...peers.keys()].forEach(drop);lbl();if(want){retry=Math.min(retry+1,6);rT=setTimeout(open,1000*2**retry);}};ws.onerror=()=>{};lbl();}
  function locate(){if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(g=>{geo=[g.coords.latitude,g.coords.longitude];if(want){close();open();}},()=>{},{maximumAge:6e5,timeout:8000,enableHighAccuracy:false});}
  if(btn&&url){btn.style.display='';btn.addEventListener('click',()=>{want=!want;saveKV({mp:want?1:0});if(want){open();locate();}else close();lbl();});}
@@ -1580,7 +1582,8 @@ const MP=(()=>{
     const sp=d*6;if(sp>.3&&f.sit<.5){f.w+=sp*dt*2.1;f.swing=Math.sin(f.w)*.38*Math.min(1,sp/3);f.bob=Math.abs(Math.sin(f.w))*.03*Math.min(1,sp/3);}else{f.swing*=.85;f.bob*=.8;}
     poseFig(f);if(f.tag)f.tag.visible=camera.position.distanceToSquared(g.position)<324;}
    sendT-=dt;if(sendT<=0&&on&&ws.readyState===1&&GS.state==='play'){sendT=.2;const g=av.g.position,r2=v=>Math.round(v*100)/100;
-    ws.send(JSON.stringify({t:'s',p:[r2(g.x),r2(g.y),r2(g.z)],r:r2(av.g.rotation.y),a:[r2(av.sit),r2(av.bow),r2(av.palms)]}));}}};
+    const p=[r2(g.x),r2(g.y),r2(g.z)],r=r2(av.g.rotation.y),a=[r2(av.sit),r2(av.bow),r2(av.palms)],k=p.concat(r,a).join();
+    if(k!==lastK||tA-lastS>3){lastK=k;lastS=tA;ws.send(JSON.stringify({t:'s',p,r,a}));}}}};
 })();
 window.__g={MP,tapWalk,get QL(){return QL;},get walking(){return !!walkF;},GS,P,camera,renderer,nextTod,interact,IA,tod,npcs,pois,bowKey,openBeads,toggleFish,greet,toggleView,knock,cushions,SP,cols,navH,cellOf};
 window.engineReady&&window.engineReady(TOUCH);
