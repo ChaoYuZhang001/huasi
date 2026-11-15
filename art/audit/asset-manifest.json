@@ -1,0 +1,18 @@
+{
+  "schema": "huashan-temple.asset-audit.v1",
+  "runtime": "threejs-single-file",
+  "quality_target": "maximum credible realism under mobile browser constraints",
+  "stages": ["hero-statues", "characters", "architecture", "props", "plants", "animals", "lighting", "mobile-runtime"],
+  "assets": [
+    {"id":"BUDDHA-MAIN","category":"statue","status":"reference-started","priority":"P0","target_polycount":90000,"tiers":["hero","mobile"]},
+    {"id":"GUANYIN","category":"statue","status":"procedural","priority":"P0","target_polycount":70000,"tiers":["hero","mobile"]},
+    {"id":"CAISHEN","category":"statue","status":"procedural","priority":"P0","target_polycount":70000,"tiers":["hero","mobile"]},
+    {"id":"WENCHANG","category":"statue","status":"procedural","priority":"P0","target_polycount":70000,"tiers":["hero","mobile"]},
+    {"id":"ABBOT","category":"character","status":"procedural","priority":"P1","target_polycount":30000,"tiers":["near","mobile"]},
+    {"id":"MONK","category":"character","status":"procedural","priority":"P1","target_polycount":24000,"tiers":["near","mobile"]},
+    {"id":"PILGRIM","category":"character","status":"procedural","priority":"P1","target_polycount":20000,"tiers":["near","mobile"]},
+    {"id":"CAT","category":"animal","status":"procedural","priority":"P1","target_polycount":12000,"tiers":["near","mobile"]},
+    {"id":"KOI","category":"animal","status":"procedural","priority":"P1","target_polycount":5000,"tiers":["near","mobile"]},
+    {"id":"PINE-GINKGO-BAMBOO","category":"plant","status":"procedural","priority":"P1","target_polycount":12000,"tiers":["near","instance","billboard"]}
+  ]
+}
