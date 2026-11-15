@@ -1437,7 +1437,7 @@ if(TOUCH){document.body.classList.add('touch');
 
 /* ---------- loop ---------- */
 const clock=new THREE.Clock();let menuA=0,bellT=50,birdT=3;applyTod();
-let QL=TOUCH?1:2,pxr=renderer.getPixelRatio(),fN=0,fpsT=-4,fpsN=0;if(QL<2)renderer.shadowMap.autoUpdate=false;
+const qSaved=SV.quality||'auto';let QL=qSaved==='smooth'?1:qSaved==='detailed'?2:(TOUCH?1:2),pxr=renderer.getPixelRatio(),fN=0,fpsT=-4,fpsN=0;if(QL<2)renderer.shadowMap.autoUpdate=false;
 const qSel=$('qMode');if(qSel){qSel.value=qSaved;qSel.addEventListener('change',()=>{const v=qSel.value;saveKV({quality:v});QL=v==='smooth'?1:v==='detailed'?2:(TOUCH?1:2);renderer.shadowMap.autoUpdate=QL>=2;});}
 function lowerQ(){if(QL===2){QL=1;renderer.shadowMap.autoUpdate=false;}else if(pxr>1){pxr=Math.max(1,pxr-.25);renderer.setPixelRatio(pxr);renderer.setSize(innerWidth,innerHeight);}else if(QL===1)QL=0;else if(pxr>.75){pxr=.75;renderer.setPixelRatio(pxr);renderer.setSize(innerWidth,innerHeight);}}
 function chantLevel(){if(P.mode==='sit'||BEADS.isOpen())return 1;const d=Math.hypot(P.pos.x,P.pos.z+7);return d<9&&P.pos.y>2?1:clamp(1-(d-9)/18,0,1)*.4;}
