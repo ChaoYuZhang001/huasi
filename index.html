@@ -1175,8 +1175,14 @@ const hatG=mergeGeometries([new THREE.LatheGeometry([V2(.292,0),V2(.288,.012),V2
 const blobM=new THREE.MeshBasicMaterial({map:(()=>{const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d'),gr=g.createRadialGradient(32,32,2,32,32,31);gr.addColorStop(0,'rgba(0,0,0,.62)');gr.addColorStop(.55,'rgba(0,0,0,.3)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,64,64);return new THREE.CanvasTexture(c);})(),transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2,fog:false});
 const blobG=new THREE.PlaneGeometry(1,1).rotateX(-Math.PI/2);
 function mkFigure(o){const g=new THREE.Group(),rc=o.robe.color.getHex(),sc=(o.skirt||o.robe).color.getHex(),SK=o.skin||0xc99d7c,HR=o.hairC||0x1b1815,WH=0xf2ede2,DK=0x2b2622,Sp=THREE.SphereGeometry,Cy=THREE.CylinderGeometry,Bx=THREE.BoxGeometry,dark=new THREE.Color(sc).multiplyScalar(.55).getHex();
- const sk=new Cy(.165,.31,.98,22,6,true),sp=sk.attributes.position;for(let i=0;i<sp.count;i++){const x=sp.getX(i),y=sp.getY(i),z=sp.getZ(i),k=.5-y/.98,a=Math.atan2(z,x),q=1+.055*k*Math.sin(a*8)+.02*k*Math.sin(a*3+1);sp.setXYZ(i,x*q,y,z*q*lerp(.8,.96,k));}sk.computeVertexNormals();
- const skirt=new THREE.Mesh(mergeC([P_(sk,sc,0,.49,0),P_(new Cy(.326,.336,.07,22,1,true),dark,0,.036,0,1,1,.96)]),VM);skirt.castShadow=true;g.add(skirt);
+ // One lathe profile: hem at ankle height (so the shoes show), knee, hip, waist, chest.
+ const V2p=(x,y)=>new THREE.Vector2(x,y);
+ const sk=new THREE.LatheGeometry([V2p(.235,.02),V2p(.245,.06),V2p(.238,.16),V2p(.225,.30),V2p(.213,.46),V2p(.222,.58),V2p(.205,.72),V2p(.178,.84),V2p(.172,.94),V2p(.178,1.0)],20,0,Math.PI*2),sp=sk.attributes.position;
+ for(let i=0;i<sp.count;i++){const x=sp.getX(i),y=sp.getY(i),z=sp.getZ(i),k=1-y/1.0,a=Math.atan2(z,x),
+  // folds deepen toward the hem; the hips sit back a little so the figure has a stance
+  q=1+.05*k*Math.sin(a*8)+.018*k*Math.sin(a*3+1);
+  sp.setXYZ(i,x*q,y,z*q*lerp(.93,1,k)*(.99+.03*k));}sk.computeVertexNormals();
+ const skirt=new THREE.Mesh(mergeC([P_(sk,sc,0,0,0),P_(new Cy(.246,.252,.05,20,1,true),dark,0,.026,0,1,1,.96)]),VM);skirt.castShadow=true;g.add(skirt);
  const feet=new THREE.Group();g.add(feet);for(const s of[-1,1]){const m=new THREE.Mesh(shoeG,shoeM);m.position.set(s*.08,.035,.07);feet.add(m);}
  const upper=new THREE.Group();upper.position.y=.95;g.add(upper);
  const T=[P_(new Cy(.172,.2,.56,16,2),rc,0,.28,0,1,1,.74),P_(new Sp(.2,14,8),rc,0,.5,0,1.25,.4,.8),P_(new Cy(.208,.208,.075,16,1),DK,0,.035,0,1,1,.76),P_(new Bx(.05,.2,.02),DK,.03,-.07,.156),P_(new Bx(.04,.16,.02),DK,-.03,-.05,.156),
@@ -1195,14 +1201,22 @@ function mkFigure(o){const g=new THREE.Group(),rc=o.robe.color.getHex(),sc=(o.sk
  const hm=new THREE.Mesh(mergeC(Hd),VM);hm.castShadow=true;head.add(hm);if(o.hat){const h=new THREE.Mesh(hatG,hatM);h.position.set(0,.088,-.012);h.rotation.x=-.12;h.castShadow=true;head.add(h);}
  const blob=new THREE.Mesh(blobG,blobM);blob.position.y=.025;blob.scale.set(.86,1,.72);blob.renderOrder=1;g.add(blob);
  const eyes=[];for(const s of[-1,1]){const e=new THREE.Mesh(eyeG2,eyeM2);e.position.set(s*.043,.008,.108);e.scale.set(1,1.3,.5);head.add(e);eyes.push(e);}
- const arm=s=>{const a=new THREE.Group();a.position.set(s*.21,.5,0);upper.add(a);a.add(new THREE.Mesh(mergeC([P_(new Cy(.06,.118,.5,10,1),rc,0,-.25,0,1,1,.8),P_(new Cy(.118,.121,.05,10,1),WH,0,-.49,0,1,1,.8),P_(new Sp(.043,8,6),SK,0,-.54,0,.8,1.25,.6)]),VM));return a;};
- const armR=arm(1),armL=arm(-1);
+ // Two segments: shoulder group carries a short sleeve, elbow group a forearm with a
+ // hanging cuff and a flattened hand. 合十 now bends instead of thrusting forward.
+ const arm=s=>{const a=new THREE.Group();a.position.set(s*.195,.5,0);upper.add(a);
+  a.add(new THREE.Mesh(mergeC([P_(new Cy(.058,.072,.27,10,1),rc,0,-.13,0,1,1,.8),P_(new Sp(.075,10,7),rc,0,-.02,0,1,.9,.85)]),VM));
+  const el=new THREE.Group();el.position.set(0,-.26,0);a.add(el);
+  el.add(new THREE.Mesh(mergeC([P_(new Sp(.058,9,7),rc,0,0,0),P_(new Cy(.052,.062,.25,10,1),rc,0,-.13,0,1,1,.85),
+   P_(new Cy(.062,.092,.11,12,1),WH,0,-.28,0,1,1,.9),P_(new Sp(.038,8,6),SK,0,-.34,0,1.05,.75,.55)]),VM));
+  return [a,el];};
+ const [armR,elbR]=arm(1),[armL,elbL]=arm(-1);
  const inc=new THREE.Group();inc.position.set(0,.4,.45);upper.add(inc);inc.visible=false;const tips=[];
  for(let i=-1;i<=1;i++){const s=new THREE.Mesh(stickG,stickM);s.position.set(i*.03,.17,0);s.rotation.z=-i*.08;inc.add(s);const t=new THREE.Mesh(tipG,tipM);t.position.set(i*.044,.35,0);t.visible=false;inc.add(t);tips.push(t);}
- return{g,upper,armL,armR,skirt,feet,head,inc,tips,eyes,blob,sit:0,bow:0,palms:0,swing:0,bob:0,w:Math.random()*6,bk:Math.random()*4};}
+ return{g,upper,armL,armR,elbL,elbR,skirt,feet,head,inc,tips,eyes,blob,sit:0,bow:0,palms:0,swing:0,bob:0,w:Math.random()*6,bk:Math.random()*4};}
 function poseFig(f){const s=f.sit,p=f.palms;if(f.blob)f.blob.scale.set(.86+s*.42,1,.72+s*.42);f.skirt.scale.set(1+s*.4,1-s*.5,1+s*.4);f.feet.visible=s<.5;
  f.upper.position.y=.95-s*.45+f.bob;f.upper.rotation.x=f.bow*(s>.5?1.15:.75);
- f.armR.rotation.set(lerp(f.swing,-1.3,p),0,lerp(0,-.45,p));f.armL.rotation.set(lerp(-f.swing,-1.3,p),0,lerp(0,.45,p));
+ f.armR.rotation.set(lerp(f.swing,-.55,p),0,lerp(0,-.28,p));f.armL.rotation.set(lerp(-f.swing,-.55,p),0,lerp(0,.28,p));
+ if(f.elbR){f.elbR.rotation.set(lerp(-.12,-1.75,p),0,0);f.elbL.rotation.set(lerp(-.12,-1.75,p),0,0);}
  const fc=f.feet.children,sw=f.swing*(1-s);fc[0].position.z=.07+sw*.32;fc[1].position.z=.07-sw*.32;fc[0].position.y=.035+Math.max(0,sw)*.09;fc[1].position.y=.035+Math.max(0,-sw)*.09;
  f.head.rotation.z=Math.sin(tA*.7+f.bk)*.03;if(f.eyes){const b=(tA*1.1+f.bk)%4.2<.13?.15:1.3;f.eyes[0].scale.y=f.eyes[1].scale.y=b;}}
 // The avatar is rebuilt when the visitor changes name or gender. Same builder, same tag.
