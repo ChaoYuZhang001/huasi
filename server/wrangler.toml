@@ -1,0 +1,20 @@
+name = "huashan-nearby"
+main = "worker.js"
+compatibility_date = "2025-06-01"
+
+# Served from your own Cloudflare-hosted domain; the DNS record is created on deploy.
+routes = [
+  { pattern = "nearby.sansitemple.com", custom_domain = true }
+]
+
+[[durable_objects.bindings]]
+name = "ROOMS"
+class_name = "Room"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Room"]
+
+[vars]
+# Only pages served from these origins may connect. Comma separated.
+ALLOWED_ORIGINS = "https://sansitemple.com,https://www.sansitemple.com,https://chaoyuzhang001.github.io"
