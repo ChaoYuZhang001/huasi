@@ -1,6 +1,6 @@
 {
-  "name": "华山寺 · 山寺 · 上香 · 静坐",
-  "short_name": "华山寺",
+  "name": "山寺 · 上香 · 静坐",
+  "short_name": "山寺",
   "description": "一座在浏览器里打开的山中寺院：上香、静坐、拨念珠、敲木鱼。",
   "start_url": "./",
   "scope": "./",
@@ -10,7 +10,17 @@
   "theme_color": "#0b0d11",
   "lang": "zh-CN",
   "icons": [
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
   ]
 }

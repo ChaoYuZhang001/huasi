@@ -3,20 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>华山寺 · 上香静坐</title>
+<title>山寺 · 上香静坐</title>
 <meta name="description" content="一座在浏览器里打开的山中寺院：上香、静坐、拜财神、文昌阁祈学业、拨念珠、敲木鱼。无需安装，无需注册。">
-<meta property="og:title" content="华山寺 · 山寺 · 上香 · 静坐">
+<meta property="og:title" content="山寺 · 上香 · 静坐">
 <meta property="og:description" content="山中有座寺，可以上香、静坐、拜财神、祈学业、拨念珠、敲木鱼。无需安装，无需注册。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://chaoyuzhang001.github.io/huasi/">
-<meta property="og:site_name" content="华山寺">
+<meta property="og:site_name" content="山寺">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://chaoyuzhang001.github.io/huasi/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="华山寺大雄宝殿前院，晨光中的山中寺院">
+<meta property="og:image:alt" content="山寺大雄宝殿前院，晨光中的山中寺院">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="华山寺 · 山寺 · 上香 · 静坐">
+<meta name="twitter:title" content="山寺 · 上香 · 静坐">
 <meta name="twitter:description" content="山中有座寺，可以上香、静坐、拨念珠、敲木鱼。无需安装，无需注册。">
 <meta name="twitter:image" content="https://chaoyuzhang001.github.io/huasi/og.jpg">
 <link rel="canonical" href="https://chaoyuzhang001.github.io/huasi/">
@@ -27,7 +27,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="华山寺">
+<meta name="apple-mobile-web-app-title" content="山寺">
 <style>
 :root{--gold:#e8c45a;--red:#c8372a}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -148,7 +148,12 @@ body.touch #cOpts i{display:none}
 #go:not(.dim){animation:glow 2.6s infinite}@keyframes glow{50%{box-shadow:0 6px 44px rgba(232,196,90,.7)}}
 #ovBtns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
 #ovBtns button,#share{margin:0;font-family:inherit;font-size:12px;letter-spacing:3px;color:#fff;background:rgba(0,0,0,.34);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:7px 16px;cursor:pointer;opacity:.92}
-#how,#mix{display:none;margin-top:16px;cursor:default}#how.open{display:block}#mix.open{display:flex}
+#how,#mix,#self{display:none;margin-top:16px;cursor:default}#how.open{display:block}#mix.open{display:flex}
+#self.open{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;font-size:12px;letter-spacing:2px;opacity:.9}
+#self input{font-family:inherit;font-size:13px;letter-spacing:2px;color:#f3e2b0;background:rgba(0,0,0,.35);border:1px solid rgba(232,196,90,.55);border-radius:8px;padding:5px 9px;width:120px;outline:none}
+#self .gsel{display:flex;gap:4px}#self .gsel button{font-family:inherit;font-size:12px;color:#f3e2b0;background:rgba(0,0,0,.3);border:1px solid rgba(232,196,90,.4);border-radius:999px;padding:4px 10px;cursor:pointer}
+#self .gsel button.on{background:rgba(232,196,90,.9);color:#1b1408;border-color:#e8c45a}
+#nmOk{font-family:inherit;font-size:12px;letter-spacing:3px;color:#1b1408;background:#e8c45a;border:0;border-radius:999px;padding:5px 14px;cursor:pointer}
 #how #steps{margin-bottom:8px}#how #keys{margin:0 auto 4px;display:inline-grid}body.touch #how #keys{display:none}#how #thelp{margin-bottom:6px}
 #daily{font-size:12px;letter-spacing:2px;color:#f3e2b0;opacity:.92;margin-bottom:14px;max-width:92vw}
 #foot{font-size:11px;letter-spacing:1px;opacity:.5;margin-top:16px}
@@ -195,8 +200,8 @@ body.en #cBody,body.en #cTitle{font-family:Georgia,serif}
 <div id="touch"><div id="stick"><div id="knob"></div></div><button id="tAct"></button><button id="tTod">时辰</button><button id="tPause">暂歇</button><button id="tPhoto">拍照</button></div>
 <div id="ov">
   <button id="langBtn" data-keep>EN</button>
-  <div class="seal kai" data-keep>西岳</div>
-  <h1 id="ttl" class="kai">华山寺</h1>
+  <div class="seal kai" data-keep>山中</div>
+  <h1 id="ttl" class="kai">山寺</h1>
   <h2 id="sub">山寺 · 上香 · 静坐</h2>
   <div id="stats"></div>
   <div id="daily"></div>
@@ -204,7 +209,7 @@ body.en #cBody,body.en #cTitle{font-family:Georgia,serif}
   <div id="chips"><span>上香</span><span>静坐</span><span>求签</span><span>拜财神</span><span>文昌阁</span><span>登钟楼</span><span>登塔</span><span>放天灯</span><span>集印</span><span>每日功课</span></div>
   <div id="wait"><span id="waitTxt">法堂尚在准备 · 不妨先拨念珠</span><button id="preBeads">先拨念珠</button></div>
   <div id="go" class="dim">山门开启中…</div>
-  <div id="ovBtns"><button id="howBtn">玩法</button><button id="setBtn">声音</button><button id="share">分享给朋友</button><button id="mpBtn" style="display:none">附近的人</button></div>
+  <div id="ovBtns"><button id="howBtn">玩法</button><button id="selfBtn">自称</button><button id="setBtn">声音</button><button id="share">分享给朋友</button><button id="mpBtn" style="display:none">附近的人</button></div>
   <div id="how">
     <div id="steps"><span><i data-keep>一</i>香案请香</span><span><i data-keep>二</i>烛台点香</span><span><i data-keep>三</i>炉前三拜敬香</span><span><i data-keep>四</i>殿内蒲团静坐</span></div>
     <div id="thelp">轻点地面 · 自行前往　拖动画面 · 环顾<br>左下拖动 · 摇杆行走　右下圆钮 · 请香 敬香 静坐</div>
@@ -215,6 +220,11 @@ body.en #cBody,body.en #cTitle{font-family:Georgia,serif}
     </div>
   </div>
   <div id="mix"><label>设备性能<select id="qMode"><option value="auto">自动</option><option value="smooth">流畅</option><option value="detailed">精细</option></select></label><label>音乐<input type="range" id="vM" min="0" max="1" step="0.05"></label><label>诵经<input type="range" id="vC" min="0" max="1" step="0.05"></label><label>山声<input type="range" id="vA" min="0" max="1" step="0.05"></label><label>法器<input type="range" id="vF" min="0" max="1" step="0.05"></label><label><input type="checkbox" id="cOn">诵经声</label></div>
+  <div id="self">
+    <label>称呼<input id="nmIn" type="text" maxlength="12" placeholder="山中之名"></label>
+    <div class="gsel"><button data-g="f">女</button><button data-g="m">男</button><button data-g="r">随机</button></div>
+    <button id="nmOk">定名</button>
+  </div>
   <div id="foot">艺术再现 · 并非真实寺院 · 进度保存在本机</div>
 </div>
 <div id="load">正在构筑山门…</div>
@@ -230,9 +240,9 @@ if(/[?&]lang=en/.test(location.search))L='en';if(/[?&]lang=zh/.test(location.sea
 window.LANG=L;
 const E={
 // home & hud
-'华山寺':'Huashan Temple','华山寺 · 上香静坐':'Huashan Temple · Incense & Stillness','山寺 · 上香 · 静坐':'A mountain temple · incense · stillness','西岳':'西岳',
+'山寺':'Mountain Temple','山寺 · 上香 · 静坐':'Mountain Temple · Incense & Stillness','山中':'MOUNTAIN',
 '入寺':'Enter','山门开启中…':'Opening the gate…','轻触入山门':'Tap to enter','点击入山门':'Click to enter','请再点击一次':'Click once more','轻触继续':'Tap to continue','点击继续':'Click to continue','山门未开':'Gate closed',
-'玩法':'How to play','声音':'Sound','安静坐一会儿':'Sit quietly','开始朝山':'Begin pilgrimage','自由游览':'Explore freely','第一次进入':'First visit','先到大雄宝殿静坐':'Start at the Main Hall','从山门开始收集朝山印记':'Start at the gate and collect pilgrimage stamps','从山门外自由探索整座寺院':'Explore the whole temple freely','设备性能':'Device quality','自动':'Auto','流畅':'Smooth','精细':'Detailed','分享给朋友':'Share','拍照':'Photo','链接已复制':'Link copied','附近的人 · 开':'Nearby · on','附近的人 · 关':'Nearby · off','附近 #km · # 人':'Within # km · #','附近 3km · 连接中':'Within 3 km · connecting','同城 · # 人':'Same city · #','请复制地址栏链接':'Copy the link from the address bar',
+'玩法':'How to play','声音':'Sound','安静坐一会儿':'Sit quietly','开始朝山':'Begin pilgrimage','自由游览':'Explore freely','第一次进入':'First visit','先到大雄宝殿静坐':'Start at the Main Hall','从山门开始收集朝山印记':'Start at the gate and collect pilgrimage stamps','从山门外自由探索整座寺院':'Explore the whole temple freely','设备性能':'Device quality','自动':'Auto','流畅':'Smooth','精细':'Detailed','分享给朋友':'Share','拍照':'Photo','链接已复制':'Link copied','附近的人 · 开':'Nearby · on','附近的人 · 关':'Nearby · off','附近 #km · # 人':'Within # km · #','自称':'You','称呼':'Name','定名':'Set name','女':'Female','男':'Male','随机':'Random','山中之名':'a name for the mountain','附近 3km · 连接中':'Within 3 km · connecting','同城 · # 人':'Same city · #','请复制地址栏链接':'Copy the link from the address bar',
 '山中有座寺，可以上香、静坐、拜财神、登钟楼、放天灯。':'A quiet mountain temple in your browser: light incense, meditate, climb the bell tower, release a sky lantern.',
 '上香':'Incense','求签':'Fortune slip','文昌阁':'Wenchang Hall','登钟楼':'Bell tower','登塔':'Climb the pagoda','集印':'Stamps','每日功课':'Daily practice',
 '艺术再现 · 并非真实寺院 · 进度保存在本机':'An artistic rendering, not a real temple · Progress is saved on this device',
@@ -313,7 +323,7 @@ if(L==='en'){document.documentElement.lang='en';document.body.classList.add('en'
  const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),ns=[];while(w.nextNode())ns.push(w.currentNode);
  for(const n of ns){const p=n.parentNode.nodeName;if(p==='SCRIPT'||p==='STYLE'||n.parentNode.dataset.keep!==undefined)continue;if(cjk.test(n.nodeValue))n.nodeValue=tr(n.nodeValue);}}
 const $=id=>document.getElementById(id),lb=$('langBtn');if(lb){lb.textContent=L==='en'?'中文':'EN';lb.addEventListener('click',e=>{e.stopPropagation();try{localStorage.setItem('huashan-lang',L==='en'?'zh':'en');}catch(_){}location.href=location.pathname;});}
-[['howBtn','how'],['setBtn','mix']].forEach(([b,p])=>{$(b).addEventListener('click',e=>{e.stopPropagation();const o=$(p).classList.contains('open');$('how').classList.remove('open');$('mix').classList.remove('open');if(!o)$(p).classList.add('open');});});
+[['howBtn','how'],['setBtn','mix'],['selfBtn','self']].forEach(([b,p])=>{$(b).addEventListener('click',e=>{e.stopPropagation();const o=$(p).classList.contains('open');$('how').classList.remove('open');$('mix').classList.remove('open');$('self').classList.remove('open');if(!o)$(p).classList.add('open');if(p==='self')fillSelf();});});
 ['how','ovBtns'].forEach(id=>$(id).addEventListener('click',e=>e.stopPropagation()));
 })();
 </script>
@@ -366,7 +376,7 @@ addEventListener('keydown',e=>{if(!open||mode!=='load')return;if(['Space','Arrow
 $('bClose').addEventListener('click',e=>{e.stopPropagation();close();});
 $('bEnter').addEventListener('click',e=>{e.stopPropagation();close();$('ov').click();});
 ['wait','mix','share','langBtn','mpBtn'].forEach(id=>{const el=$(id);if(el)el.addEventListener('click',e=>e.stopPropagation());});
-$('share').addEventListener('click',async()=>{const b=$('share'),d={title:tr('华山寺'),text:tr('山中有座寺，可以上香、静坐、拜财神、登钟楼、放天灯。'),url:location.href.split('#')[0]};try{if(navigator.share){await navigator.share(d);return;}await navigator.clipboard.writeText(d.text+' '+d.url);b.textContent=tr('链接已复制');}catch(e){if(e&&e.name==='AbortError')return;b.textContent=tr('请复制地址栏链接');}setTimeout(()=>b.textContent=tr('分享给朋友'),2200);});
+$('share').addEventListener('click',async()=>{const b=$('share'),d={title:tr('山寺'),text:tr('山中有座寺，可以上香、静坐、拜财神、登钟楼、放天灯。'),url:location.href.split('#')[0]};try{if(navigator.share){await navigator.share(d);return;}await navigator.clipboard.writeText(d.text+' '+d.url);b.textContent=tr('链接已复制');}catch(e){if(e&&e.name==='AbortError')return;b.textContent=tr('请复制地址栏链接');}setTimeout(()=>b.textContent=tr('分享给朋友'),2200);});
 $('preBeads').addEventListener('click',e=>{e.stopPropagation();getAC();openB('load');});
 window.BEADS={isOpen:()=>open,open:openB,close,step,drag:dy=>{if(open)drag(dy);},get total(){return B.total;},get count(){return B.count;}};
 window.engineReady=function(touch){ready=true;$('go').textContent=tr(touch?'轻触入山门':'点击入山门');$('go').classList.remove('dim');$('wait').style.display='none';if(open&&mode==='load')$('bEnter').style.display='inline-block';};
@@ -683,7 +693,9 @@ chain(-30,-69.6,30,-69.6,3.5);
 hall(0,-7,1.5,0,24,12,{name:'大雄宝殿',double:true,doors:3,statue:true,ch:4.7,couplet:['云海松风千嶂静','钟声月色一山空']});
 hall(36,-5,0,3,20,9,{name:'观音殿',custom:true});
 hall(-36,-5,0,1,20,9,{name:'祖师殿',custom:true});
-hall(0,40,0,0,14,6,{name:'华山寺',through:true,porch:0,plat:.3,ch:4.2,empty:true});
+hall(0,40,0,0,14,6,{name:'山寺',through:true,porch:0,plat:.3,ch:4.2,empty:true});
+hall(-18.3,-18.6,1.5,1,8,4.8,{name:'五观堂',custom:true,nolight:true,plat:.5,ch:3.6,porch:1.4,doors:1});
+hall(15.5,-34.4,3.5,0,9,5,{name:'禅堂',custom:true,nolight:true,plat:.45,ch:3.4,porch:1.3});
 hall(17,-45,3.5,0,12,8,{name:'藏经阁',plat:.6,custom:true});
 // walls
 wall(-44.6,40,-7.1,40);wall(7.1,40,44.6,40);for(const s of[-1,1]){wall(s*44.6,40,s*44.6,22.6);wall(s*44.6,17.4,s*44.6,-69.6);}wall(30.2,-69.6,44.6,-69.6);wall(-44.6,-69.6,-30.2,-69.6);
@@ -723,6 +735,56 @@ incTable(4.2,0,26);candleStand(-4.2,0,26);incTable(4.6,1.5,7.2);candleStand(-4.6
 for(const x of[-1.3,0,1.3])cushion(x,2.35,-5.1,0);monk(-3.3,2.35,-5.3,M.robe);monk(3.3,2.35,-5.3,M.robe2);
 at(0,1.5,-7);S(.15,.75,2,-1.3,M.wood,1.25,.9,1,10,8);C(.2,.2,.04,.75,1.85,-1.3,M.lantern,false,10);C(.17,.11,.15,-.75,1.85,-1.3,M.bronze,false,14);C(.012,.012,.3,.5,1.87,-1.2,M.woodDark,false,5);
 for(const sx of[-10,10]){at(sx,3.5,-67.5);B(1.3,.12,1.3,0,0,0,M.cliff);cushion(sx,3.62,-67.5,0);}
+// —— 演武场：大雄宝殿月台以东的侧院（x 13.2-24, z -24..-11)
+(()=>{const Y=1.72;
+ at(18.2,1.5,-17.5);B(9.2,.22,12.4,0,0,0,M.ashlar);B(9.4,.05,12.6,0,.22,0,M.marble,false);
+ for(const sx of[-4.5,4.5])B(.3,.34,12.4,sx,0,0,M.marble,false);B(9.2,.34,.3,0,0,-6.1,M.marble,false);
+ stairs(18.2,-11.1,3.4,1.5,Y);
+ for(const sx of[-4.2,4.2])for(const sz of[-5.9,5.9]){S(.16,sx,.52,sz,M.marble,1,1.5,1,6,5);lg(sx,Y+.38,sz);}
+ NL.push(wpv(18.2,2.6,-17.5));
+ // 兵器架
+ at(15.4,Y,-22.8);for(const sz of[-1.6,1.6])C(.07,.09,1.65,0,0,sz,M.woodDark,false,8);
+ B(.14,.12,3.4,0,1.55,0,M.woodDark);
+ for(let i=0;i<5;i++){const g=new THREE.CylinderGeometry(.026,.026,1.8,6);g.rotateZ(.09*(i-2));G(g,M.wood,.1*i-0.2,.86,0);
+  if(i>1){B(.018,.5,.05,.1*i-.2,1.5,0,M.iron,false);B(.05,.34,.06,.1*i-.2,1.86,0,M.gold,false);}}
+ // 练武旗
+ at(18.2,Y,-23.0);C(.055,.085,7.2,0,0,0,M.iron,true,8);S(.14,0,7.3,0,M.gold);
+ B(1.25,.06,.06,0,6.9,0,M.woodDark);B(1.05,1.55,.03,.68,6.05,0,M.red,false);
+ B(1.05,.07,.035,.68,6.86,0,M.gold,false);B(1.05,.07,.035,.68,5.26,0,M.gold,false);
+ plaque('演武',18.2,5.3,-22.9,{bg:'#101c33'});
+ // 鼓（东南角）
+ at(21.8,Y,-12.5);for(const sx of[-.28,.28])for(const sz of[-.26,.26])B(.09,.62,.09,sx,0,sz,M.woodDark);
+ {const g=new THREE.CylinderGeometry(.42,.42,.66,16);g.rotateZ(Math.PI/2);G(g,M.lantern,0,.9,0);
+  for(const sx of[-.34,.34]){const d=new THREE.CylinderGeometry(.44,.44,.03,16);d.rotateZ(Math.PI/2);G(d,M.drum,sx,.9,0);}
+  B(.06,.9,.06,-.5,.45,0,M.woodDark,false,6);B(.05,.32,.05,-.5,1.9,0,M.wood,false,6);}
+ // 锣（西南角）
+ at(14.4,Y,-12.5);for(const sz of[-.62,.62])C(.05,.06,1.9,0,0,sz,M.woodDark,false,8);
+ B(.1,.12,1.5,0,1.86,0,M.woodDark);
+ {const g=new THREE.CylinderGeometry(.5,.5,.045,18);g.rotateX(Math.PI/2);G(g,M.bronze,0,1.32,0);}
+ S(.09,0,1.32,.03,M.gold);
+ // 草人 ×2
+ for(const sz of[-20.4,-17.6]){at(21.7,Y,sz);C(.09,.12,.9,0,0,0,M.woodDark,true,8);
+  S(.32,0,.92,0,M.sack,1,1.2,1,8,6);B(.94,.07,.07,0,1.06,0,M.woodDark);
+  {const c=new THREE.ConeGeometry(.3,.42,8);G(c,M.clay,0,1.32,0);}}
+ // 梅花桩
+ at(16.6,Y,-13.6);for(const[f,s]of[[0,[0,0]],[1,[-.8,0]],[2,[.8,0]],[3,[0,-.8]],[4,[0,.8]]]){C(.15,.18,.48,s[0],0,s[1],M.woodDark,true,8);S(.17,s[0],.48,s[1],M.wood,1,.4,1,8,5);}
+ // 石锁与石担
+ at(22.2,Y,-14.2);for(const sx of[-.5,.5]){S(.2,sx,.16,0,M.cliff,1,.85,1,8,6);C(.05,.05,.3,sx,.31,0,M.cliff,false,6);}
+ C(.05,.05,1.6,0,.6,0,M.cliff,true,6);
+ cushion(20.6,Y,-22.9,0,false);
+})();
+
+// —— 放天灯 · 观云台灯场（自带灯笼几何：此处天空灯尚未定义）
+(()=>{at(0,3.5,-67.6);B(13,.1,6.2,0,0,0,M.paving,false);
+ for(const sx of[-5.4,5.4])for(const sz of[-2.4,2.4]){C(.13,.17,3.5,sx,0,sz,M.wood,true,10);S(.17,sx,3.56,sz,M.gold);}
+ for(const sx of[-5.4,5.4])C(.028,.028,5.3,sx,3.5,0,M.woodDark,false,6);
+ for(let i=0;i<7;i++){const x=-5.0+i/3*5.0;
+  C(.006,.006,.42,x,3.65,0,M.woodDark,false,4);
+  G(new THREE.CylinderGeometry(.28,.2,.5,10,1,true),M.lantern,x,3.9,0);C(.16,.16,.05,x,3.63,0,M.gold,false,10);}
+ plaque('放天灯',0,4.3,-64.6,{vertical:true,bg:'#152d24'});
+ for(const sx of[-6.9,6.9]){at(sx,3.5,-67.6);C(.22,.3,.9,0,0,0,M.marble,true,10);C(.26,.26,.12,0,.98,0,M.bronze,false,12);S(.2,0,1.05,0,M.glow);}
+ G(new THREE.CircleGeometry(6.6,32).rotateX(-Math.PI/2),M.moss,0,.06,-67.6);
+})();;
 at(-7,0,57.3);B(1.3,.12,1.3,0,0,0,M.cliff);cushion(-7,.12,57.3,Math.PI);
 at(-19,3.5,-40);cushion(-19,3.86,-38.3,0);
 // —— 造像 ——
@@ -1017,22 +1079,28 @@ const TOD=[
  {n:'暮',dir:[-95,22,38],sunC:0xff9050,sunI:2.6,hS:0xa9a4c8,hG:0x5a4638,hI:.7,fog:0xdcb49a,zen:[.16,.19,.42],glow:[1,.42,.16],dens:.0036,stars:.12,lamp:1,exp:1.05},
  {n:'夜',dir:[-55,85,-50],sunC:0x93aede,sunI:.6,hS:0x2c3c62,hG:0x15151c,hI:.42,fog:0x0d1322,zen:[.008,.014,.045],glow:[.35,.45,.7],dens:.0030,stars:1,lamp:2.2,exp:1.1}
 ].map(p=>({n:p.n,dir:new V3(...p.dir).normalize(),sunC:new THREE.Color(p.sunC),sunI:p.sunI,hS:new THREE.Color(p.hS),hG:new THREE.Color(p.hG),hI:p.hI,fog:new THREE.Color(p.fog),zen:new THREE.Color().setRGB(...p.zen),glow:new THREE.Color().setRGB(...p.glow),dens:p.dens,stars:p.stars,lamp:p.lamp,exp:p.exp}));
-const tod={i:0,from:0,k:1,lamp:.35,stars:0},curDir=new V3(),_w=new THREE.Color(1,1,1);
+// Each visitor's own local clock decides the hour, so a temple opened in Shanghai and one
+// opened in Berlin see different light. Dawn 5-8, noon 8-17, dusk 17-20, night 20-5.
+const hourIdx=()=>{const h=new Date().getHours();return h>=5&&h<8?0:h>=8&&h<17?1:h>=17&&h<20?2:3;};
+const tod={i:hourIdx(),from:hourIdx(),k:1,lamp:.35,stars:0},curDir=new V3(),_w=new THREE.Color(1,1,1);
 function applyTod(){const a=TOD[tod.from],b=TOD[tod.i],k=tod.k*tod.k*(3-2*tod.k),L=(x,y)=>x+(y-x)*k;
  curDir.copy(a.dir).lerp(b.dir,k).normalize();sun.position.copy(curDir).multiplyScalar(220).add(sun.target.position);sun.color.copy(a.sunC).lerp(b.sunC,k);sun.intensity=L(a.sunI,b.sunI)*(1-.75*Math.sin(Math.PI*k)*(a.dir.dot(b.dir)<.5?1:0));
  hemi.color.copy(a.hS).lerp(b.hS,k);hemi.groundColor.copy(a.hG).lerp(b.hG,k);hemi.intensity=L(a.hI,b.hI);vmHemi.color.copy(hemi.color);vmHemi.groundColor.copy(hemi.groundColor);vmHemi.intensity=hemi.intensity*1.3;vmSun.color.copy(sun.color);vmSun.intensity=sun.intensity*.8;
  scene.fog.color.copy(a.fog).lerp(b.fog,k);scene.fog.density=L(a.dens,b.dens);skyU.sun.value.copy(curDir);skyU.hor.value.copy(scene.fog.color);skyU.zen.value.copy(a.zen).lerp(b.zen,k);skyU.glow.value.copy(a.glow).lerp(b.glow,k);skyU.stars.value=tod.stars=L(a.stars,b.stars);
  renderer.toneMappingExposure=L(a.exp,b.exp);const lamp=tod.lamp=L(a.lamp,b.lamp);M.lantern.emissiveIntensity=.7+lamp*1.3;M.glow.emissiveIntensity=1.2+lamp*2.2;lampL.forEach(l=>l.intensity=l.userData.b*lamp);hallL.forEach(l=>l.intensity=l.userData.b*(.6+lamp*.5));
  cloudM.forEach(m=>m.color.copy(scene.fog.color).lerp(_w,.5-.3*tod.stars));}
-function nextTod(){if(tod.k<1)return;tod.from=tod.i;tod.i=(tod.i+1)%TOD.length;tod.k=0;save();$('tod').textContent=TOD[tod.i].n;msg(['晨光初照','日正当空','暮色归山','月夜山寺'][tod.i]);if(tod.i===0||tod.i===2)sfx.bell();}
+function nextTod(){if(tod.k<1)return;tod.from=tod.i;tod.i=(tod.i+1)%TOD.length;tod.k=0;saveKV({todAt:Date.now()});save();$('tod').textContent=TOD[tod.i].n;msg(['晨光初照','日正当空','暮色归山','月夜山寺'][tod.i]);if(tod.i===0||tod.i===2)sfx.bell();}
 
 /* ---------- player state & save ---------- */
 const SV=(window.loadSave?loadSave():{})||{};
 const NAMES=['松间客','听雨人','云中客','拾叶人','看山人','煮茶客','晚钟客','问月人','踏雪人','观云客','栖霞客','抱琴人','扫阶人','闻香客','渡溪人','守灯人'];
 const P={pos:new V3(0,0,54),vel:new V3(),yaw:0,pitch:0,onG:true,eye:1.65,camY:0,bob:0,stepAcc:0,inc:0,mode:'walk',
- merit:SV.merit|0,sat:+SV.sat||0,bows:SV.bows|0,gongde:SV.gongde|0,name:SV.name||NAMES[Math.random()*NAMES.length|0],view:SV.view==='first'?'first':'third',
+ merit:SV.merit|0,sat:+SV.sat||0,bows:SV.bows|0,gongde:SV.gongde|0,name:SV.name||NAMES[Math.random()*NAMES.length|0],gender:SV.gender==='m'?'m':SV.gender==='f'?'f':'f',view:SV.view==='first'?'first':'third',
  prK:0,prT:0,autoBow:false,greetT:0,greetK:0,avYaw:Math.PI,fish:false,sbT:0};
-if(SV.tod>=0&&SV.tod<TOD.length){tod.i=tod.from=SV.tod|0;$('tod').textContent=TOD[tod.i].n;}
+// A manual pick (T) holds for two hours, then the local clock takes over again.
+if(SV.tod>=0&&SV.tod<TOD.length&&Date.now()-(SV.todAt||0)<72e5){tod.i=tod.from=SV.tod|0;}
+$('tod').textContent=TOD[tod.i].n;
+setInterval(()=>{if(tod.k<1)return;const h=hourIdx();if(h!==tod.i){tod.from=tod.i;tod.i=h;tod.k=0;$('tod').textContent=TOD[h].n;save();}},6e4);
 if(SV.mix&&typeof SV.mix==='object'){const old=SV.mix.mus===undefined;Object.assign(MIX,SV.mix);if(old){MIX.mus=.6;MIX.chant=Math.min(MIX.chant,.35);}}
 function save(){window.saveKV&&saveKV({merit:P.merit,sat:Math.floor(P.sat),tod:tod.i,bows:P.bows,gongde:P.gongde,name:P.name,view:P.view,mix:MIX,lamps:P.lamps,laps:P.laps,wishes:P.wishes,qDay:P.qDay,qIdx:P.qIdx,cats:P.cats,cai:P.cai,coins:P.coins,yuan:P.yuan,tea:P.tea,wen:P.wen,fuDay:P.fuDay,fuI:P.fuI});}
 setInterval(()=>{if(GS.state==='play')save();},15000);
@@ -1110,7 +1178,11 @@ function poseFig(f){const s=f.sit,p=f.palms;if(f.blob)f.blob.scale.set(.86+s*.42
  f.armR.rotation.set(lerp(f.swing,-1.3,p),0,lerp(0,-.45,p));f.armL.rotation.set(lerp(-f.swing,-1.3,p),0,lerp(0,.45,p));
  const fc=f.feet.children,sw=f.swing*(1-s);fc[0].position.z=.07+sw*.32;fc[1].position.z=.07-sw*.32;fc[0].position.y=.035+Math.max(0,sw)*.09;fc[1].position.y=.035+Math.max(0,-sw)*.09;
  f.head.rotation.z=Math.sin(tA*.7+f.bk)*.03;if(f.eyes){const b=(tA*1.1+f.bk)%4.2<.13?.15:1.3;f.eyes[0].scale.y=f.eyes[1].scale.y=b;}}
-const av=mkFigure({robe:mat(null,1,{c:0x9c7c4c,r:1}),hat:true,mala:true,bag:true});scene.add(av.g);av.g.visible=false;
+// The avatar is rebuilt when the visitor changes name or gender. Same builder, same tag.
+const AV_ROBE={f:0x9c7c4c,m:0x5f6b7a},AV_SKIRT={f:0x6a4a5c,m:0x3f4a55};
+function mkAvatar(){const f=mkFigure({robe:mat(null,1,{c:AV_ROBE[P.gender],r:1}),skirt:P.gender==='f'?mat(null,1,{c:AV_SKIRT.f,r:1}):null,hat:true,mala:true,bag:true,
+  bun:P.gender==='f',long:P.gender==='f'});scene.add(f.g);f.g.visible=false;charm(f);tag(f,'我 · '+P.name,true);return f;}
+let av=mkAvatar();
 const robeMs=[0x6e6a63,0x7c5b3e,0x3f4b5e,0x5a5f4e,0x8b8478,0x4e3d33,0xb58d8d,0x8fa3b5,0x9db08a,0xc4ae84].map(c=>mat(null,1,{c,r:1})),skirtMs=[0x3a3f52,0x5a3a34,0x44503c].map(c=>mat(null,1,{c,r:1}));
 const POI=[{p:[0,27.4],face:Math.PI,act:'bow'},{p:[0,8.6],face:Math.PI,act:'bow'},{p:[-4,-3.6],face:Math.PI,act:'bow'},{p:[4,-3.6],face:Math.PI,act:'bow'},{p:[0,-43.8],face:Math.PI,act:'bow'},
  {p:[29.2,-5],face:Math.PI/2,act:'bow'},{p:[-29.2,-5],face:-Math.PI/2,act:'bow'},{p:[-7,-67],face:Math.PI,act:'gaze'},{p:[7,-67],face:Math.PI,act:'gaze'},{p:[4,57.5],face:0,act:'gaze'},{p:[-22,31.5],face:0,act:'gaze'},{p:[-19,-36.4],face:Math.PI,act:'gaze'},{p:[12,14],face:Math.PI/2,act:'gaze'},
@@ -1232,7 +1304,6 @@ const eyeG=new THREE.SphereGeometry(.017,8,6),blushG=new THREE.SphereGeometry(.0
 function charm(f){return f;}
 function tag(f,text,gold){text=tr(text);const c=document.createElement('canvas');c.width=256;c.height=64;const g=c.getContext('2d');g.font='30px "Kaiti SC","STKaiti","KaiTi","PingFang SC",sans-serif';g.textAlign='center';g.textBaseline='middle';g.shadowColor='rgba(0,0,0,.9)';g.shadowBlur=6;g.fillStyle=gold?'#f0cf6a':'#ffffff';g.fillText(text,128,34,248);g.fillText(text,128,34,248);
  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthWrite:false}));s.scale.set(1.25,.31,1);s.position.y=2.2;f.g.add(s);f.tag=s;}
-charm(av);tag(av,'我 · '+P.name,true);
 const pool=NAMES.filter(n=>n!==P.name);
 npcs.forEach((q,i)=>{charm(q.f);q.f.g.scale.setScalar(.93+((i*37)%10)/90);tag(q.f,pool[i%pool.length]);});
 (()=>{const f=charm(mkFigure({robe:M.robe,bald:true,mala:true}));scene.add(f.g);tag(f,'扫地僧');const b=new THREE.Group();b.position.set(0,-.5,.05);b.rotation.x=.9;f.armR.add(b);
@@ -1269,6 +1340,47 @@ const kasM=mat(null,1,{c:0x7a3b1e,r:1}),kasG=new THREE.TorusGeometry(.215,.04,6,
 function kasaya(f,m,trim){const ring=(g,mm)=>{const t=new THREE.Mesh(g,mm);t.position.set(0,.3,0);t.rotation.order='ZYX';t.rotation.x=Math.PI/2;t.rotation.z=.7;t.scale.set(1,1.15,1);f.upper.add(t);};ring(kasG,m||kasM);if(trim)ring(kasG2,trim);
  const d=new THREE.Mesh(drapeG,m||kasM);d.position.set(-.17,.5,0);d.scale.set(1,.6,1.15);f.upper.add(d);}
 function monkFig(o={}){const f=charm(mkFigure({robe:o.robe||M.robe,bald:true,mala:true}));kasaya(f,o.kas,o.trim);scene.add(f.g);return f;}
+/* ---------- 演武场 · 武僧 ----------
+   There is no skeletal rig, so the staff hangs off the right forearm: poseFig drives
+   armR.rotation.x from f.swing, so putting the staff there turns "swing" into a staff
+   circle. Amplitudes are pre-divided by the 0.85 decay updNpc applies to f.swing. */
+const WM_STAFF=new THREE.CylinderGeometry(.022,.022,1.9,6);
+function warrior(name,x,z,yaw,kind,ph){
+ const f=charm(mkFigure({robe:M.robe2,bald:true,mala:true}));scene.add(f.g);
+ if(kind!=='sit'){const st=new THREE.Mesh(WM_STAFF,M.wood);st.position.set(0,-.55,.04);st.rotation.x=Math.PI/2;f.armR.add(st);}
+ if(kind==='sit')f.sit=1;
+ tag(f,name);f.tag.position.y=kind==='sit'?1.7:2.2;
+ npcs.push({f,p:new V3(x,1.72,z),ci:cellOf(x,z),tx:-1,poi:pois[0],st:'fixed',fixed:true,t:ph,dur:1e9,yaw,y0:yaw,ox:0,oz:0,gd:0,greetT:0,gy:0,
+  upd(q,dt){
+   if(QL<2&&(fN&1))return [0,f.bow];
+   if(kind==='sit'){f.bob=.008*Math.sin(Math.PI*2*q.t/5.2);f.head.rotation.x=.10+.03*Math.sin(q.t*.45);
+    if(Math.sin(Math.PI*2*q.t/5.2)>.999&&Math.random()<.02&&Math.hypot(P.pos.x-x,P.pos.z-z)<9)sfx.fish(.12);
+    return[0,0];}
+   if(kind==='form'){const T=6.4,ss=((q.t+ph)%T)/T;let sw=0,bw=0;
+    if(ss<.15){const k=ss/.15;sw=(-.75+1.5*k)/.85;bw=.06;}
+    else if(ss<.42){const k=(ss-.15)/.27,m=4*Math.PI*k;sw=1.05*Math.sin(m)/.85;bw=.1+.04*Math.sin(m);f.head.rotation.y=-.35*Math.sin(2*Math.PI*k);}
+    else if(ss<.60){const k=(ss-.42)/.18;sw=(-.2+.9*k)/.85;bw=.34*Math.sin(Math.PI*k);}
+    else{const k=(ss-.60)/.40;sw=.8*Math.sin(2*Math.PI*k+Math.PI)/.85;bw=.1*(1-k);f.head.rotation.y=.4*k;}
+    f.swing=sw;f.bob=(.03*Math.abs(Math.sin(Math.PI*ss*2)))/.8;
+    return[ss>.93?1:0,bw];}
+   // sparring: 3.4 s cycle, attack and defend swap each round
+   const T=3.4,ph2=((q.t+ph)%(T*2)),atk=ph2<T,head=atk,q2=atk?ph2:ph2-T;let sw=0,bw=0,tp=0;
+   if(head){if(q2<.5){const k=q2/.5;sw=(1.2*k)/.85;bw=.05;}
+    else if(q2<.85){const k=(q2-.5)/.35;sw=(1.2-2.65*k)/.85;bw=.3*k;f.bob=.05/.8;
+     if(!q.hit&&k>.5){q.hit=1;const tip=f.armR.localToWorld(new V3(0,-1.6,0));sparkle(tip,6);nz(.12,.06,'bandpass',1500);}}
+    else{sw=.35/.85;tp=.4;f.bob=0;}}
+   else{if(q2<.5){sw=.2/.85;bw=-.12;}
+    else if(q2<.85){sw=(-.6)/.85;bw=-.2;f.bob=-.07/.8;}
+    else{sw=.35/.85;tp=.4;}}
+   if(q2<T*.05)q.hit=0;
+   f.swing=sw;f.head.rotation.y=head?(q2<.85?-.2:0):.15;
+   return[tp,Math.max(0,bw)];}});
+}
+warrior('僧 · 慧刚',14.8,-17.2,Math.PI/2,'form',0);
+warrior('僧 · 净觉',14.8,-19.8,Math.PI/2,'form',.5);
+warrior('教头 · 武明',19.2,-20,0,'spar',0);
+warrior('僧 · 悟尘',19.2,-17.2,Math.PI,'spar',3.4);
+warrior('僧 · 了尘',20.6,-22.9,2.6,'sit',0);
 const DH=['慧明','净尘','了然','悟远'];
 [[-3.3,-5.3],[3.3,-5.3]].forEach(([x,z],i)=>{const f=monkFig({robe:i?M.robe2:M.robe});f.sit=1;tag(f,'僧 · '+DH[i]);f.tag.position.y=1.7;
  npcs.push({f,p:new V3(x,2.47,z),ci:cellOf(x,z),tx:-1,poi:pois[0],st:'fixed',fixed:true,t:i*2,dur:1e9,yaw:Math.PI,y0:Math.PI,ox:0,oz:0,gd:0,greetT:0,gy:0,
@@ -1359,24 +1471,24 @@ function daily(){return[['敬香',Math.min(1,P.merit-DAY.m),1,''],['静坐',Math
 function dailyText(){const y=new Date();y.setDate(y.getDate()-1);const live=P.lastDone===today()||P.lastDone===ymd(y);return'今日功课 · '+(DAY.done?'已圆满':daily().map(a=>`${a[0]} ${Math.max(0,a[1])}/${a[2]}${a[3]}`).join(' · '))+(live&&P.streak?` · 连续 ${P.streak} 日`:'');}
 function checkDaily(){if(DAY.d!==today())DAY={d:today(),m:P.merit,s:Math.floor(P.sat),b:P.bows,k:BEADS.total,done:false};if(DAY.done||daily().some(a=>a[1]<a[2]))return;DAY.done=true;const y=new Date();y.setDate(y.getDate()-1);P.streak=P.lastDone===ymd(y)?P.streak+1:1;P.lastDone=today();saveKV({day:DAY,streak:P.streak,lastDone:P.lastDone});sfx.bowl(.2);banner('今日功课圆满',`连续 ${P.streak} 日`);}
 // stamps
-const STAMPS=['山门','前院','钟楼','鼓楼','月台','大雄宝殿','观音殿','祖师殿','镇岳塔','塔顶 · 凌云台','听松亭','藏经阁','舍身崖 · 观云台','财神殿','月老祠','文昌阁','状元桥','禅茶寮'];
+const STAMPS=['山门','前院','钟楼','鼓楼','月台','演武场','大雄宝殿','观音殿','祖师殿','镇岳塔','塔顶 · 凌云台','听松亭','藏经阁','舍身崖 · 观云台','财神殿','月老祠','文昌阁','状元桥','禅茶寮'];
 P.stamps=Array.isArray(SV.stamps)?SV.stamps.filter(n=>n>=0&&n<STAMPS.length):[];let lastLoc='';
 function checkStamp(){const n=locName();if(n===lastLoc)return;lastLoc=n;const i=STAMPS.indexOf(n);if(i<0||P.stamps.includes(i))return;P.stamps.push(i);saveKV({stamps:P.stamps});sfx.bowl(.07);
  if(P.stamps.length===STAMPS.length)banner('朝山圆满','集齐全部印记');else msg(`朝山印记 · ${n}（${P.stamps.length}/${STAMPS.length}）`);}
 // photo
 function photo(){if(GS.state!=='play')return;try{renderer.clear();renderer.render(scene,camera);const W=cv.width,H=cv.height,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');g.drawImage(cv,0,0);
   const u=Math.max(14,Math.round(Math.min(W,H)*.03)),gr=g.createLinearGradient(0,H-u*5,0,H);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(0,0,0,.65)');g.fillStyle=gr;g.fillRect(0,H-u*5,W,u*5);
-  g.fillStyle='#c8372a';g.fillRect(u,H-u*3.1,u*2.1,u*2.1);g.fillStyle='#fff';g.font=`${u*1.5}px "Kaiti SC","STKaiti","KaiTi",serif`;g.textBaseline='middle';g.textAlign='center';g.fillText('寺',u*2.05,H-u*2);
-  g.textAlign='left';g.fillStyle='#e8c45a';g.font=`${u*1.25}px "Kaiti SC","STKaiti","KaiTi",Georgia,serif`;g.fillText(tr('华山寺')+' · '+tr(locName()),u*3.8,H-u*2.45);
+  g.fillStyle='#c8372a';g.fillRect(u,H-u*3.1,u*2.1,u*2.1);g.fillStyle='#fff';g.font=`${u*1.5}px "Kaiti SC","STKaiti","KaiTi",serif`;g.textBaseline='middle';g.textAlign='center';g.fillText('山',u*2.05,H-u*2);
+  g.textAlign='left';g.fillStyle='#e8c45a';g.font=`${u*1.25}px "Kaiti SC","STKaiti","KaiTi",Georgia,serif`;g.fillText(tr('山寺')+' · '+tr(locName()),u*3.8,H-u*2.45);
   const d=new Date();g.fillStyle='rgba(255,255,255,.85)';g.font=`${u*.8}px sans-serif`;g.fillText(`${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} · ${tr(P.name)}`,u*3.8,H-u*1.25);
-  c.toBlob(async b=>{if(!b){msg('照片生成失败');return;}const f=new File([b],'huashan-temple.jpg',{type:'image/jpeg'});try{if(TOUCH&&navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:tr('华山寺')});return;}}catch(e){if(e&&e.name==='AbortError')return;}
+  c.toBlob(async b=>{if(!b){msg('照片生成失败');return;}const f=new File([b],'shansi-temple.jpg',{type:'image/jpeg'});try{if(TOUCH&&navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:tr('山寺')});return;}}catch(e){if(e&&e.name==='AbortError')return;}
    const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='huashan-temple.jpg';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);msg('已保存照片');},'image/jpeg',.92);
   fadeEl.style.transition='none';fadeEl.style.background='#fff';fadeEl.style.opacity=.7;setTimeout(()=>{fadeEl.style.transition='opacity .45s';fadeEl.style.opacity=0;setTimeout(()=>fadeEl.style.background='#05070a',500);},60);sfx.take();}catch(e){msg('照片生成失败');}}
 // sky lanterns
 P.sky=SV.sky|0;const skyL=[],skyG=new THREE.CylinderGeometry(.34,.24,.62,10,1,true),skyM=new THREE.MeshBasicMaterial({color:0xffb45a,side:THREE.DoubleSide,transparent:true,opacity:.92}),skyS=new THREE.SpriteMaterial({map:softT,color:0xff9a40,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
 function launchSky(i){P.sky++;saveKV({sky:P.sky});const g=new THREE.Group();g.add(new THREE.Mesh(skyG,skyM));const s=new THREE.Sprite(skyS);s.scale.set(2.4,2.4,1);g.add(s);const top=new THREE.Mesh(new THREE.CircleGeometry(.34,10),skyM);top.rotation.x=-Math.PI/2;top.position.y=.31;g.add(top);
  g.position.set(P.pos.x-Math.sin(P.yaw)*1.2,P.pos.y+1.5,P.pos.z-Math.cos(P.yaw)*1.2);scene.add(g);skyL.push({g,t:0,o:Math.random()*6});if(skyL.length>8){const o=skyL.shift();scene.remove(o.g);}sfx.light();sfx.bowl(.08);banner(WISH[i],'天灯已升空');}
-IA.push({p:new V3(0,4.9,-67.6),r:5.5,label:()=>P.pos.z<-63?'放天灯':null,act(){showCard({title:'天灯',sub:'择一心愿 · 随灯升空',opts:WISH,onPick:launchSky});}});
+IA.push({p:new V3(0,4.4,-67.6),r:8.5,label:()=>P.pos.z<-60?'放天灯 · 观云台':null,act(){showCard({title:'天灯',sub:'择一心愿 · 随灯升空',opts:WISH,onPick:launchSky});}});
 // koi feeding
 let feedT=0;const feedP=new V3();
 IA.push({p:SP.pond.clone().setY(.9),r:4.6,label:()=>feedT<=0?'喂锦鲤':null,act(){feedT=7;const dx=P.pos.x-SP.pond.x,dz=P.pos.z-SP.pond.z,d=Math.hypot(dx,dz)||1;feedP.set(SP.pond.x+dx/d*1.7,0,SP.pond.z+dz/d*1.7);nz(.2,.08,'bandpass',1100,0,0,1);msg('锦鲤聚拢过来');}});
@@ -1463,7 +1575,7 @@ function updCamera(dt){const hs=Math.hypot(P.vel.x,P.vel.z),bobA=P.mode==='walk'
  const pk=Math.max(P.greetK,P.mode==='sit'&&P.autoBow?1:0);palms.visible=!third&&P.inc===0&&pk>.02;if(palms.visible)palms.position.set(0,-.33+pk*.15,-.36);
  vmSun.position.copy(curDir).applyQuaternion(camera.quaternion.clone().invert());}
 function locName(){const{x,y,z}=P.pos;if(y>15&&z<-40)return'塔顶 · 凌云台';if(x>45)return z<8.5&&y>.5?'财神殿':x>74&&z>19&&z<31&&y>.5?'月老祠':'财神院';if(x<-45)return z<8.5&&y>.5?'文昌阁':x<-74&&z>19&&z<31&&y>.5?'禅茶寮':Math.abs(x+65.5)<3&&Math.abs(z-22)<4?'状元桥':'文昌院';if(z>41)return'山门外 · 苍龙岭';if(z>37)return'山门';if(y>3.2&&z<-26)return Math.hypot(x,z+51)<9?'镇岳塔':x<-14&&z>-45?'听松亭':x>10&&z>-50&&z<-40&&y>3.9?'藏经阁':z<-64?'舍身崖 · 观云台':'塔院';
- if(y>2.2&&Math.abs(x)<12.2&&z<-3&&z>-13.2)return'大雄宝殿';if(y>1.3&&Math.abs(x)<24.2&&z<10.2)return'月台';if(Math.abs(x)>31&&z>-15&&z<5&&y>.5)return x>0?'观音殿':'祖师殿';if(z>10)return x<-19&&z>20&&z<31?'钟楼':x>19&&z>20&&z<31?'鼓楼':'前院';return'松径';}
+ if(y>2.2&&Math.abs(x)<12.2&&z<-3&&z>-13.2)return'大雄宝殿';if(y>1.2&&x>13.2&&x<24&&z<-11&&z>-24.5)return'演武场';if(y>2.9&&x>9&&x<21.5&&z<-30&&z>-38)return Math.abs(z+34.4)<3?'禅堂':null||'塔院';if(y>1.3&&Math.abs(x)<24.2&&z<10.2)return'月台';if(Math.abs(x)>31&&z>-15&&z<5&&y>.5)return x>0?'观音殿':'祖师殿';if(z>10)return x<-19&&z>20&&z<31?'钟楼':x>19&&z>20&&z<31?'鼓楼':'前院';return'松径';}
 let hudT=0;const actBtn=a=>document.querySelector(`#acts [data-a=${a}]`);
 function updHud(dt){hudT-=dt;if(hudT<=0){hudT=.25;$('locn').textContent=tr(locName());$('me').textContent=tr('我 · '+P.name);$('mr').textContent=P.merit;$('mb').textContent=P.bows;$('mk').textContent=BEADS.total;$('mg').textContent=P.gongde;$('fc').textContent=tr('功德 '+P.gongde);
   const s=Math.floor(P.sat);$('mt').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
@@ -1475,7 +1587,7 @@ function updHud(dt){hudT-=dt;if(hudT<=0){hudT=.25;$('locn').textContent=tr(locNa
 
 /* ---------- input ---------- */
 const cv=renderer.domElement,joy={x:0,y:0,id:-1,ox:0,oy:0},lookT={id:-1,x:0,y:0};let dragMode=false,lockFails=0,lastFail=0,wAcc=0,startIntent='free';
-function enterPlay(){if(GS.state==='play')return;fadeEl.style.opacity=0;if(GS.state==='menu'){setGuide(0);if(startIntent==='meditate'){P.pos.set(0,2.35,-8);P.camY=2.35;P.yaw=0;P.pitch=-.08;msg('已到大雄宝殿 · 找一方蒲团静坐');}else if(startIntent==='pilgrimage'){P.pos.set(0,0,54);P.camY=0;P.yaw=0;P.pitch=0;msg('朝山从山门开始 · 先收集第一枚印记');}else{P.pos.set(0,0,54);P.camY=0;P.yaw=0;P.pitch=0;}banner('华山寺',`山门已开 · ${P.name} · 请随缘礼拜`);sfx.bell();}GS.state='play';$('ov').style.display='none';$('hud').style.display='block';if(TOUCH){$("touch").style.display="block";if(!hinted){hinted=true;setTimeout(()=>msg("轻点地面即可前往 · 拖动环顾"),5200);}}wake();}
+function enterPlay(){if(GS.state==='play')return;fadeEl.style.opacity=0;if(GS.state==='menu'){setGuide(0);if(startIntent==='meditate'){P.pos.set(0,2.35,-8);P.camY=2.35;P.yaw=0;P.pitch=-.08;msg('已到大雄宝殿 · 找一方蒲团静坐');}else if(startIntent==='pilgrimage'){P.pos.set(0,0,54);P.camY=0;P.yaw=0;P.pitch=0;msg('朝山从山门开始 · 先收集第一枚印记');}else{P.pos.set(0,0,54);P.camY=0;P.yaw=0;P.pitch=0;}banner('山寺',`山门已开 · ${P.name} · 请随缘礼拜`);sfx.bell();}GS.state='play';$('ov').style.display='none';$('hud').style.display='block';if(TOUCH){$("touch").style.display="block";if(!hinted){hinted=true;setTimeout(()=>msg("轻点地面即可前往 · 拖动环顾"),5200);}}wake();}
 function pause(){if(GS.state!=="play")return;unwake();stopWalk();closeCard();{const s=Math.floor(P.sat);$('stats').textContent=tr(`香火 ${P.merit} · 礼拜 ${P.bows} · 念珠 ${BEADS.total} · 功德 ${P.gongde} · 供灯 ${P.lamps} · 绕塔 ${P.laps} · 财神 ${P.cai} · 福币 ${P.coins} · 印记 ${P.stamps.length}/${STAMPS.length} · 静坐 ${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`);$("stats").style.display="block";$("daily").textContent=tr(dailyText());$("chips").style.display="none";}if(BEADS.isOpen())BEADS.close();GS.state='pause';for(const k in keys)keys[k]=false;joy.x=joy.y=0;joy.id=lookT.id=-1;$('stick').style.display='none';save();$('ttl').textContent=tr('暂歇');$('sub').textContent=tr('山风未止 · 钟声未歇');$('go').textContent=tr(TOUCH?'轻触继续':'点击继续');$("ov").style.display="flex";$("touch").style.display="none";$("hud").style.display="none";}
 function toDrag(){dragMode=true;enterPlay();msg('按住鼠标左键拖动以环顾 · Esc 暂停');}
 function lockFail(){const n=performance.now();if(n-lastFail<400)return;lastFail=n;if(document.pointerLockElement===cv)return;if(++lockFails>=2)toDrag();else $('go').textContent=tr('请再点击一次');}
@@ -1585,7 +1697,20 @@ const MP=(()=>{
     const p=[r2(g.x),r2(g.y),r2(g.z)],r=r2(av.g.rotation.y),a=[r2(av.sit),r2(av.bow),r2(av.palms)],k=p.concat(r,a).join();
     if(k!==lastK||tA-lastS>3){lastK=k;lastS=tA;ws.send(JSON.stringify({t:'s',p,r,a}));}}}};
 })();
-window.__g={MP,tapWalk,get QL(){return QL;},get walking(){return !!walkF;},GS,P,camera,renderer,nextTod,interact,IA,tod,npcs,pois,bowKey,openBeads,toggleFish,greet,toggleView,knock,cushions,SP,cols,navH,cellOf};
+function fillSelf(){const i=$('nmIn');if(i){i.value=P.name;document.querySelectorAll('#self [data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g===P.gender));}}
+function setSelf(name,g){
+  const n=String(name||'').replace(/[\u0000-\u001f<>]/g,'').trim().slice(0,12);if(n)P.name=n;
+  if(g==='m'||g==='f')P.gender=g;
+  saveKV({name:P.name,gender:P.gender});save();
+  if(av){scene.remove(av.g);if(av.tag){av.tag.material.map.dispose();av.tag.material.dispose();}}
+  av=mkAvatar();av.g.visible=P.view!=='first'&&GS.state==='play';
+  fillSelf();msg('已定名 · '+P.name);
+}
+if($('nmOk'))$('nmOk').addEventListener('click',()=>setSelf($('nmIn').value,P.gender));
+if($('nmIn'))$('nmIn').addEventListener('keydown',e=>{if(e.key==='Enter')setSelf($('nmIn').value,P.gender);});
+document.querySelectorAll('#self [data-g]').forEach(b=>b.addEventListener('click',()=>{
+  const g=b.dataset.g;setSelf($('nmIn').value,g==='r'?(Math.random()<.5?'f':'m'):g);}));
+window.__g={setSelf,mkAvatar,MP,tapWalk,get QL(){return QL;},get walking(){return !!walkF;},GS,P,camera,renderer,nextTod,interact,IA,tod,npcs,pois,bowKey,openBeads,toggleFish,greet,toggleView,knock,cushions,SP,cols,navH,cellOf};
 window.engineReady&&window.engineReady(TOUCH);
 frame();
 </script>
