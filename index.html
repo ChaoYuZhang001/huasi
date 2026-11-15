@@ -845,7 +845,10 @@ function standFig(x,y,z,s,m,o={}){lotus(x,y,z,.5*s,o.lotusM||M.gold,o.petalM);co
  if(o.crown){C(.07*s,.13*s,.2*s,x,b+1.95*s,z,M.gold,false,10);shape(new THREE.SphereGeometry(.22*s,10,8),o.veil||m,x,b+1.72*s,z-.09*s,1,1.6,.85);}
  if(o.halo)disc(.36*s,x,b+1.82*s,z-.22*s,o.haloM||M.gold);
  if(o.vase){S(.05*s,x+.07*s,b+1.32*s,z+.3*s,M.white,1,1.6,1);C(.008*s,.008*s,.22*s,x+.07*s,b+1.38*s,z+.3*s,M.pad,false,4);}}
-at(0,1.5,-7);(()=>{const y=.85+1.1,z=-6+1.7;seatedFig(0,y,z,.8,M.gold,{buddha:true,halo:true,petalM:M.gold2,trim:M.gold2});standFig(-2.35,y,z+.25,1.05,M.gold,{halo:true,haloM:M.gold2});standFig(2.35,y,z+.25,1.05,M.gold,{halo:true,haloM:M.gold2});})();
+at(0,1.5,-7);(()=>{const y=.85+1.1,z=-6+1.7;
+ // Hierarchy: the main image must dominate its two attendants from the doorway.
+ seatedFig(0,y,z,1.15,M.gold,{buddha:true,halo:true,petalM:M.gold2,trim:M.gold2});
+ standFig(-2.75,y,z+.3,.78,M.gold,{halo:true,haloM:M.gold2});standFig(2.75,y,z+.3,.78,M.gold,{halo:true,haloM:M.gold2});})();
 // —— 殿堂陈设、放生池、花树、祈福架 ——
 const SP={lamps:[],lampIA:[]},wv=(x,y,z)=>{const[a,b]=Wp(x,z);return new V3(a,O.y+y,b);};
 M.jade=mat(T.marble,1.5,{c:0xf4f1e8,r:.45});M.pink=mat(null,1,{c:0xe89ab0,r:.8});M.water=mat(null,1,{c:0x2c5a55,r:.1,m:.35});M.water.transparent=true;M.water.opacity=.82;T.ripple=ctex(256,(g,s)=>{g.fillStyle='#808080';g.fillRect(0,0,s,s);blotch(g,s,70,'rgba(255,255,255,.5)',26);blotch(g,s,70,'rgba(0,0,0,.5)',22);});M.water.bumpMap=T.ripple;M.water.bumpScale=2.5;M.water.roughness=.06;M.water.metalness=.55;M.water.userData.s=2.2;M.pad=mat(null,1,{c:0x3f6a34,r:.9});M.blossom=mat(T.marble,1.2,{c:0xffa9c6,r:1,e:0x40121f,ei:.12});
