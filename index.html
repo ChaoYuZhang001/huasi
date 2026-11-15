@@ -640,11 +640,38 @@ function chain(x1,z1,x2,z2,y){at(0,y,0);const L=Math.hypot(x2-x1,z2-z1),ax=Math.
  for(const h of[.55,1]){ax?B(L,.045,.045,cx,h,cz,M.iron,false):B(.045,.045,L,cx,h,cz,M.iron,false);}
  for(let d=.3;d<L-.3;d+=rr(.12,.5)){const px=lerp(x1,x2,d/L),pz=lerp(z1,z2,d/L),k=R();if(k<.55){const l=rr(.18,.45);ax?B(.035,l,.012,px,1-l,pz+rr(-.03,.03),M.ribbon,false):B(.012,l,.035,px+rr(-.03,.03),1-l,pz,M.ribbon,false);}else if(k<.75)B(.05,.06,.03,px,.93,pz,M.gold,false);}
  ax?col(L,1.1,.3,cx,0,cz):col(.3,1.1,L,cx,0,cz);}
-function pine(x,y,z,h){at(x,y,z);let px=0,pz=0,py=0;const l1=rr(-.3,.3),l2=rr(-.3,.3),n=4;
- for(let s=0;s<n;s++){const sh=h/n,r0=.3*(1-s/n*.6);const g=uvs(new THREE.CylinderGeometry(r0*.78,r0,sh*1.08,7),2,sh/1.2);g.rotateZ(-l1*.5*s*.5);g.rotateX(l2*.5*s*.5);G(g,M.bark,px,py+sh/2,pz);if(s===0)col(.5,sh,.5,0,0,0);py+=sh;px+=l1*sh*s*.5;pz+=l2*sh*s*.5;}
- for(let k=0;k<8;k++){const a=R()*6.28,d=rr(.3,2.5),fy=h*rr(.62,1.04),rad=rr(1.1,2.1);const g=uvs(new THREE.SphereGeometry(rad*.7,8,5),3,1.5);g.scale(1,.26,1);G(g,M.leaf,px*.8+Math.cos(a)*d,fy,pz*.8+Math.sin(a)*d);pad(M.pineC,rad*1.3,px*.8+Math.cos(a)*d,fy+.05,pz*.8+Math.sin(a)*d);
-  const bg=new THREE.CylinderGeometry(.04,.07,d,5);bg.rotateZ(Math.PI/2);bg.rotateY(-a);G(bg,M.bark,px*.8+Math.cos(a)*d/2,fy-.2,pz*.8+Math.sin(a)*d/2);}
- at(x,y,z);B(3.4,.04,3.4,0,0,0,M.moss,false);}
+// Pine: a curved tapering trunk carrying upswept branches, each hung with tilted
+// needle tufts instead of flat pads. ~1.4k verts, still one merged material bucket.
+function pine(x,y,z,h){at(x,y,z);
+ const bx=rr(-.55,.55),bz=rr(-.55,.55);
+ const tr=new THREE.CatmullRomCurve3([new V3(0,0,0),new V3(bx*.2,h*.28,bz*.2),new V3(bx*.5,h*.56,bz*.5),new V3(bx,h*.82,bz),new V3(bx*1.25,h,bz*1.25)]);
+ const tg=new THREE.TubeGeometry(tr,6,Math.max(.09,h*.035),7,false);
+ const tp=tg.attributes.position,tv=new V3();
+ for(let i=0;i<tp.count;i++){const t=i/tp.count;tv.fromBufferAttribute(tp,i);
+  // taper toward the crown and flare the root
+  const k=(1-t*.62)*(1+1.1*Math.exp(-t*16));tp.setXYZ(i,tv.x*k,tv.y,tv.z*k);}
+ tg.computeVertexNormals();G(uvs(tg,2,h/1.2),M.bark,0,0,0);col(.55,h*.5,.55,0,0,0);
+ const NB=7;
+ for(let b=0;b<NB;b++){
+  const t=.30+(b/NB)*.58+rr(-.03,.03),p0=tr.getPointAt(t),dir=new V3(Math.cos(b*2.1+rr(-.4,.4)),0,Math.sin(b*2.1+rr(-.4,.4))).normalize();
+  const len=rr(1.3,2.6)*(1-t*.45),rise=rr(.35,.85);
+  const mid=p0.clone().addScaledVector(dir,len*.5).add(new V3(0,rise*.55,0));
+  const tip=p0.clone().addScaledVector(dir,len).add(new V3(0,rise,0));
+  // local cylinder instead of limb(): pine runs before the shared temp vectors exist
+  const seg=(A,B,r1,r2)=>{const d=B.clone().sub(A),L2=d.length();const g2=new THREE.CylinderGeometry(r2,r1,L2,8);
+   g2.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new V3(0,1,0),d.normalize()));G(g2,M.bark,(A.x+B.x)/2,(A.y+B.y)/2,(A.z+B.z)/2);};
+  seg(p0,mid,.10,.075);seg(mid,tip,.075,.035);
+  // tufts along the outer half, tilted to catch the light from above
+  for(let u=0;u<4;u++){
+   const k2=.45+u*.19,pp=mid.clone().lerp(tip,k2);
+   const rad=rr(.5,1.0)*(1-k2*.35);
+   const pad2=new THREE.PlaneGeometry(2*rad,2*rad,2,2),pv=pad2.attributes.position;
+   for(let q=0;q<pv.count;q++){const d2=Math.hypot(pv.getX(q),pv.getY(q))/rad;pv.setZ(q,-d2*d2*rad*.14);}
+   pad2.rotateX(-Math.PI/2+rr(-.15,.15));pad2.rotateY(R()*6.28);
+   G(upN(pad2),M.pineC,pp.x+rr(-.25,.25),pp.y+rr(-.1,.15),pp.z+rr(-.25,.25));
+  }
+ }
+}
 function rockGeo(r,sx,sy,sz,ph){const g=new THREE.SphereGeometry(r,16,11),p=g.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i),n=1+.22*Math.sin(x*2.3/r+ph)*Math.cos(z*2.7/r+ph*1.7)+.14*Math.sin(y*4/r+x*3/r+ph)+.05*Math.sin(x*9/r+z*7/r+ph*3)*Math.cos(y*8/r+ph);p.setXYZ(i,x*n*sx,y*n*sy,z*n*sz);}g.computeVertexNormals();return uvs(g,r*sx/3,r*sy/3);}
 function boulder(x,y,z,r){at(x,y,z);G(rockGeo(r,rr(.8,1.3),rr(.6,.9),rr(.8,1.3),R()*9),M.rock,0,r*.3,0);col(r*1.3,r*.8,r*1.3,0,0,0);}
 function peak(x,z,rad,h,top){at(0,0,0);const g=new THREE.CylinderGeometry(rad*.32,rad,h,44,22),p=g.attributes.position;
