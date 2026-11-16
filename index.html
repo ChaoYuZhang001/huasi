@@ -323,7 +323,7 @@ if(L==='en'){document.documentElement.lang='en';document.body.classList.add('en'
  const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),ns=[];while(w.nextNode())ns.push(w.currentNode);
  for(const n of ns){const p=n.parentNode.nodeName;if(p==='SCRIPT'||p==='STYLE'||n.parentNode.dataset.keep!==undefined)continue;if(cjk.test(n.nodeValue))n.nodeValue=tr(n.nodeValue);}}
 const $=id=>document.getElementById(id),lb=$('langBtn');if(lb){lb.textContent=L==='en'?'中文':'EN';lb.addEventListener('click',e=>{e.stopPropagation();try{localStorage.setItem('huashan-lang',L==='en'?'zh':'en');}catch(_){}location.href=location.pathname;});}
-[['howBtn','how'],['setBtn','mix'],['selfBtn','self']].forEach(([b,p])=>{$(b).addEventListener('click',e=>{e.stopPropagation();const o=$(p).classList.contains('open');$('how').classList.remove('open');$('mix').classList.remove('open');$('self').classList.remove('open');if(!o)$(p).classList.add('open');if(p==='self')fillSelf();});});
+[['howBtn','how'],['setBtn','mix'],['selfBtn','self']].forEach(([b,p])=>{$(b).addEventListener('click',e=>{e.stopPropagation();const o=$(p).classList.contains('open');$('how').classList.remove('open');$('mix').classList.remove('open');$('self').classList.remove('open');if(!o)$(p).classList.add('open');if(p==='self'&&window.fillSelf)window.fillSelf();});});
 ['how','ovBtns'].forEach(id=>$(id).addEventListener('click',e=>e.stopPropagation()));
 })();
 </script>
@@ -375,7 +375,7 @@ cv.addEventListener('wheel',e=>{e.preventDefault();if(!open)return;wacc+=Math.ab
 addEventListener('keydown',e=>{if(!open||mode!=='load')return;if(['Space','ArrowDown','ArrowUp','KeyJ'].includes(e.code)){e.preventDefault();step();}else if(e.code==='Escape')close();});
 $('bClose').addEventListener('click',e=>{e.stopPropagation();close();});
 $('bEnter').addEventListener('click',e=>{e.stopPropagation();close();$('ov').click();});
-['wait','mix','share','langBtn','mpBtn'].forEach(id=>{const el=$(id);if(el)el.addEventListener('click',e=>e.stopPropagation());});
+['wait','mix','share','langBtn','mpBtn','self'].forEach(id=>{const el=$(id);if(el)el.addEventListener('click',e=>e.stopPropagation());});
 $('share').addEventListener('click',async()=>{const b=$('share'),d={title:tr('山寺'),text:tr('山中有座寺，可以上香、静坐、拜财神、登钟楼、放天灯。'),url:location.href.split('#')[0]};try{if(navigator.share){await navigator.share(d);return;}await navigator.clipboard.writeText(d.text+' '+d.url);b.textContent=tr('链接已复制');}catch(e){if(e&&e.name==='AbortError')return;b.textContent=tr('请复制地址栏链接');}setTimeout(()=>b.textContent=tr('分享给朋友'),2200);});
 $('preBeads').addEventListener('click',e=>{e.stopPropagation();getAC();openB('load');});
 window.BEADS={isOpen:()=>open,open:openB,close,step,drag:dy=>{if(open)drag(dy);},get total(){return B.total;},get count(){return B.count;}};
@@ -721,8 +721,8 @@ hall(0,-7,1.5,0,24,12,{name:'大雄宝殿',double:true,doors:3,statue:true,ch:4.
 hall(36,-5,0,3,20,9,{name:'观音殿',custom:true});
 hall(-36,-5,0,1,20,9,{name:'祖师殿',custom:true});
 hall(0,40,0,0,14,6,{name:'山寺',through:true,porch:0,plat:.3,ch:4.2,empty:true});
-hall(-18.3,-18.6,1.5,1,8,4.8,{name:'五观堂',custom:true,nolight:true,plat:.5,ch:3.6,porch:1.4,doors:1});
-hall(15.5,-34.4,3.5,0,9,5,{name:'禅堂',custom:true,nolight:true,plat:.45,ch:3.4,porch:1.3});
+hall(-37.3,-45,0,1,8,4.8,{name:'五观堂',custom:true,nolight:true,plat:.5,ch:3.6,porch:1.4,doors:1});
+hall(-20.4,-59,3.5,0,9,5,{name:'禅堂',custom:true,nolight:true,plat:.45,ch:3.4,porch:1.3});
 hall(17,-45,3.5,0,12,8,{name:'藏经阁',plat:.6,custom:true});
 // walls
 wall(-44.6,40,-7.1,40);wall(7.1,40,44.6,40);for(const s of[-1,1]){wall(s*44.6,40,s*44.6,22.6);wall(s*44.6,17.4,s*44.6,-69.6);}wall(30.2,-69.6,44.6,-69.6);wall(-44.6,-69.6,-30.2,-69.6);
@@ -745,8 +745,8 @@ burner(0,0,24);burner(0,1.5,6.2);
 for(const s of[-1,1]){lantern(s*4.5,0,17);lantern(s*4.5,0,31);lantern(s*8.5,1.5,8);lantern(s*6,3.5,-29);lantern(s*4,0,46);
  at(s*5,0,44.6);B(1.3,1,1.7,0,0,0,M.ashlar);S(.55,0,1.5,0,M.marble,.9,1,1.25,10,8);S(.42,0,2.15,.42,M.marble,1,1,1,10,8);S(.2,0,1.25,.75,M.marble);}
 at(8.5,0,53);B(1.6,.5,.8,0,0,0,M.cliff);B(1.2,2.6,.4,0,.5,0,M.cliff);at(8.5,0,53,3);plaque('华山',0,1.8,.22,{vertical:true,h:2.1,bg:'#9c968b',fg:'#b3261c',noframe:true,side:0x9c968b});
-[[-13,0,21,7.5],[14,0,33,8.5],[-33,0,13,9],[33,0,17,8],[-38,0,33,10],[38,0,31,9],[39,0,-24,8],[-39,0,-30,9],[38,0,-52,10],[-37,0,-58,8.5],[-24,3.5,-62,9],[25,3.5,-63,10],[-9,3.5,-34,7],[-10,0,48,7],[10.5,0,57,6.5],[-21,1.5,6,6]].forEach(p=>pine(...p));
-[[-28,0,31,1.6],[30,0,35,1.3],[-40,0,13,1.2],[40,0,-40,1.7],[-41,0,-45,1.4],[-11,0,56,1.1],[22,3.5,-33,1.2],[-26,3.5,-52,1.5],[16,0,14,1.0]].forEach(p=>boulder(...p));
+[[-13,0,21,7.5],[14,0,33,8.5],[-33,0,13,9],[33,0,17,8],[-38,0,33,10],[38,0,31,9],[39,0,-24,8],[-39,0,-30,9],[38,0,-52,10],[-37,0,-58,8.5],[25,3.5,-63,10],[-9,3.5,-34,7],[-10,0,48,7],[10.5,0,57,6.5],[-21,1.5,6,6]].forEach(p=>pine(...p));
+[[-28,0,31,1.6],[30,0,35,1.3],[-40,0,13,1.2],[42.6,0,-50,1.7],[-33,0,-60,1.4],[-11,0,56,1.1],[22,3.5,-33,1.2],[-26,3.5,-52,1.5],[16,0,14,1.0]].forEach(p=>boulder(...p));
 // —— 礼佛陈设：香案、烛台、蒲团、僧人、法器 ——
 M.cushion=mat(T.marble,.4,{c:0xc79a4a,r:1});M.robe=mat(null,1,{c:0x6f6a60,r:1});M.robe2=mat(null,1,{c:0xa8641e,r:1});M.skin=mat(null,1,{c:0xc79a78,r:.8});M.stick=mat(null,1,{c:0x9a2a1e,r:.9});M.paper=mat(null,1,{c:0xe6c84e,r:.9});
 const cushions=[],tables=[],candles=[],candles2=[];
@@ -760,57 +760,62 @@ function candleStand(x,y,z,light=true){at(x,y,z);lg(0,1.3,0);for(const sx of[-.7
 function monk(x,y,z,m){cushion(x,y,z,0,false);}
 incTable(4.2,0,26);candleStand(-4.2,0,26);incTable(4.6,1.5,7.2);candleStand(-4.6,1.5,7.2);
 for(const x of[-1.3,0,1.3])cushion(x,2.35,-5.1,0);monk(-3.3,2.35,-5.3,M.robe);monk(3.3,2.35,-5.3,M.robe2);
+// 禅堂：三方蒲团（可静坐），后壁一张供桌
+for(const dx of[-2.4,0,2.4])cushion(-20.4+dx,3.95,-58.6,0);
+at(-20.4,3.95,-61);B(2.2,.8,.6,0,0,0,M.woodDark);C(.16,.11,.14,0,.8,0,M.bronze,false,14);
+// 五观堂：两条长斋桌、长凳与钵
+for(const dx of[-1.1,1.1]){at(-37.3+dx,.5,-45);B(.62,.06,6,0,.72,0,M.woodDark,false);for(const sz of[-2.6,2.6])B(.5,.72,.08,0,0,sz,M.woodDark,false);col(.62,.78,6,0,0,0);
+ B(.28,.42,6,dx<0?-.6:.6,0,0,M.wood);for(let k=0;k<6;k++)S(.07,0,.82,-2.5+k,M.bronze,1,.55,1,10,6);}
 at(0,1.5,-7);S(.15,.75,2,-1.3,M.wood,1.25,.9,1,10,8);C(.2,.2,.04,.75,1.85,-1.3,M.lantern,false,10);C(.17,.11,.15,-.75,1.85,-1.3,M.bronze,false,14);C(.012,.012,.3,.5,1.87,-1.2,M.woodDark,false,5);
 for(const sx of[-10,10]){at(sx,3.5,-67.5);B(1.3,.12,1.3,0,0,0,M.cliff);cushion(sx,3.62,-67.5,0);}
-// —— 演武场：大雄宝殿月台以东的侧院（x 13.2-24, z -24..-11)
-(()=>{const Y=1.72;
- at(18.2,1.5,-17.5);B(9.2,.22,12.4,0,0,0,M.ashlar);B(9.4,.05,12.6,0,.22,0,M.marble,false);
+// —— 演武场：塔院台壁与东院墙之间的夹道（x 32.6-42，z -43.2..-30.8）。
+//    距藏经阁檐 7 米、观音殿檐 13 米，四周不再贴着任何殿宇。
+(()=>{const X0=37.3,Z0=-37,Y=.22,A=(dx,dz,y=Y)=>at(X0+dx,y,Z0+dz);
+ A(0,0,0);B(9.2,.22,12.4,0,0,0,M.ashlar);B(9.4,.05,12.6,0,.22,0,M.marble,false);
  for(const sx of[-4.5,4.5])B(.3,.34,12.4,sx,0,0,M.marble,false);B(9.2,.34,.3,0,0,-6.1,M.marble,false);
- stairs(18.2,-11.1,3.4,1.5,Y);
- for(const sx of[-4.2,4.2])for(const sz of[-5.9,5.9]){S(.16,sx,.52,sz,M.marble,1,1.5,1,6,5);lg(sx,Y+.38,sz);}
- NL.push(wpv(18.2,2.6,-17.5));
- // 兵器架
- at(15.4,Y,-22.8);for(const sz of[-1.6,1.6])C(.07,.09,1.65,0,0,sz,M.woodDark,false,8);
+ for(const sx of[-4.2,4.2])for(const sz of[-5.9,5.9]){S(.16,sx,.52,sz,M.marble,1,1.5,1,6,5);lg(sx,.6,sz);}
+ NL.push(wpv(0,2.6,0));
+ // 兵器架（整架都在台面内）
+ A(-2.8,-4);for(const sz of[-1.6,1.6])C(.07,.09,1.65,0,0,sz,M.woodDark,false,8);
  B(.14,.12,3.4,0,1.55,0,M.woodDark);
  for(let i=0;i<5;i++){const g=new THREE.CylinderGeometry(.026,.026,1.8,6);g.rotateZ(.09*(i-2));G(g,M.wood,.1*i-0.2,.86,0);
   if(i>1){B(.018,.5,.05,.1*i-.2,1.5,0,M.iron,false);B(.05,.34,.06,.1*i-.2,1.86,0,M.gold,false);}}
- // 练武旗
- at(18.2,Y,-23.0);C(.055,.085,7.2,0,0,0,M.iron,true,8);S(.14,0,7.3,0,M.gold);
- B(1.25,.06,.06,0,6.9,0,M.woodDark);B(1.05,1.55,.03,.68,6.05,0,M.red,false);
+ // 练武旗：旗面挂在横担下方
+ A(0,-5.5);C(.055,.085,7.2,0,0,0,M.iron,true,8);S(.14,0,7.3,0,M.gold);
+ B(1.25,.06,.06,0,6.9,0,M.woodDark);B(1.05,1.53,.03,.68,5.33,0,M.red,false);
  B(1.05,.07,.035,.68,6.86,0,M.gold,false);B(1.05,.07,.035,.68,5.26,0,M.gold,false);
- plaque('演武',18.2,5.3,-22.9,{bg:'#101c33'});
+ plaque('演武',0,3.2,.12,{h:.6,bg:'#101c33'});
  // 鼓（东南角）
- at(21.8,Y,-12.5);for(const sx of[-.28,.28])for(const sz of[-.26,.26])B(.09,.62,.09,sx,0,sz,M.woodDark);
+ A(3.6,5);for(const sx of[-.28,.28])for(const sz of[-.26,.26])B(.09,.62,.09,sx,0,sz,M.woodDark);
  {const g=new THREE.CylinderGeometry(.42,.42,.66,16);g.rotateZ(Math.PI/2);G(g,M.lantern,0,.9,0);
   for(const sx of[-.34,.34]){const d=new THREE.CylinderGeometry(.44,.44,.03,16);d.rotateZ(Math.PI/2);G(d,M.drum,sx,.9,0);}
   B(.06,.9,.06,-.5,.45,0,M.woodDark,false,6);B(.05,.32,.05,-.5,1.9,0,M.wood,false,6);}
  // 锣（西南角）
- at(14.4,Y,-12.5);for(const sz of[-.62,.62])C(.05,.06,1.9,0,0,sz,M.woodDark,false,8);
+ A(-3.8,5);for(const sz of[-.62,.62])C(.05,.06,1.9,0,0,sz,M.woodDark,false,8);
  B(.1,.12,1.5,0,1.86,0,M.woodDark);
  {const g=new THREE.CylinderGeometry(.5,.5,.045,18);g.rotateX(Math.PI/2);G(g,M.bronze,0,1.32,0);}
  S(.09,0,1.32,.03,M.gold);
  // 草人 ×2
- for(const sz of[-20.4,-17.6]){at(21.7,Y,sz);C(.09,.12,.9,0,0,0,M.woodDark,true,8);
+ for(const dz of[-2.9,-.1]){A(3.5,dz);C(.09,.12,.9,0,0,0,M.woodDark,true,8);
   S(.32,0,.92,0,M.sack,1,1.2,1,8,6);B(.94,.07,.07,0,1.06,0,M.woodDark);
   {const c=new THREE.ConeGeometry(.3,.42,8);G(c,M.clay,0,1.32,0);}}
  // 梅花桩
- at(16.6,Y,-13.6);for(const[f,s]of[[0,[0,0]],[1,[-.8,0]],[2,[.8,0]],[3,[0,-.8]],[4,[0,.8]]]){C(.15,.18,.48,s[0],0,s[1],M.woodDark,true,8);S(.17,s[0],.48,s[1],M.wood,1,.4,1,8,5);}
- // 石锁与石担
- at(22.2,Y,-14.2);for(const sx of[-.5,.5]){S(.2,sx,.16,0,M.cliff,1,.85,1,8,6);C(.05,.05,.3,sx,.31,0,M.cliff,false,6);}
+ A(-1.6,3.9);for(const s of[[0,0],[-.8,0],[.8,0],[0,-.8],[0,.8]]){C(.15,.18,.48,s[0],0,s[1],M.woodDark,true,8);S(.17,s[0],.48,s[1],M.wood,1,.4,1,8,5);}
+ // 石锁与石担（离开边石）
+ A(3.4,3.3);for(const sx of[-.5,.5]){S(.2,sx,.16,0,M.cliff,1,.85,1,8,6);C(.05,.05,.3,sx,.31,0,M.cliff,false,6);}
  C(.05,.05,1.6,0,.6,0,M.cliff,true,6);
- cushion(20.6,Y,-22.9,0,false);
+ A(2.4,-5.4);cushion(X0+2.4,Y,Z0-5.4,0,false);
 })();
 
-// —— 放天灯 · 观云台灯场（自带灯笼几何：此处天空灯尚未定义）
-(()=>{at(0,3.5,-67.6);B(13,.1,6.2,0,0,0,M.paving,false);
- for(const sx of[-5.4,5.4])for(const sz of[-2.4,2.4]){C(.13,.17,3.5,sx,0,sz,M.wood,true,10);S(.17,sx,3.56,sz,M.gold);}
- for(const sx of[-5.4,5.4])C(.028,.028,5.3,sx,3.5,0,M.woodDark,false,6);
- for(let i=0;i<7;i++){const x=-5.0+i/3*5.0;
-  C(.006,.006,.42,x,3.65,0,M.woodDark,false,4);
-  G(new THREE.CylinderGeometry(.28,.2,.5,10,1,true),M.lantern,x,3.9,0);C(.16,.16,.05,x,3.63,0,M.gold,false,10);}
- plaque('放天灯',0,4.3,-64.6,{vertical:true,bg:'#152d24'});
- for(const sx of[-6.9,6.9]){at(sx,3.5,-67.6);C(.22,.3,.9,0,0,0,M.marble,true,10);C(.26,.26,.12,0,.98,0,M.bronze,false,12);S(.2,0,1.05,0,M.glow);}
- G(new THREE.CircleGeometry(6.6,32).rotateX(-Math.PI/2),M.moss,0,.06,-67.6);
+// —— 放天灯 · 观云台灯场（全部在铁链栏杆以内）
+(()=>{const Z=-67;at(0,3.5,Z);B(13,.1,5.2,0,0,0,M.paving,false);
+ for(const sx of[-5.4,5.4])for(const sz of[-2,2]){C(.13,.17,4.2,sx,0,sz,M.wood,true,10);S(.17,sx,4.26,sz,M.gold);}
+ for(const sx of[-5.4,5.4])B(.1,.1,4.3,sx,4.05,0,M.woodDark,false);
+ B(11.1,.1,.1,0,4.05,0,M.woodDark,false);B(11.1,.1,.1,0,4.05,2,M.woodDark,false);
+ for(let i=0;i<7;i++){const x=-4.5+i*1.5;C(.006,.006,.36,x,3.7,0,M.woodDark,false,4);
+  G(new THREE.CylinderGeometry(.28,.2,.5,10,1,true),M.lantern,x,3.45,0);C(.16,.16,.05,x,3.18,0,M.gold,false,10);}
+ plaque('放天灯',0,3.25,2.07,{vertical:true,h:1.15,bg:'#152d24'});
+ for(const sx of[-6.9,6.9]){at(sx,3.5,Z);C(.22,.3,.9,0,0,0,M.marble,true,10);C(.26,.26,.12,0,.98,0,M.bronze,false,12);S(.2,0,1.05,0,M.glow);}
 })();;
 at(-7,0,57.3);B(1.3,.12,1.3,0,0,0,M.cliff);cushion(-7,.12,57.3,Math.PI);
 at(-19,3.5,-40);cushion(-19,3.86,-38.3,0);
@@ -1030,7 +1035,7 @@ const sfx={
  step(){nz(.07,.07,'lowpass',mr(350,650));},land(){nz(.12,.18,'lowpass',260);},
  bell(v=.22){[[98,.5,8],[196,.3,7],[247,.2,5.5],[294,.14,4.5],[412,.08,3],[590,.05,2]].forEach(([f,a,d])=>tone(f,a*v,d));nz(.05,.2*v/.22,'lowpass',900);},
  bowl(v=.16){[[392,.55,7],[393.4,.3,7],[1082,.22,4.5],[2118,.08,2.5]].forEach(([f,a,d])=>tone(f,a*v,d));},
- fish(){tone(560,.45,.13,0,430,'sine',.2);tone(1130,.1,.05,0,900,'sine',0);nz(.025,.28,'bandpass',1300,0,0,3);},
+ fish(v=1){tone(560,.45*v,.13,0,430,'sine',.2);tone(1130,.1*v,.05,0,900,'sine',0);nz(.025,.28*v,'bandpass',1300,0,0,3);},
  drum(){tone(96,.9,.7,0,42,'triangle',.6);nz(.22,.5,'lowpass',320,0,.5);},
  take(){nz(.18,.12,'bandpass',2800,0,0,1.5);nz(.12,.1,'bandpass',3600,0,0,1.5,.12);},
  light(){nz(.5,.12,'bandpass',1800,0,0,.8);nz(.08,.14,'highpass',4000);},
@@ -1394,19 +1399,19 @@ function warrior(name,x,z,yaw,kind,ph){
  if(kind!=='sit'){const st=new THREE.Mesh(WM_STAFF,M.wood);st.position.set(0,-.55,.04);st.rotation.x=Math.PI/2;f.armR.add(st);}
  if(kind==='sit')f.sit=1;
  tag(f,name);f.tag.position.y=kind==='sit'?1.7:2.2;
- npcs.push({f,p:new V3(x,1.72,z),ci:cellOf(x,z),tx:-1,poi:pois[0],st:'fixed',fixed:true,t:ph,dur:1e9,yaw,y0:yaw,ox:0,oz:0,gd:0,greetT:0,gy:0,
+ npcs.push({f,p:new V3(x,.22,z),ci:cellOf(x,z),tx:-1,poi:pois[0],st:'fixed',fixed:true,t:ph,dur:1e9,yaw,y0:yaw,ox:0,oz:0,gd:0,greetT:0,gy:0,
   upd(q,dt){
-   if(QL<2&&(fN&1))return [0,f.bow];
+   q.yaw=turn(q.yaw,q.y0,Math.min(1,dt*1.5));if(QL<2&&(fN&1)&&q.lr)return q.lr;
    if(kind==='sit'){f.bob=.008*Math.sin(Math.PI*2*q.t/5.2);f.head.rotation.x=.10+.03*Math.sin(q.t*.45);
     if(Math.sin(Math.PI*2*q.t/5.2)>.999&&Math.random()<.02&&Math.hypot(P.pos.x-x,P.pos.z-z)<9)sfx.fish(.12);
-    return[0,0];}
+    return q.lr=[0,0];}
    if(kind==='form'){const T=6.4,ss=((q.t+ph)%T)/T;let sw=0,bw=0;
     if(ss<.15){const k=ss/.15;sw=(-.75+1.5*k)/.85;bw=.06;}
     else if(ss<.42){const k=(ss-.15)/.27,m=4*Math.PI*k;sw=1.05*Math.sin(m)/.85;bw=.1+.04*Math.sin(m);f.head.rotation.y=-.35*Math.sin(2*Math.PI*k);}
     else if(ss<.60){const k=(ss-.42)/.18;sw=(-.2+.9*k)/.85;bw=.34*Math.sin(Math.PI*k);}
     else{const k=(ss-.60)/.40;sw=.8*Math.sin(2*Math.PI*k+Math.PI)/.85;bw=.1*(1-k);f.head.rotation.y=.4*k;}
     f.swing=sw;f.bob=(.03*Math.abs(Math.sin(Math.PI*ss*2)))/.8;
-    return[ss>.93?1:0,bw];}
+    return q.lr=[ss>.93?1:0,bw];}
    // sparring: 3.4 s cycle, attack and defend swap each round
    const T=3.4,ph2=((q.t+ph)%(T*2)),atk=ph2<T,head=atk,q2=atk?ph2:ph2-T;let sw=0,bw=0,tp=0;
    if(head){if(q2<.5){const k=q2/.5;sw=(1.2*k)/.85;bw=.05;}
@@ -1418,13 +1423,13 @@ function warrior(name,x,z,yaw,kind,ph){
     else{sw=.35/.85;tp=.4;}}
    if(q2<T*.05)q.hit=0;
    f.swing=sw;f.head.rotation.y=head?(q2<.85?-.2:0):.15;
-   return[tp,Math.max(0,bw)];}});
+   return q.lr=[tp,Math.max(0,bw)];}});
 }
-warrior('僧 · 慧刚',14.8,-17.2,Math.PI/2,'form',0);
-warrior('僧 · 净觉',14.8,-19.8,Math.PI/2,'form',.5);
-warrior('教头 · 武明',19.2,-20,0,'spar',0);
-warrior('僧 · 悟尘',19.2,-17.2,Math.PI,'spar',3.4);
-warrior('僧 · 了尘',20.6,-22.9,2.6,'sit',0);
+warrior('僧 · 慧刚',33.9,-36.7,Math.PI/2,'form',0);
+warrior('僧 · 净觉',33.9,-39.3,Math.PI/2,'form',.5);
+warrior('教头 · 武明',38.3,-39.5,0,'spar',0);
+warrior('僧 · 悟尘',38.3,-36.7,Math.PI,'spar',3.4);
+warrior('僧 · 了尘',39.7,-42.4,2.6,'sit',0);
 const DH=['慧明','净尘','了然','悟远'];
 [[-3.3,-5.3],[3.3,-5.3]].forEach(([x,z],i)=>{const f=monkFig({robe:i?M.robe2:M.robe});f.sit=1;tag(f,'僧 · '+DH[i]);f.tag.position.y=1.7;
  npcs.push({f,p:new V3(x,2.47,z),ci:cellOf(x,z),tx:-1,poi:pois[0],st:'fixed',fixed:true,t:i*2,dur:1e9,yaw:Math.PI,y0:Math.PI,ox:0,oz:0,gd:0,greetT:0,gy:0,
@@ -1510,10 +1515,10 @@ IA.push({p:galP.clone().setY(galP.y+1.3).setZ(galP.z-.5),r:2.2,label:()=>'下塔
 TOP.forEach(t=>IA.push({p:t.p,r:2.8,label:()=>t.bell?'撞钟':'击鼓',act(){if(t.bell){sfx.bell(.4);msg('登楼撞钟 · 声闻十里');}else{sfx.drum();setTimeout(()=>sfx.drum(),400);setTimeout(()=>sfx.drum(),800);msg('登楼击鼓 · 声震群山');}}}));
 // daily practice
 const ymd=d=>d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
-let DAY=SV.day&&SV.day.d===today()?SV.day:{d:today(),m:P.merit,s:Math.floor(P.sat),b:P.bows,k:BEADS.total,done:false};P.streak=SV.streak|0;P.lastDone=SV.lastDone|0;
+let DAY=SV.day&&SV.day.d===today()?SV.day:{d:today(),m:P.merit,s:Math.floor(P.sat),b:P.bows,k:BEADS.total,done:false};if(DAY!==SV.day)saveKV({day:DAY});P.streak=SV.streak|0;P.lastDone=SV.lastDone|0;
 function daily(){return[['敬香',Math.min(1,P.merit-DAY.m),1,''],['静坐',Math.min(1,Math.floor((P.sat-DAY.s)/60)),1,' 分'],['礼拜',Math.min(3,P.bows-DAY.b),3,''],['念珠',Math.min(27,BEADS.total-DAY.k),27,'']];}
 function dailyText(){const y=new Date();y.setDate(y.getDate()-1);const live=P.lastDone===today()||P.lastDone===ymd(y);return'今日功课 · '+(DAY.done?'已圆满':daily().map(a=>`${a[0]} ${Math.max(0,a[1])}/${a[2]}${a[3]}`).join(' · '))+(live&&P.streak?` · 连续 ${P.streak} 日`:'');}
-function checkDaily(){if(DAY.d!==today())DAY={d:today(),m:P.merit,s:Math.floor(P.sat),b:P.bows,k:BEADS.total,done:false};if(DAY.done||daily().some(a=>a[1]<a[2]))return;DAY.done=true;const y=new Date();y.setDate(y.getDate()-1);P.streak=P.lastDone===ymd(y)?P.streak+1:1;P.lastDone=today();saveKV({day:DAY,streak:P.streak,lastDone:P.lastDone});sfx.bowl(.2);banner('今日功课圆满',`连续 ${P.streak} 日`);}
+function checkDaily(){if(DAY.d!==today()){DAY={d:today(),m:P.merit,s:Math.floor(P.sat),b:P.bows,k:BEADS.total,done:false};saveKV({day:DAY});}if(DAY.done||daily().some(a=>a[1]<a[2]))return;DAY.done=true;const y=new Date();y.setDate(y.getDate()-1);P.streak=P.lastDone===ymd(y)?P.streak+1:1;P.lastDone=today();saveKV({day:DAY,streak:P.streak,lastDone:P.lastDone});sfx.bowl(.2);banner('今日功课圆满',`连续 ${P.streak} 日`);}
 // stamps
 const STAMPS=['山门','前院','钟楼','鼓楼','月台','演武场','大雄宝殿','观音殿','祖师殿','镇岳塔','塔顶 · 凌云台','听松亭','藏经阁','舍身崖 · 观云台','财神殿','月老祠','文昌阁','状元桥','禅茶寮'];
 P.stamps=Array.isArray(SV.stamps)?SV.stamps.filter(n=>n>=0&&n<STAMPS.length):[];let lastLoc='';
@@ -1618,8 +1623,8 @@ function updCamera(dt){const hs=Math.hypot(P.vel.x,P.vel.z),bobA=P.mode==='walk'
   if(P.inc===2){incT-=dt;if(incT<=0){incT=.07;camera.getWorldDirection(_f);_r.crossVectors(_f,camera.up).normalize();_u.crossVectors(_r,_f);_h.copy(camera.position).addScaledVector(_f,.62).addScaledVector(_u,lerp(.02,.12,handK)).addScaledVector(_r,mr(-.02,.02));puff(_h,mr(-.03,.03),mr(.25,.4),mr(-.03,.03),mr(1.6,2.6),.035,0xdfe2e6,.3,7);}}}
  const pk=Math.max(P.greetK,P.mode==='sit'&&P.autoBow?1:0);palms.visible=!third&&P.inc===0&&pk>.02;if(palms.visible)palms.position.set(0,-.33+pk*.15,-.36);
  vmSun.position.copy(curDir).applyQuaternion(camera.quaternion.clone().invert());}
-function locName(){const{x,y,z}=P.pos;if(y>15&&z<-40)return'塔顶 · 凌云台';if(x>45)return z<8.5&&y>.5?'财神殿':x>74&&z>19&&z<31&&y>.5?'月老祠':'财神院';if(x<-45)return z<8.5&&y>.5?'文昌阁':x<-74&&z>19&&z<31&&y>.5?'禅茶寮':Math.abs(x+65.5)<3&&Math.abs(z-22)<4?'状元桥':'文昌院';if(z>41)return'山门外 · 苍龙岭';if(z>37)return'山门';if(y>3.2&&z<-26)return Math.hypot(x,z+51)<9?'镇岳塔':x<-14&&z>-45?'听松亭':x>10&&z>-50&&z<-40&&y>3.9?'藏经阁':z<-64?'舍身崖 · 观云台':'塔院';
- if(y>2.2&&Math.abs(x)<12.2&&z<-3&&z>-13.2)return'大雄宝殿';if(y>1.2&&x>13.2&&x<24&&z<-11&&z>-24.5)return'演武场';if(y>2.9&&x>9&&x<21.5&&z<-30&&z>-38)return Math.abs(z+34.4)<3?'禅堂':null||'塔院';if(y>1.3&&Math.abs(x)<24.2&&z<10.2)return'月台';if(Math.abs(x)>31&&z>-15&&z<5&&y>.5)return x>0?'观音殿':'祖师殿';if(z>10)return x<-19&&z>20&&z<31?'钟楼':x>19&&z>20&&z<31?'鼓楼':'前院';return'松径';}
+function locName(){const{x,y,z}=P.pos;if(y>15&&z<-40)return'塔顶 · 凌云台';if(x>45)return z<8.5&&y>.5?'财神殿':x>74&&z>19&&z<31&&y>.5?'月老祠':'财神院';if(x<-45)return z<8.5&&y>.5?'文昌阁':x<-74&&z>19&&z<31&&y>.5?'禅茶寮':Math.abs(x+65.5)<3&&Math.abs(z-22)<4?'状元桥':'文昌院';if(z>41)return'山门外 · 苍龙岭';if(z>37)return'山门';if(y>3.2&&z<-26)return Math.hypot(x,z+51)<9?'镇岳塔':x<-14&&z>-45?'听松亭':x>10&&z>-50&&z<-40&&y>3.9?'藏经阁':x<-13&&x>-27.5&&z<-53.8&&z>-64?'禅堂':z<-64?'舍身崖 · 观云台':'塔院';
+ if(y>2.2&&Math.abs(x)<12.2&&z<-3&&z>-13.2)return'大雄宝殿';if(y<1.2&&x>31.5&&x<44.4&&z<-30&&z>-44.5)return'演武场';if(y<2&&x>-42.6&&x<-32&&z<-38.5&&z>-51.5)return'五观堂';if(y>1.3&&Math.abs(x)<24.2&&z<10.2)return'月台';if(Math.abs(x)>31&&z>-15&&z<5&&y>.5)return x>0?'观音殿':'祖师殿';if(z>10)return x<-19&&z>20&&z<31?'钟楼':x>19&&z>20&&z<31?'鼓楼':'前院';return'松径';}
 let hudT=0;const actBtn=a=>document.querySelector(`#acts [data-a=${a}]`);
 function updHud(dt){hudT-=dt;if(hudT<=0){hudT=.25;$('locn').textContent=tr(locName());$('me').textContent=tr('我 · '+P.name);$('mr').textContent=P.merit;$('mb').textContent=P.bows;$('mk').textContent=BEADS.total;$('mg').textContent=P.gongde;$('fc').textContent=tr('功德 '+P.gongde);
   const s=Math.floor(P.sat);$('mt').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
@@ -1631,8 +1636,8 @@ function updHud(dt){hudT-=dt;if(hudT<=0){hudT=.25;$('locn').textContent=tr(locNa
 
 /* ---------- input ---------- */
 const cv=renderer.domElement,joy={x:0,y:0,id:-1,ox:0,oy:0},lookT={id:-1,x:0,y:0};let dragMode=false,lockFails=0,lastFail=0,wAcc=0,startIntent='free';
-function enterPlay(){if(GS.state==='play')return;fadeEl.style.opacity=0;if(GS.state==='menu'){setGuide(0);if(startIntent==='meditate'){P.pos.set(0,2.35,-8);P.camY=2.35;P.yaw=0;P.pitch=-.08;msg('已到大雄宝殿 · 找一方蒲团静坐');}else if(startIntent==='pilgrimage'){P.pos.set(0,0,54);P.camY=0;P.yaw=0;P.pitch=0;msg('朝山从山门开始 · 先收集第一枚印记');}else{P.pos.set(0,0,54);P.camY=0;P.yaw=0;P.pitch=0;}banner('山寺',`山门已开 · ${P.name} · 请随缘礼拜`);sfx.bell();}GS.state='play';$('ov').style.display='none';$('hud').style.display='block';if(TOUCH){$("touch").style.display="block";if(!hinted){hinted=true;setTimeout(()=>msg("轻点地面即可前往 · 拖动环顾"),5200);}}wake();}
-function pause(){if(GS.state!=="play")return;unwake();stopWalk();closeCard();{const s=Math.floor(P.sat);$('stats').textContent=tr(`香火 ${P.merit} · 礼拜 ${P.bows} · 念珠 ${BEADS.total} · 功德 ${P.gongde} · 供灯 ${P.lamps} · 绕塔 ${P.laps} · 财神 ${P.cai} · 福币 ${P.coins} · 印记 ${P.stamps.length}/${STAMPS.length} · 静坐 ${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`);$("stats").style.display="block";$("daily").textContent=tr(dailyText());$("chips").style.display="none";}if(BEADS.isOpen())BEADS.close();GS.state='pause';for(const k in keys)keys[k]=false;joy.x=joy.y=0;joy.id=lookT.id=-1;$('stick').style.display='none';save();$('ttl').textContent=tr('暂歇');$('sub').textContent=tr('山风未止 · 钟声未歇');$('go').textContent=tr(TOUCH?'轻触继续':'点击继续');$("ov").style.display="flex";$("touch").style.display="none";$("hud").style.display="none";}
+function enterPlay(){if(GS.state==='play')return;fadeEl.style.opacity=0;if(GS.state==='menu'){setGuide(0);if(startIntent==='meditate'){P.pos.set(0,2.35,-8);P.camY=2.35;P.yaw=0;P.pitch=-.08;msg('已到大雄宝殿 · 找一方蒲团静坐');setGuide(3);}else if(startIntent==='pilgrimage'){P.pos.set(0,0,54);P.camY=0;P.yaw=0;P.pitch=0;msg('朝山从山门开始 · 先收集第一枚印记');}else{P.pos.set(0,0,54);P.camY=0;P.yaw=0;P.pitch=0;}banner('山寺',`山门已开 · ${P.name} · 请随缘礼拜`);sfx.bell();}GS.state='play';$('ov').style.display='none';$('hud').style.display='block';if(TOUCH){$("touch").style.display="block";if(!hinted){hinted=true;setTimeout(()=>msg("轻点地面即可前往 · 拖动环顾"),5200);}}wake();}
+function pause(){if(GS.state!=="play")return;unwake();stopWalk();closeCard();{const s=Math.floor(P.sat);$('stats').textContent=tr(`香火 ${P.merit} · 礼拜 ${P.bows} · 念珠 ${BEADS.total} · 功德 ${P.gongde} · 供灯 ${P.lamps} · 绕塔 ${P.laps} · 财神 ${P.cai} · 福币 ${P.coins} · 印记 ${P.stamps.length}/${STAMPS.length} · 静坐 ${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`);$("stats").style.display="block";$("daily").textContent=tr(dailyText());$("chips").style.display="none";$("entryModes").style.display="none";}if(BEADS.isOpen())BEADS.close();GS.state='pause';for(const k in keys)keys[k]=false;joy.x=joy.y=0;joy.id=lookT.id=-1;$('stick').style.display='none';save();$('ttl').textContent=tr('暂歇');$('sub').textContent=tr('山风未止 · 钟声未歇');$('go').textContent=tr(TOUCH?'轻触继续':'点击继续');$("ov").style.display="flex";$("touch").style.display="none";$("hud").style.display="none";}
 function toDrag(){dragMode=true;enterPlay();msg('按住鼠标左键拖动以环顾 · Esc 暂停');}
 function lockFail(){const n=performance.now();if(n-lastFail<400)return;lastFail=n;if(document.pointerLockElement===cv)return;if(++lockFails>=2)toDrag();else $('go').textContent=tr('请再点击一次');}
 function addLook(dx,dy,k){P.yaw-=dx*k;const th=P.view==='third';P.pitch=clamp(P.pitch-dy*k,th?-1.15:-1.45,th?.85:1.45);}
@@ -1742,6 +1747,7 @@ const MP=(()=>{
     if(k!==lastK||tA-lastS>3){lastK=k;lastS=tA;ws.send(JSON.stringify({t:'s',p,r,a}));}}}};
 })();
 function fillSelf(){const i=$('nmIn');if(i){i.value=P.name;document.querySelectorAll('#self [data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g===P.gender));}}
+window.fillSelf=fillSelf;
 function setSelf(name,g){
   const n=String(name||'').replace(/[\u0000-\u001f<>]/g,'').trim().slice(0,12);if(n)P.name=n;
   if(g==='m'||g==='f')P.gender=g;
