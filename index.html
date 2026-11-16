@@ -478,7 +478,7 @@ function nrmFrom(t,strength=1){
   const lum=new Float32Array(w*h);
   for(let i=0,p=0;i<lum.length;i++,p+=4)lum[i]=(sg[p]*.299+sg[p+1]*.587+sg[p+2]*.114)/255;
   // box blur keeps the normals from turning every speck into a spike
-  const bl=new Float32Array(w*h),k=1;
+  const bl=new Float32Array(w*h),k=2;
   for(let y=0;y<h;y++)for(let x=0;x<w;x++){let s=0,n=0;
     for(let dy=-k;dy<=k;dy++)for(let dx=-k;dx<=k;dx++){s+=lum[((y+dy+h)%h)*w+((x+dx+w)%w)];n++;}bl[y*w+x]=s/n;}
   const c=document.createElement('canvas');c.width=w;c.height=h;
@@ -518,15 +518,15 @@ function rghFrom(t,lo=.45,hi=.95){
 const _nrmCache=new Map(),_rghCache=new Map();
 function mat(t,s,o={}){const m=new THREE.MeshStandardMaterial({map:t||null,roughness:o.r??.9,metalness:o.m??0,color:o.c??0xffffff,side:o.side??THREE.FrontSide,flatShading:!!o.flat,emissive:o.e??0,emissiveIntensity:o.ei??1});
  if(t){
-   if(o.n!==0){ if(!_nrmCache.has(t))_nrmCache.set(t,nrmFrom(t,o.ns??2.2)); m.normalMap=_nrmCache.get(t); m.normalScale=new THREE.Vector2(o.nk??1,o.nk??1); }
-   if(o.rm!==0){ if(!_rghCache.has(t))_rghCache.set(t,rghFrom(t,o.rlo??.45,o.rhi??1)); m.roughnessMap=_rghCache.get(t); }
+   if(o.n!==0){ if(!_nrmCache.has(t))_nrmCache.set(t,nrmFrom(t,o.ns??1.3)); m.normalMap=_nrmCache.get(t); m.normalScale=new THREE.Vector2((o.nk??.55)*(TOUCH?.7:1),(o.nk??.55)*(TOUCH?.7:1)); }
+   if(o.rm!==0){ if(!_rghCache.has(t))_rghCache.set(t,rghFrom(t,o.rlo??.62,o.rhi??1)); m.roughnessMap=_rghCache.get(t); }
    if(o.b&&o.b>0&&!m.normalMap){const b=new THREE.CanvasTexture(t.image);b.wrapS=b.wrapT=THREE.RepeatWrapping;m.bumpMap=b;m.bumpScale=o.b;}
  }
  m.userData.s=s;m.userData.tr=o.tr??8;return m;}
 const M={
  cliff:mat(T.granite,9,{b:3}),rock:mat(T.granite,14,{b:3.5}),paving:mat(T.paving,4,{b:2}),ashlar:mat(T.ashlar,3,{b:2.5}),
  red:mat(T.red,4,{b:.8}),wood:mat(T.wood,1.5,{r:.55,b:.5}),woodDark:mat(T.woodDark,1.5,{r:.7}),crate:mat(T.crate,1,{r:.85}),
- tile:mat(T.tile,1.4,{r:.42,side:THREE.DoubleSide,b:2.5}),paint:mat(T.paint,1.3,{r:.6,b:.4}),lattice:mat(T.lattice,1,{r:.7,b:2}),
+ tile:mat(T.tile,1.4,{r:.62,side:THREE.DoubleSide,b:2.5}),paint:mat(T.paint,1.3,{r:.6,b:.4}),lattice:mat(T.lattice,1,{r:.7,b:2}),
  brick:mat(T.brick,3,{b:2}),marble:mat(T.marble,2,{r:.7,b:.8}),bark:mat(T.bark,1.2,{b:3}),leaf:mat(T.leaf,1.5,{r:1,b:2}),moss:mat(T.moss,3,{r:1}),
  ridge:mat(null,1,{c:0x2b3032,r:.5}),eave:mat(T.woodDark,1.5,{c:0xb06a4a}),dark:mat(null,1,{c:0x120d0a,r:1}),
  gold:mat(T.gilt,1.2,{c:0xe0b040,r:1,m:.9,e:0x140c00,ns:1.3,rlo:.24,rhi:.6}),bronze:mat(T.patina,1.2,{c:0x7a7452,r:1,m:.7,ns:1.6,rlo:.34,rhi:.8}),iron:mat(null,1,{c:0x25262a,r:.6,m:.5}),
@@ -536,7 +536,7 @@ const M={
 
 function leafTex(draw){const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');draw(g);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return t;}
 const WIND={value:0};
-function leafMat(t,e=0,ei=1){const m=new THREE.MeshStandardMaterial({map:t,alphaTest:.4,side:THREE.DoubleSide,roughness:1,emissive:e,emissiveIntensity:ei});
+function leafMat(t,e=0,ei=1){const m=new THREE.MeshStandardMaterial({map:t,alphaTest:.4,alphaToCoverage:true,side:THREE.DoubleSide,roughness:1,emissive:e,emissiveIntensity:ei});
  m.onBeforeCompile=sh=>{sh.uniforms.uWind=WIND;sh.vertexShader='uniform float uWind;\n'+sh.vertexShader.replace('#include <begin_vertex>',
   '#include <begin_vertex>\n vec4 wW=modelMatrix*vec4(transformed,1.0);float wS=sin(uWind*1.3+wW.x*.7+wW.z*.5)*.6+sin(uWind*2.7+wW.x*1.9+wW.y*1.3)*.25;transformed.x+=wS*.055;transformed.z+=wS*.04;transformed.y+=sin(uWind*1.9+wW.z*1.1)*.012;');};
  return m;}
@@ -856,7 +856,7 @@ at(0,1.5,-7);(()=>{const y=.85+1.1,z=-6+1.7;
  standFig(-2.75,y,z+.3,.78,M.gold,{halo:true,haloM:M.gold2});standFig(2.75,y,z+.3,.78,M.gold,{halo:true,haloM:M.gold2});})();
 // —— 殿堂陈设、放生池、花树、祈福架 ——
 const SP={lamps:[],lampIA:[]},wv=(x,y,z)=>{const[a,b]=Wp(x,z);return new V3(a,O.y+y,b);};
-M.jade=mat(T.marble,1.5,{c:0xf4f1e8,r:.45});M.pink=mat(null,1,{c:0xe89ab0,r:.8});M.water=mat(null,1,{c:0x2c5a55,r:.1,m:.35});M.water.transparent=true;M.water.opacity=.82;T.ripple=ctex(256,(g,s)=>{g.fillStyle='#808080';g.fillRect(0,0,s,s);blotch(g,s,70,'rgba(255,255,255,.5)',26);blotch(g,s,70,'rgba(0,0,0,.5)',22);});M.water.bumpMap=T.ripple;M.water.bumpScale=2.5;M.water.roughness=.06;M.water.metalness=.55;M.water.userData.s=2.2;M.pad=mat(null,1,{c:0x3f6a34,r:.9});M.blossom=mat(T.marble,1.2,{c:0xffa9c6,r:1,e:0x40121f,ei:.12});
+M.jade=mat(T.marble,1.5,{c:0xf4f1e8,r:.45});M.pink=mat(null,1,{c:0xe89ab0,r:.8});M.water=mat(null,1,{c:0x2c5a55,r:.1,m:.35});M.water.transparent=true;M.water.opacity=.82;T.ripple=ctex(256,(g,s)=>{g.fillStyle='#808080';g.fillRect(0,0,s,s);blotch(g,s,70,'rgba(255,255,255,.5)',26);blotch(g,s,70,'rgba(0,0,0,.5)',22);});M.water.bumpMap=T.ripple;M.water.bumpScale=1;M.water.roughness=.16;M.water.metalness=.35;M.water.userData.s=2.2;M.pad=mat(null,1,{c:0x3f6a34,r:.9});M.blossom=mat(T.marble,1.2,{c:0xffa9c6,r:1,e:0x40121f,ei:.12});
 function disc(r,x,y,z,m){const g=new THREE.CylinderGeometry(r,r,.05,24);g.rotateX(Math.PI/2);G(g,m,x,y,z);}
 // 观音殿
 at(36,0,-5,3);(()=>{const ph=.85,zb=-4.5,z=zb+.8;standFig(0,ph+1,z,1.3,M.jade,{crown:true,halo:true,vase:true,urna:true,petalM:M.pink});
@@ -1686,7 +1686,7 @@ const qSel=$('qMode');if(qSel){qSel.value=qSaved;qSel.addEventListener('change',
 function lowerQ(){if(QL===2){QL=1;renderer.shadowMap.autoUpdate=false;}else if(pxr>1){pxr=Math.max(1,pxr-.25);renderer.setPixelRatio(pxr);renderer.setSize(innerWidth,innerHeight);}else if(QL===1)QL=0;else if(pxr>.75){pxr=.75;renderer.setPixelRatio(pxr);renderer.setSize(innerWidth,innerHeight);}}
 function chantLevel(){if(P.mode==='sit'||BEADS.isOpen())return 1;const d=Math.hypot(P.pos.x,P.pos.z+7);return d<9&&P.pos.y>2?1:clamp(1-(d-9)/18,0,1)*.4;}
 function frame(){requestAnimationFrame(frame);const raw=clock.getDelta(),dt=Math.min(raw,.05);tA+=dt;fN++;
- if(QL<2&&(tod.k<1||fN<5||fN%(QL?3:40)===0))renderer.shadowMap.needsUpdate=true;
+ if(QL<2&&(tod.k<1||fN<5||fN%(QL?2:8)===0))renderer.shadowMap.needsUpdate=true;
  if(GS.state==="play"&&!document.hidden&&raw<.5){fpsT+=raw;fpsN++;if(fpsT<0)fpsN=0;if(fpsT>=4){const fps=fpsN/fpsT;fpsT=0;fpsN=0;if(fps<25)lowerQ();}}
  if(ring.visible){const k=1+.14*Math.sin(tA*6);ring.scale.set(k,k,k);}
  if(tod.k<1){tod.k=Math.min(1,tod.k+dt/5);applyTod();}
@@ -1699,7 +1699,7 @@ function frame(){requestAnimationFrame(frame);const raw=clock.getDelta(),dt=Math
  WIND.value=tA;sky2.position.copy(camera.position);
  smokeT-=dt;if(smokeT<=0){smokeT=.2;for(const b of burners)puff(b,mr(-.1,.1),mr(.45,.75),mr(-.1,.1),mr(4,6.5),.35,0xcfd2d6,.16,6);
   for(let k=0;k<7&&offered.length;k++){const o=offered[Math.random()*offered.length|0];puff(o,mr(-.02,.02),mr(.3,.5),mr(-.02,.02),mr(2.5,4),.04,0xe2e4e8,.28,9);}}
- candleL.forEach((l,i)=>l.intensity=(7+Math.sin(tA*13+i*2)*1.2+Math.sin(tA*31+i)*.8)*(.6+tod.lamp*.5));
+ candleL.forEach((l,i)=>l.intensity=(7+Math.sin(tA*2.3+i*2)*.35+Math.sin(tA*5.1+i)*.2)*(.6+tod.lamp*.5));
  updFx(dt);updNew(dt);updFeat(dt);clouds.forEach((t,i)=>{t.offset.x+=dt*.0016*(i+1);t.offset.y+=dt*.0007*(i+1);});
  renderer.clear();renderer.render(scene,camera);if(GS.state!=='menu'&&P.view==='first'){renderer.clearDepth();renderer.render(vmScene,vmCam);}}
 $('load').style.display='none';
