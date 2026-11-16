@@ -239,6 +239,46 @@ let L='zh';try{L=localStorage.getItem('huashan-lang')||(/^zh/i.test(navigator.la
 if(/[?&]lang=en/.test(location.search))L='en';if(/[?&]lang=zh/.test(location.search))L='zh';
 window.LANG=L;
 const E={
+'三清观':'Sanqing Daoist Court','三清殿':'Hall of the Three Pure Ones','太岁殿':'Hall of Tai Sui','斗姆阁':'Pavilion of Doumu','太极坪':'Taiji Terrace',
+'拜三清':'Bow to the Three Pure Ones','拜太岁':'Pay respects to Tai Sui','礼斗':'Worship the Dipper','北斗当空':'the Dipper is overhead','读道德经':'Read the Daodejing','问讯道长':'Greet the Daoist',
+'道长 · 清虚':'Daoist Qingxu','道长 · 明玄':'Daoist Mingxuan','道童 · 青松':'Acolyte Qingsong','知客 · 守一':'Guest master Shouyi',
+'正殿三清殿 · 拜三清':'Main hall: bow to the Three Pure Ones','东侧太岁殿 · 拜太岁、点平安灯':'East: Hall of Tai Sui, light a lamp of peace','西侧斗姆阁 · 礼斗，寻本命星':'West: Pavilion of Doumu, find your birth star in the Dipper',
+'老君炉前敬一炷香 · 碑前读一章《道德经》':'Offer incense at Laozi’s censer · read a chapter of the Daodejing at the stele','福生无量天尊':'Blessings without measure',
+'太岁殿 · 平安灯':'Hall of Tai Sui · lamp of peace','斗姆元君 · 北斗七星 · 你属什么？':'Doumu, mother of the Dipper · what is your zodiac sign?','道德经':'Daodejing',
+'鼠':'Rat','牛':'Ox','虎':'Tiger','兔':'Rabbit','龙':'Dragon','蛇':'Snake','马':'Horse','羊':'Goat','猴':'Monkey','鸡':'Rooster','狗':'Dog','猪':'Pig',
+'道法自然':'The Way follows nature','人法地，地法天，天法道，道法自然。':'People follow earth, earth follows heaven, heaven follows the Way, and the Way follows what is so of itself.',
+'上善若水':'The highest good is like water','水善利万物而不争。':'Water benefits all things and does not contend.',
+'知足常乐':'Content is joy','知足不辱，知止不殆，可以长久。':'Know contentment and you meet no disgrace; know when to stop and you meet no danger, and you can last long.',
+'致虚守静':'Empty and still','致虚极，守静笃。':'Reach the utmost emptiness; hold fast to stillness.',
+'见素抱朴':'Plain and simple','见素抱朴，少私寡欲。':'Show plainness, hold to simplicity; have little self and few desires.',
+'柔弱胜刚强':'The soft overcomes the hard','天下之至柔，驰骋天下之至坚。':'The softest thing in the world gallops through the hardest.',
+'大器晚成':'Great vessels are late to finish','大方无隅，大器晚成。':'The great square has no corners; the great vessel is late to finish.','福生无量':'Blessings without measure','福生无量天尊。':'Blessings without measure.',
+'道可道，非常道；名可名，非常名。无名天地之始，有名万物之母。':'The Way that can be spoken is not the constant Way; the name that can be named is not the constant name. The nameless is the beginning of heaven and earth; the named is the mother of all things.',
+'天下皆知美之为美，斯恶已；皆知善之为善，斯不善已。':'When all the world knows beauty as beauty, ugliness is already there; when all know good as good, the not-good is already there.',
+'上善若水。水善利万物而不争，处众人之所恶，故几于道。':'The highest good is like water. Water benefits all things and does not contend; it settles where people disdain to be, and so it is close to the Way.',
+'金玉满堂，莫之能守；富贵而骄，自遗其咎。功遂身退，天之道。':'A hall full of gold and jade cannot be guarded; wealth and rank with arrogance bring their own ruin. Withdraw when the work is done: that is the way of heaven.',
+'三十辐共一毂，当其无，有车之用。……故有之以为利，无之以为用。':'Thirty spokes share one hub; it is the empty space that makes the cart useful. … What is there gives the benefit; what is not there gives the use.',
+'五色令人目盲；五音令人耳聋；五味令人口爽。':'The five colours blind the eye; the five notes deafen the ear; the five flavours dull the palate.',
+'致虚极，守静笃。万物并作，吾以观复。':'Reach the utmost emptiness; hold fast to stillness. The ten thousand things rise together, and I watch them return.',
+'曲则全，枉则直，洼则盈，敝则新，少则得，多则惑。':'Bend and be whole; crook and be straight; hollow and be filled; wear out and be new; have little and gain; have much and be confused.',
+'企者不立，跨者不行；自见者不明，自是者不彰。':'On tiptoe you cannot stand; with long strides you cannot walk. Who shows himself is not seen clearly; who thinks himself right is not recognised.',
+'知其雄，守其雌，为天下谿。':'Know the male, hold to the female, and be the ravine of the world.',
+'知人者智，自知者明。胜人者有力，自胜者强。知足者富。':'Knowing others is wisdom; knowing yourself is clarity. Overcoming others is force; overcoming yourself is strength. Who knows contentment is rich.',
+'道常无为而无不为。':'The Way does nothing, yet nothing is left undone.',
+'反者道之动，弱者道之用。天下万物生于有，有生于无。':'Returning is the motion of the Way; yielding is its use. All things are born of being, and being is born of non-being.',
+'大方无隅，大器晚成，大音希声，大象无形。':'The great square has no corners; the great vessel is late to finish; the great sound is faint; the great image has no shape.',
+'道生一，一生二，二生三，三生万物。万物负阴而抱阳，冲气以为和。':'The Way gives birth to one, one to two, two to three, and three to all things. All things carry yin and embrace yang, and blend their breath into harmony.',
+'知足不辱，知止不殆，可以长久。':'Know contentment and you meet no disgrace; know when to stop and you meet no danger, and you can last long.',
+'祸莫大于不知足；咎莫大于欲得。故知足之足，常足矣。':'No disaster is greater than not knowing contentment; no fault is greater than wanting to get. So the contentment of knowing enough is lasting contentment.',
+'为学日益，为道日损。损之又损，以至于无为。':'In learning you gain a little each day; in the Way you let go a little each day. Let go and let go again, until you arrive at non-action.',
+'知者不言，言者不知。':'Those who know do not speak; those who speak do not know.','祸兮福之所倚，福兮祸之所伏。':'Fortune leans on misfortune; misfortune hides inside fortune.',
+'治大国，若烹小鲜。':'Govern a great state as you would cook a small fish.','天下难事，必作于易；天下大事，必作于细。':'The hard things of the world begin as easy ones; the great things of the world begin as small ones.',
+'合抱之木，生于毫末；九层之台，起于累土；千里之行，始于足下。':'A tree you cannot reach around grows from a tiny shoot; a nine-storey tower rises from a heap of earth; a journey of a thousand li begins beneath your feet.',
+'我有三宝，持而保之：一曰慈，二曰俭，三曰不敢为天下先。':'I have three treasures that I hold and keep: the first is compassion, the second is frugality, the third is not daring to put myself first.',
+'知不知，上；不知知，病。':'To know that you do not know is best; to not know yet think you know is a sickness.','天网恢恢，疏而不失。':'Heaven’s net is vast; its mesh is wide, yet nothing slips through.',
+'人之生也柔弱，其死也坚强。':'In life people are soft and supple; in death they are hard and stiff.','天之道，损有余而补不足。':'The way of heaven takes from what has too much and gives to what has too little.',
+'天下莫柔弱于水，而攻坚强者莫之能胜。':'Nothing in the world is softer than water, yet nothing surpasses it in wearing down the hard.',
+'信言不美，美言不信。……天之道，利而不害；圣人之道，为而不争。':'True words are not beautiful; beautiful words are not true. … The way of heaven benefits and does not harm; the way of the sage acts and does not contend.',
 // home & hud
 '山寺':'Mountain Temple','山寺 · 上香 · 静坐':'Mountain Temple · Incense & Stillness','山中':'MOUNTAIN',
 '入寺':'Enter','山门开启中…':'Opening the gate…','轻触入山门':'Tap to enter','点击入山门':'Click to enter','请再点击一次':'Click once more','轻触继续':'Tap to continue','点击继续':'Click to continue','山门未开':'Gate closed',
@@ -734,7 +774,7 @@ hall(-37.3,-45,0,1,8,4.8,{name:'五观堂',custom:true,nolight:true,plat:.5,ch:3
 hall(-20.4,-59,3.5,0,9,5,{name:'禅堂',custom:true,nolight:true,plat:.45,ch:3.4,porch:1.3});
 hall(17,-45,3.5,0,12,8,{name:'藏经阁',plat:.6,custom:true});
 // walls
-wall(-44.6,40,-7.1,40);wall(7.1,40,44.6,40);for(const s of[-1,1]){wall(s*44.6,40,s*44.6,22.6);wall(s*44.6,17.4,s*44.6,-69.6);}wall(30.2,-69.6,44.6,-69.6);wall(-44.6,-69.6,-30.2,-69.6);
+wall(-44.6,40,-7.1,40);wall(7.1,40,44.6,40);for(const s of[-1,1]){wall(s*44.6,40,s*44.6,22.6);if(s>0){wall(44.6,17.4,44.6,-53.4);wall(44.6,-58.6,44.6,-69.6);}else wall(-44.6,17.4,-44.6,-69.6);}wall(30.2,-69.6,44.6,-69.6);wall(-44.6,-69.6,-30.2,-69.6);
 chain(-13.6,42.6,-13.6,59.6,0);chain(13.6,42.6,13.6,59.6,0);chain(-13.6,59.7,13.6,59.7,0);
 // towers
 tower(-25,25,'钟楼',true);tower(25,25,'鼓楼',false);
@@ -909,7 +949,7 @@ function ginkgo(x,y,z,h){at(x,y,z);C(.3,.48,h*.5,0,0,0,M.bark,true,9);
  C(h*.5,h*.5,.03,0,0,0,M.ginkgo,false,18);return wv(0,h*.8,0);}
 for(const s of[-1,1]){const X=s*65.5;at(0,0,0);B(40.9,70,49,s*65.45,-70.3,16,M.cliff);B(40.9,.3,49,s*65.45,-.3,16,M.paving);
  B(4.6,.03,23,X,0,19.5,M.marble,false);B(17.5,.03,3.2,s*54.2,0,20,M.marble,false);B(15,.03,3.2,s*36.5,0,20,M.marble,false);
- wall(s*44.9,-8.25,s*85.9,-8.25);rail(s*85.6,-8,s*85.6,40.2,0);rail(s*45.2,40.2,s*85.6,40.2,0);
+ if(s>0){wall(44.9,-8.25,77.4,-8.25);wall(82.6,-8.25,85.9,-8.25);}else wall(-44.9,-8.25,-85.9,-8.25);rail(s*85.6,-8,s*85.6,40.2,0);rail(s*45.2,40.2,s*85.6,40.2,0);
  at(s*44.6,0,20,s>0?3:1);B(.7,3.4,.9,-2.75,0,0,M.red);B(.7,3.4,.9,2.75,0,0,M.red);B(6.2,.5,.7,0,3.4,0,M.paint,false);roof(8.4,3.6,1.5,.6,0,3.9,0);plaque(s>0?'财神院':'文昌院',0,3,.42,{h:.7});
  for(const k of[-1,1]){S(.26,k*1.9,2.75,.6,M.lantern,1,.85,1,10,8);lg(k*1.9,2.75,.6);}
  burner(X,0,12.5);incTable(X+s*4,0,15);candleStand(X-s*4,0,15,false);lion(X-3.5,0,9.4);lion(X+3.5,0,9.4);
@@ -988,10 +1028,101 @@ for(const z of[-5,-1.5,2,5.5,9,12.5])bamboo(-83.6,0,z);bamboo(-80,0,-6.4);bamboo
 [[-43,0,36,.8,M.pink],[43,0,36,.8,M.pink],[-43,0,12,.7,M.white],[43,0,12.5,.7,M.white],[-30,0,38.6,.7,M.blossom],[30.5,0,38.7,.7,M.blossom],[-18.5,0,38.7,.6,null],[18.5,0,38.7,.6,null],[-43,0,-20,.8,M.pink],[43,0,-20,.8,M.white],
  [47.5,0,38.6,.8,M.pink],[53,0,38.8,.7,M.white],[79,0,38.6,.8,M.pink],[83.6,0,33,.7,M.blossom],[47,0,5,.8,M.white],[47,0,-2,.7,M.pink],[83.6,0,12,.7,M.white],
  [-47.5,0,38.6,.8,M.pink],[-59,0,38.8,.7,M.white],[-47,0,5,.8,M.white],[-47,0,-2,.7,M.pink],[-70,0,38.7,.7,M.blossom]].forEach(p=>shrub(...p));
+// —— 东北 · 三清观（道教）——
+//   财神院以北那块空崖台（x 45–86，z -70 – -8.5）。中轴 x 65.5，坐北朝南：
+//   牌坊(z -13) → 太极坪(-28) → 老君炉(-40) → 月台与三清殿(-56.5)；太岁殿在东、斗姆阁在西，都面向中轴。
+//   两道门：财神院北墙 x 80，主寺东墙 z -56。
+M.ink=mat(null,1,{c:0x1b1d1f,r:.7});M.stele=mat(T.marble,1.6,{c:0xb3afa4,r:.8});
+M.daoRobe=mat(null,1,{c:0x2a3758,r:1});M.daoRobe2=mat(null,1,{c:0x45484e,r:1});
+// 太极坪：先天八卦（乾南坤北、离东坎西），爻自内而外；画布上方为北、右方为东。
+T.bagua=ctex(1024,(g,s)=>{const c=s/2,R=s/2,TAU=6.2832,ring=(r,w,col)=>{g.strokeStyle=col;g.lineWidth=w;g.beginPath();g.arc(c,c,r,0,TAU);g.stroke();};
+ g.fillStyle='#8e8b83';g.fillRect(0,0,s,s);g.fillStyle='#a6a298';g.beginPath();g.arc(c,c,R*.97,0,TAU);g.fill();speck(g,s,16000,70,200,.07,3);
+ ring(R*.955,R*.03,'#4a4743');ring(R*.62,R*.016,'#4a4743');ring(R*.41,R*.016,'#4a4743');
+ const TRI=[['乾',[1,1,1],Math.PI/2],['兑',[1,1,0],Math.PI/4],['离',[1,0,1],0],['震',[1,0,0],-Math.PI/4],['坤',[0,0,0],-Math.PI/2],['艮',[0,0,1],-3*Math.PI/4],['坎',[0,1,0],Math.PI],['巽',[0,1,1],3*Math.PI/4]];
+ g.fillStyle='#23211e';g.textAlign='center';g.textBaseline='middle';g.font=`bold ${R*.105|0}px "Kaiti SC","STKaiti","KaiTi","Songti SC",serif`;
+ for(const[n,ls,a]of TRI){g.save();g.translate(c,c);g.rotate(a-Math.PI/2);
+  ls.forEach((yang,k)=>{const d=R*(.45+k*.052),w=R*.22,h=R*.03;if(yang)g.fillRect(-w/2,d,w,h);else{g.fillRect(-w/2,d,w*.42,h);g.fillRect(w*.08,d,w*.42,h);}});
+  g.fillText(n,0,R*.79);g.restore();}
+ const r=R*.36;g.fillStyle='#ebe7dd';g.beginPath();g.arc(c,c,r,0,TAU);g.fill();
+ g.fillStyle='#1e1d1b';g.beginPath();g.arc(c,c,r,Math.PI/2,-Math.PI/2);g.arc(c,c-r/2,r/2,-Math.PI/2,Math.PI/2,false);g.arc(c,c+r/2,r/2,-Math.PI/2,Math.PI/2,true);g.fill();
+ g.beginPath();g.arc(c,c+r/2,r*.13,0,TAU);g.fill();g.fillStyle='#ebe7dd';g.beginPath();g.arc(c,c-r/2,r*.13,0,TAU);g.fill();ring(r,R*.012,'#1e1d1b');});
+M.bagua=mat(T.bagua,14,{r:.85,nk:.4});
+(()=>{at(0,0,0);B(40.9,70,61.5,65.45,-70.3,-39.25,M.cliff);B(40.9,.3,61.5,65.45,-.3,-39.25,M.paving);
+ B(3.2,.03,34,65.5,0,-30,M.marble,false);B(15,.03,2.6,73,0,-10.9,M.marble,false);B(3,.03,2.4,80,0,-9.4,M.marble,false);
+ wall(44.6,-69.6,85.9,-69.6);rail(85.6,-69.2,85.6,-8.6,0);
+ // 两道门：南门开在财神院北墙上，西门开在主寺东墙上
+ for(const[x,z,r,a,b]of[[80,-8.25,0,'三清观','财神院'],[44.6,-56,3,'三清观','山寺']]){at(x,0,z,r);B(.7,3.4,.9,-2.75,0,0,M.red);B(.7,3.4,.9,2.75,0,0,M.red);B(6.2,.5,.7,0,3.4,0,M.paint,false);roof(8.4,3.6,1.5,.6,0,3.9,0);
+  plaque(a,0,3,.42,{h:.7});at(x,0,z,(r+2)%4);plaque(b,0,3,.42,{h:.7});}
+ pine(49,0,-15,8.5);pine(82.5,0,-15.5,7.5);pine(49.5,0,-66.5,9);pine(82,0,-66,8);pine(56.5,0,-44.6,6.5);pine(74.5,0,-44.6,6.5);
+ bamboo(46.6,0,-40);bamboo(46.6,0,-43);bamboo(84,0,-45);bamboo(84,0,-48);
+ lantern(61.6,0,-17.5);lantern(69.4,0,-17.5);lantern(60.6,0,-44);lantern(70.4,0,-44);
+ // 牌坊：四柱三间三楼。南面「三清观」，北面「众妙之门」
+ at(65.5,0,-13);for(const px of[-4.5,-1.8,1.8,4.5]){B(.5,Math.abs(px)<2?5:4.2,.5,px,0,0,M.marble);B(1,1.1,1,px,0,0,M.ashlar);}
+ B(4.1,.42,.42,0,3.55,0,M.paint,false);B(3.1,.85,.2,0,3.97,0,M.paint,false);B(4.5,.28,.56,0,4.82,0,M.marble,false);roof(5.4,1.8,.9,.45,0,5.12,0);
+ for(const s of[-1,1]){B(3.2,.36,.4,s*3.15,3,0,M.paint,false);B(3.4,.24,.46,s*3.15,3.94,0,M.marble,false);roof(3.8,1.5,.7,.35,s*3.15,4.2,0);}
+ plaque('三清观',0,4.4,.16,{h:.72});at(65.5,0,-13,2);plaque('众妙之门',0,4.4,.16,{h:.72});
+ // 太极坪
+ at(65.5,0,-28);C(7.3,7.3,.04,0,0,0,M.marble,false,56);{const g=new THREE.CircleGeometry(7,72);g.rotateX(-Math.PI/2);G(g,M.bagua,0,.045,0);}
+ // 老君炉：三足双耳鼎
+ at(65.5,0,-40);B(3.6,.45,3.6,0,0,0,M.ashlar);B(3.9,.12,3.9,0,.45,0,M.marble,false);
+ for(let i=0;i<3;i++){const a=i*2.094-Math.PI/2,cx=Math.cos(a),cz=Math.sin(a);limb(cx*.9,.6,cz*.9,cx*.75,1.55,cz*.75,.17,M.bronze,.13);S(.24,cx*.95,.66,cz*.95,M.bronze,1,.6,1.1,8,6);}
+ lathe([[0,0],[1.05,0],[1.32,.35],[1.42,.8],[1.3,1.15],[1.46,1.24],[1.46,1.36],[1.26,1.36],[1.16,1.2],[0,1.2]],M.bronze,0,1.3,0,1,28);
+ for(const s of[-1,1]){B(.16,.62,.12,s*1.3,2.62,-.22,M.bronze,false);B(.16,.62,.12,s*1.3,2.62,.22,M.bronze,false);B(.16,.12,.56,s*1.3,3.12,0,M.bronze,false);}
+ for(let i=0;i<9;i++){const a=i*.7,d=.15+i*.06;C(.012,.012,.55,Math.cos(a)*d,2.5,Math.sin(a)*d,M.lantern,false,4);S(.018,Math.cos(a)*d,3.05,Math.sin(a)*d,M.glow,1,1,1,4,3);}
+ col(2.9,2.7,2.9,0,.57,0);burners.push(new V3(65.5,2.75,-40));
+ incTable(69.5,0,-36.8);candleStand(61.5,0,-36.8,true);
+ // 《道德经》碑：龟趺螭首，面向中轴
+ at(57.5,0,-40,1);S(1.05,0,.42,0,M.cliff,1,.46,1.5,14,8);S(.34,0,.5,1.6,M.cliff,1,.85,1.3,10,8);for(const s of[-1,1])for(const k of[-1,1])S(.28,s*.9,.16,k*.95,M.cliff,1,.55,1.25,8,6);
+ B(1.7,3.2,.44,0,.72,0,M.stele);S(.95,0,3.92,0,M.stele,.92,.5,.26,14,8);col(2.2,1,3.3,0,0,0);
+ plaque('道德经',0,3.35,.235,{vertical:true,h:1.1,bg:'#2e3231',fg:'#ddd5c2',noframe:true});plaque('上善若水',0,1.95,.235,{vertical:true,h:1.45,bg:'#2e3231',fg:'#ddd5c2',noframe:true});
+ SP.stele=wv(0,1.5,1.2);
+ // 月台（1.2 米）与台阶、栏杆
+ at(65.5,0,-55.5);B(26,1.2,17,0,0,0,M.ashlar);at(65.5,0,-47);stairs(0,0,7,0,1.2);
+ rail(52.6,-47.15,61.4,-47.15,1.2);rail(69.6,-47.15,78.4,-47.15,1.2);rail(52.6,-47.15,52.6,-63.85,1.2);rail(78.4,-47.15,78.4,-63.85,1.2);rail(52.6,-63.85,78.4,-63.85,1.2);})();
+hall(65.5,-56.5,1.2,0,20,10,{name:'三清殿',double:true,custom:true,nolight:true,inner:'道法自然',couplet:['紫气东来三千里','青牛西去五千言']});
+// 三清：元始天尊居中（持宝珠），灵宝天尊居左（神像之左＝东，持如意），道德天尊居右（西，持扇）
+at(65.5,1.2,-56.5);(()=>{const ph=.85,zb=-5,z=-3.1;
+ B(13.4,1.1,2.6,0,ph,z,M.ashlar);B(13,3,.14,0,ph+1.1,zb+.3,M.redc,false);
+ const fig=(x,s,k)=>{const b=ph+1.62;B(2.1,.5,1.5,x,ph+1.1,z,M.woodDark,false);B(2.1,1.7,.18,x,ph+1.1,z-.78,M.woodDark,false);disc(.62,x,b+2.5*s,z-.62,M.gold2);
+  seatedFig(x,b,z,s,M.gilt,{noLotus:true,beard:true,beardM:M.ink,trim:M.redc});
+  C(.16*s,.23*s,.24*s,x,b+2.82*s,z,M.gold,false,10);S(.09*s,x,b+3.1*s,z,M.gold);B(.62*s,.04*s,.05*s,x,b+3*s,z,M.gold,false);
+  if(k===0)S(.14*s,x,b+.8*s,z+.82*s,M.jade,1,1,1,12,10);
+  if(k===1){limb(x-.32*s,b+.66*s,z+.86*s,x+.18*s,b+1.32*s,z+.74*s,.045*s,M.jade,.04*s);S(.13*s,x+.2*s,b+1.38*s,z+.72*s,M.jade,1.3,.8,.5,10,8);}
+  if(k===2){const g=new THREE.CylinderGeometry(.42*s,.42*s,.02,18,1,false,Math.PI-.9,1.8);g.rotateX(Math.PI/2);G(g,M.jade,x+.12*s,b+1.25*s,z+.8*s);C(.02*s,.02*s,.55*s,x+.12*s,b+.7*s,z+.8*s,M.woodDark,false,5);}};
+ fig(0,.8,0);fig(3.7,.72,1);fig(-3.7,.72,2);
+ B(5.2,1,1.1,0,ph,-1.1,M.woodDark);C(.3,.22,.32,0,ph+1,-1.1,M.bronze,false,12);for(const sx of[-1.8,1.8]){C(.05,.05,.42,sx,ph+1,-1.1,M.lantern,false,6);S(.06,sx,ph+1.48,-1.1,M.glow);}
+ for(let i=0;i<5;i++)C(.006,.006,.3,-.12+i*.06,ph+1.32,-1.1,M.stick,false,4);
+ SP.sanqing=wv(0,ph+1.9,-1.6);})();
+cushion(64,2.05,-55.6,0);cushion(65.5,2.05,-55.6,0);cushion(67,2.05,-55.6,0);
+// 太岁殿（东，面西）：值年太岁居中，两旁三层光明灯
+hall(78.5,-28,0,3,12,7,{name:'太岁殿',custom:true,nolight:true,couplet:['岁岁平安添福寿','年年顺遂纳吉祥']});
+at(78.5,0,-28,3);(()=>{const ph=.85,zb=-3.5,z=zb+1.05,s=.56,b=ph+1.5;
+ B(4.4,3,.14,0,ph+1,zb+.3,M.redc,false);disc(.95,0,ph+3.05,zb+.4,M.gold2);B(2.2,.5,1.3,0,ph+1,z,M.woodDark,false);
+ seatedFig(0,b,z,s,M.gilt,{noLotus:true,beard:true,beardM:M.ink,hat:true,trim:M.redc});
+ B(3,.9,.8,0,ph,zb+2.45,M.woodDark);C(.24,.17,.28,0,ph+.9,zb+2.45,M.bronze,false,10);
+ for(const sx of[-1,1])for(let t=0;t<3;t++){const lx=sx*4.1,y=ph+.6+t*.55,zt=zb+1.15-t*.3;B(3,y-ph,.3,lx,ph,zt,M.redc,false);
+  for(let i=0;i<8;i++){const x=lx+(i-3.5)*.36;C(.055,.04,.07,x,y,zt,M.gold,false,8);S(.028,x,y+.13,zt,M.glow,1,1.7,1,5,4);}}
+ SP.taisui=wv(0,ph+1.7,zb+2.2);SP.tsLamp=wv(.9,ph+.9,zb+2.45);})();
+cushion(78.5,.85,-28,-Math.PI/2);
+// 斗姆阁（西，面东）：斗姆元君八臂，屏上北斗七星
+hall(52.5,-28,0,1,12,7,{name:'斗姆阁',double:true,custom:true,nolight:true,inner:'众星拱北',couplet:['七星朗照乾坤静','一念虔诚福寿长']});
+at(52.5,0,-28,1);(()=>{const ph=.85,zb=-3.5,z=zb+1.2,s=.55,y=ph+1,b=y+.5*s;
+ B(4.4,3,.14,0,ph+1,zb+.3,M.ink,false);
+ [[-1.4,2.55],[-1.32,1.98],[-.62,1.82],[-.48,2.36],[.22,2.46],[.84,2.56],[1.46,2.2]].forEach(([x,yy])=>S(.075,x,ph+1+yy,zb+.4,M.gold,1,1,.5,8,6));
+ B(2.2,1,1.4,0,ph,z,M.ashlar);seatedFig(0,y,z,s,M.gilt,{halo:true,petalM:M.gold2,trim:M.redc});
+ C(.17*s,.24*s,.26*s,0,b+2.82*s,z,M.gold,false,10);S(.1*s,0,b+3.12*s,z,M.gold);
+ // 另外三对手臂：日、月举在最上，其余持铃、印
+ for(const sx of[-1,1]){const sh=[sx*.62*s,b+1.5*s,z-.05*s];
+  for(const[ex,ey,hx,hy,k]of[[1.12,1.98,1.02,2.6,0],[1.32,1.62,1.68,1.98,1],[1.22,1.22,1.6,1.08,2]]){const e=[sx*ex*s,b+ey*s,z+.08*s],h=[sx*hx*s,b+hy*s,z+.16*s];
+   limb(...sh,...e,.13*s,M.gilt,.11*s);limb(...e,...h,.11*s,M.gilt,.085*s);
+   if(k===0)disc(.2*s,h[0],h[1]+.18*s,h[2]+.02,sx<0?M.gold2:M.jade);else if(k===1)S(.08*s,h[0],h[1]+.08*s,h[2],M.bronze,1,1.3,1,8,6);else B(.14*s,.14*s,.14*s,h[0],h[1],h[2],M.redc,false);}}
+ B(3,.9,.8,0,ph,zb+2.45,M.woodDark);C(.24,.17,.28,0,ph+.9,zb+2.45,M.bronze,false,10);
+ SP.doumu=wv(0,ph+1.6,zb+2.4);})();
+cushion(52.5,.85,-28,Math.PI/2);
 // far peaks + mountain body
 (()=>{at(0,0,0);const g=new THREE.CylinderGeometry(66,120,420,22,10),p=g.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i),k=1+.14*Math.sin(x*.06+y*.03)*Math.cos(z*.05-y*.02)+.06*Math.sin(x*.2+z*.17+y*.08);p.setXYZ(i,x*k,y,z*k);}g.computeVertexNormals();g.scale(1.45,1,1);G(uvs(g,30,30),M.rock,0,-211,-12);})();
 [[-190,-130,75,360,58],[170,-230,95,420,105],[-70,-400,130,470,150],[270,30,85,340,36],[-310,90,115,400,84],[100,310,95,340,22],[-150,270,75,320,14],[400,-320,160,560,170],[-440,-280,170,580,185],[40,-640,220,640,225],[-560,-600,240,660,240],[640,-120,230,600,150],[330,330,140,460,60],[-420,420,170,480,70]].forEach(p=>peak(...p));
-[[-52,-30,7,-6],[95,8,9,-10],[-95,22,8,-10],[49,-55,7,-7],[90,-15,7,-9],[-90,-15,7,-9],[92,40,6,-10],[-92,42,6,-10],[66,49,6,-10],[-64,49,6,-10],[20,-78,7,-6],[-25,-77,6,-8],[20,64,5,-7],[-19,56,4,-6]].forEach(([x,z,r,y])=>{at(x,y,z);G(rockGeo(r,1,1.8,1,x),M.rock,0,0,0);});
+[[-52,-30,7,-6],[95,8,9,-10],[-95,22,8,-10],[90,-15,7,-9],[-90,-15,7,-9],[92,40,6,-10],[-92,42,6,-10],[66,49,6,-10],[-64,49,6,-10],[20,-78,7,-6],[-25,-77,6,-8],[20,64,5,-7],[-19,56,4,-6]].forEach(([x,z,r,y])=>{at(x,y,z);G(rockGeo(r,1,1.8,1,x),M.rock,0,0,0);});
 
 // merge
 for(const[m,arr]of buckets){const g=mergeGeometries(arr,false);const me=new THREE.Mesh(g,m);me.castShadow=me.receiveShadow=true;me.matrixAutoUpdate=false;scene.add(me);arr.forEach(a=>a.dispose());}
@@ -1146,7 +1277,7 @@ if(SV.tod>=0&&SV.tod<TOD.length&&Date.now()-(SV.todAt||0)<72e5){tod.i=tod.from=S
 $('tod').textContent=TOD[tod.i].n;
 setInterval(()=>{if(tod.k<1)return;const h=hourIdx();if(h!==tod.i){tod.from=tod.i;tod.i=h;tod.k=0;$('tod').textContent=TOD[h].n;save();}},6e4);
 if(SV.mix&&typeof SV.mix==='object'){const old=SV.mix.mus===undefined;Object.assign(MIX,SV.mix);if(old){MIX.mus=.6;MIX.chant=Math.min(MIX.chant,.35);}}
-function save(){window.saveKV&&saveKV({merit:P.merit,sat:Math.floor(P.sat),tod:tod.i,bows:P.bows,gongde:P.gongde,name:P.name,view:P.view,mix:MIX,lamps:P.lamps,laps:P.laps,wishes:P.wishes,qDay:P.qDay,qIdx:P.qIdx,cats:P.cats,cai:P.cai,coins:P.coins,yuan:P.yuan,tea:P.tea,wen:P.wen,fuDay:P.fuDay,fuI:P.fuI});}
+function save(){window.saveKV&&saveKV({merit:P.merit,sat:Math.floor(P.sat),tod:tod.i,bows:P.bows,gongde:P.gongde,name:P.name,view:P.view,mix:MIX,lamps:P.lamps,laps:P.laps,wishes:P.wishes,qDay:P.qDay,qIdx:P.qIdx,cats:P.cats,cai:P.cai,coins:P.coins,yuan:P.yuan,tea:P.tea,wen:P.wen,fuDay:P.fuDay,fuI:P.fuI,dao:P.dao,ts:P.ts});}
 setInterval(()=>{if(GS.state==='play')save();},15000);
 addEventListener('pagehide',save);
 const GS={state:'menu'},keys={};let tG=0,tA=0,msgT=0,bannerT=0,guide=0;
@@ -1213,6 +1344,8 @@ function mkFigure(o){const g=new THREE.Group(),rc=o.robe.color.getHex(),sc=(o.sk
  for(const s of[-1,1]){Hd.push(P_(new Sp(.028,6,5),SK,s*.106,-.005,-.005,.45,1,.7));Hd.push(P_(new Sp(.02,8,6),0xf4f0ea,s*.043,.008,.097,1.15,.7,.5));Hd.push(P_(new Bx(.038,.007,.01),HR,s*.043,.042,.108,1,1,1,0,0,-s*.12));}
  if(!o.bald)Hd.push(P_(new Sp(.122,14,10,0,6.2832,0,1.45),HR,0,.02,-.008,.96,1.1,1,-.25));
  if(o.bun)Hd.push(P_(new Sp(.055,10,8),HR,0,.118,-.07));
+ if(o.dao){Hd.push(P_(new Sp(.046,10,8),HR,0,.138,-.012,1,.85,1));Hd.push(P_(new Cy(.03,.038,.042,8,1),0x1c1a18,0,.158,-.012));Hd.push(P_(new Cy(.0035,.0035,.13,4,1),0xd8c27a,0,.164,-.012,1,1,1,0,0,Math.PI/2));}
+ if(o.beard)Hd.push(P_(new Sp(.05,8,6),o.beardC||HR,0,-.135,.075,1,1.75,.55));
  if(o.long){Hd.push(P_(new Sp(.055,10,8),HR,0,-.07,-.075,1.9,2.6,1.1));Hd.push(P_(new Sp(.02,6,5),0xd9a93a,.075,.1,-.085,.5,.5,1.8));}
  if(o.hat)for(const s of[-1,1])Hd.push(P_(new Cy(.0035,.0035,.2,4,1),0x3a2c1a,s*.1,-.01,.02,1,1,1,0,0,s*.16));
  const hm=new THREE.Mesh(mergeC(Hd),VM);hm.castShadow=true;head.add(hm);if(o.hat){const h=new THREE.Mesh(hatG,hatM);h.position.set(0,.088,-.012);h.rotation.x=-.12;h.castShadow=true;head.add(h);}
@@ -1235,7 +1368,7 @@ function poseFig(f){const s=f.sit,p=f.palms;if(f.blob)f.blob.scale.set(.86+s*.42
  f.armR.rotation.set(lerp(f.swing,-.55,p),0,lerp(0,-.28,p));f.armL.rotation.set(lerp(-f.swing,-.55,p),0,lerp(0,.28,p));
  if(f.elbR){f.elbR.rotation.set(lerp(-.12,-1.75,p),0,0);f.elbL.rotation.set(lerp(-.12,-1.75,p),0,0);}
  const fc=f.feet.children,sw=f.swing*(1-s);fc[0].position.z=.07+sw*.32;fc[1].position.z=.07-sw*.32;fc[0].position.y=.035+Math.max(0,sw)*.09;fc[1].position.y=.035+Math.max(0,-sw)*.09;
- f.head.rotation.z=Math.sin(tA*.7+f.bk)*.03;if(f.eyes){const b=(tA*1.1+f.bk)%4.2<.13?.15:1.3;f.eyes[0].scale.y=f.eyes[1].scale.y=b;}}
+ f.head.rotation.z=Math.sin(tA*.7+f.bk)*.03;if(f.eyes){const b=(tA*1.1+f.bk)%4.2<.13?.15:1.3;f.eyes[0].scale.y=f.eyes[1].scale.y=b;}if(f.post)f.post(f);}
 // The avatar is rebuilt when the visitor changes name or gender. Same builder, same tag.
 const AV_ROBE={f:0x9c7c4c,m:0x5f6b7a},AV_SKIRT={f:0x6a4a5c,m:0x3f4a55};
 function mkAvatar(){const f=mkFigure({robe:mat(null,1,{c:AV_ROBE[P.gender],r:1}),skirt:P.gender==='f'?mat(null,1,{c:AV_SKIRT.f,r:1}):null,hat:true,mala:true,bag:true,
@@ -1244,7 +1377,8 @@ let av=mkAvatar();
 const robeMs=[0x6e6a63,0x7c5b3e,0x3f4b5e,0x5a5f4e,0x8b8478,0x4e3d33,0xb58d8d,0x8fa3b5,0x9db08a,0xc4ae84].map(c=>mat(null,1,{c,r:1})),skirtMs=[0x3a3f52,0x5a3a34,0x44503c].map(c=>mat(null,1,{c,r:1}));
 const POI=[{p:[0,27.4],face:Math.PI,act:'bow'},{p:[0,8.6],face:Math.PI,act:'bow'},{p:[-4,-3.6],face:Math.PI,act:'bow'},{p:[4,-3.6],face:Math.PI,act:'bow'},{p:[0,-43.8],face:Math.PI,act:'bow'},
  {p:[29.2,-5],face:Math.PI/2,act:'bow'},{p:[-29.2,-5],face:-Math.PI/2,act:'bow'},{p:[-7,-67],face:Math.PI,act:'gaze'},{p:[7,-67],face:Math.PI,act:'gaze'},{p:[4,57.5],face:0,act:'gaze'},{p:[-22,31.5],face:0,act:'gaze'},{p:[-19,-36.4],face:Math.PI,act:'gaze'},{p:[12,14],face:Math.PI/2,act:'gaze'},
- {p:[65.5,16.2],face:Math.PI,act:'bow'},{p:[60.6,22.5],face:Math.PI/2,act:'gaze'},{p:[71.8,25.5],face:Math.PI/2,act:'bow'},{p:[56.5,26],face:0,act:'gaze'},{p:[-65.5,16.2],face:Math.PI,act:'bow'},{p:[-59.2,25.2],face:-Math.PI/2,act:'gaze'},{p:[-72,25.5],face:-Math.PI/2,act:'gaze'}];
+ {p:[65.5,16.2],face:Math.PI,act:'bow'},{p:[60.6,22.5],face:Math.PI/2,act:'gaze'},{p:[71.8,25.5],face:Math.PI/2,act:'bow'},{p:[56.5,26],face:0,act:'gaze'},{p:[-65.5,16.2],face:Math.PI,act:'bow'},{p:[-59.2,25.2],face:-Math.PI/2,act:'gaze'},{p:[-72,25.5],face:-Math.PI/2,act:'gaze'},
+ {p:[65.5,-35.4],face:Math.PI,act:'bow'},{p:[65.5,-49.6],face:Math.PI,act:'bow'},{p:[71.4,-28],face:Math.PI/2,act:'bow'},{p:[59.6,-28],face:-Math.PI/2,act:'bow'},{p:[61.5,-21],face:0,act:'gaze'},{p:[83.4,-58],face:Math.PI/2,act:'gaze'}];
 function fieldFrom(c){const f=new Int16Array(NX*NZ).fill(32000);f[c]=0;const q=[c];let h=0;while(h<q.length){const a=q[h++],d=f[a]+1,l=nb[a]||[];for(const n of l)if(f[n]>d){f[n]=d;q.push(n);}}return f;}
 const pois=POI.map(o=>({...o,c:cellOf(o.p[0],o.p[1])})).filter(o=>o.c>=0&&!isNaN(navH[o.c]));pois.forEach(o=>{o.f=fieldFrom(o.c);o.y=navH[o.c];});
 const npcs=[];
@@ -1485,6 +1619,72 @@ IA.push({p:SP.tea,r:2.6,label:()=>'饮一盏茶',act(){P.tea++;save();sfx.pour()
  IA.push({p:new V3(p.x,1.4,p.z),r:3,label:()=>'问讯知客',act(){q.greetT=2.2;q.gy=Math.atan2(P.pos.x-p.x,P.pos.z-p.z);sfx.bowl(.06);showCard({title:'财神院',sub:'知客僧 · 广善',body:'<p>正殿拜财神 · 请今日福袋</p><p>聚宝池投福币 · 摸金元宝</p><p>钻一钻钱眼 · 摸一摸福字</p><p>东侧月老祠 · 可系红绳</p><small>财从勤中来 · 福自善中生</small>'});}});
  const g=monkFig({robe:M.robe});g.sit=1;tag(g,'茶头 · 清和');g.tag.position.y=1.7;const tp=SP.teaM.clone();tp.y+=.12;const ty=Math.atan2(SP.tea.x-tp.x,SP.tea.z-tp.z);
  npcs.push({f:g,p:tp,ci:cellOf(tp.x,tp.z),tx:-1,poi:pois[0],st:'fixed',fixed:true,t:0,dur:1e9,yaw:ty,y0:ty,ox:0,oz:0,gd:0,greetT:0,gy:0,upd(q){q.yaw=turn(q.yaw,q.y0,.05);g.bob=Math.sin(q.t*.8)*.01;return[0,0];}});})();
+/* ---------- 三清观 · 道长、太极、太岁、礼斗、北斗七星 ---------- */
+function taoist(name,x,y,z,yaw,o={}){const f=charm(mkFigure({robe:o.robe||M.daoRobe,dao:true,beard:o.beard,beardC:o.beardC}));scene.add(f.g);tag(f,name);
+ const q={f,p:new V3(x,y,z),ci:cellOf(x,z),tx:-1,poi:pois[0],st:'fixed',fixed:true,t:0,dur:1e9,yaw,y0:yaw,ox:0,oz:0,gd:0,greetT:0,gy:0,upd:o.upd||(q=>{q.yaw=turn(q.yaw,q.y0,.05);return[0,0];})};npcs.push(q);return q;}
+// 太极·云手：没有骨骼，poseFig 之后直接摆两臂和腰（f.post）。两手在身前轮流划圆，腰随手转，膝微屈。
+const taiji=ph=>f=>{const t=tA*.6+ph,a=Math.sin(t),b=Math.cos(t);
+ f.armR.rotation.set(-.85-.45*a,0,-.25-.35*b);f.armL.rotation.set(-.85+.45*a,0,.25-.35*b);
+ if(f.elbR){f.elbR.rotation.set(-.95+.3*b,0,0);f.elbL.rotation.set(-.95-.3*b,0,0);}
+ f.upper.rotation.y=.32*a;f.head.rotation.y=.2*a;f.upper.position.y-=.06+.02*(1-b*b);};
+for(const[n,x,z,ph,old]of[['道长 · 清虚',63.2,-26.6,0,1],['道长 · 明玄',67.8,-26.6,.25,1],['道童 · 青松',65.5,-30.2,.5,0]])taoist(n,x,.045,z,0,{beard:old}).f.post=taiji(ph);
+(()=>{const p=new V3(71.5,.03,-11.5),q=taoist('知客 · 守一',p.x,p.y,p.z,1.2,{robe:M.daoRobe2,beard:true,beardC:0xd8d4cc,
+  upd(q){const dx=P.pos.x-p.x,dz=P.pos.z-p.z,n=Math.hypot(dx,dz)<6;q.yaw=turn(q.yaw,n?Math.atan2(dx,dz):q.y0,.05);return[n?1:0,0];}});
+ IA.push({p:new V3(p.x,1.4,p.z),r:3,label:()=>'问讯道长',act(){q.greetT=2.2;q.gy=Math.atan2(P.pos.x-p.x,P.pos.z-p.z);sfx.bowl(.06);
+  showCard({title:'三清观',sub:'知客 · 守一',body:'<p>正殿三清殿 · 拜三清</p><p>东侧太岁殿 · 拜太岁、点平安灯</p><p>西侧斗姆阁 · 礼斗，寻本命星</p><p>老君炉前敬一炷香 · 碑前读一章《道德经》</p><small>福生无量天尊</small>'});}});})();
+// 北斗七星：挂在天穹上，入夜渐亮。礼斗后，本命星外圈泛金。
+const DIP=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d'),gr=g.createRadialGradient(32,32,0,32,32,32);
+ gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.18,'rgba(232,238,255,.85)');gr.addColorStop(.5,'rgba(170,190,255,.14)');gr.addColorStop(1,'rgba(150,170,255,0)');g.fillStyle=gr;g.fillRect(0,0,64,64);
+ const tx=new THREE.CanvasTexture(c);tx.colorSpace=THREE.SRGBColorSpace;const m=new THREE.SpriteMaterial({map:tx,transparent:true,depthWrite:false,fog:false,blending:THREE.AdditiveBlending,opacity:0}),hm=m.clone();hm.color.set(0xffcf70);
+ // 天枢…摇光（Dubhe … Alkaid）：赤经（时）、赤纬（度）、星等。正北方、仰角约 40°（第三人称抬头也看得到）。
+ const ST=[[11.06,61.75,1.8],[11.03,56.38,2.4],[11.9,53.69,2.4],[12.26,57.03,3.3],[12.9,55.96,1.8],[13.4,54.93,2.2],[13.79,49.31,1.9]],R=1500,D2R=Math.PI/180;
+ const pos=ST.map(([ra,de])=>{const az=(ra-12.4)*15*Math.cos(de*D2R)*D2R,el=.7+(de-55.5)*D2R;return new V3(Math.cos(el)*Math.sin(az),Math.sin(el),-Math.cos(el)*Math.cos(az)).multiplyScalar(R);});
+ const sp=pos.map((p,i)=>{const s=new THREE.Sprite(m);s.position.copy(p);const k=46-(ST[i][2]-1.8)*9;s.scale.set(k,k,1);sky2.add(s);return s;});
+ const hl=new THREE.Sprite(hm);hl.scale.set(120,120,1);hl.visible=false;sky2.add(hl);
+ sp[0].onBeforeRender=()=>{const o=clamp((tod.stars-.3)*1.6,0,1);m.opacity=o;hm.opacity=o*(.55+.45*Math.sin(tA*2.4));};
+ return{hl(k){hl.position.copy(pos[k]);hl.visible=true;}};})();
+// 太岁：岁首从立春（约 2 月 4 日）算；六十甲子各有一位值年太岁
+const ZOD='鼠牛虎兔龙蛇马羊猴鸡狗猪',GAN='甲乙丙丁戊己庚辛壬癸',ZHI='子丑寅卯辰巳午未申酉戌亥',
+ ZOD_EN=['Rat','Ox','Tiger','Rabbit','Dragon','Snake','Horse','Goat','Monkey','Rooster','Dog','Pig'],GAN_EN='Jia Yi Bing Ding Wu Ji Geng Xin Ren Gui'.split(' '),ZHI_EN='Zi Chou Yin Mao Chen Si Wu Wei Shen You Xu Hai'.split(' '),
+ TS='金辨 陈材 耿章 沈兴 赵达 郭灿 王清 李素 刘旺 康志 施广 任保 郭嘉 汪文 曾光 伍仲 董德 郑但 陆明 魏仁 方杰 蒋崇 白敏 封齐 邹铛 傅佑 邬桓 范宁 彭泰 徐单 章词 杨仙 管仲 唐杰 姜武 谢太 卢秘 杨信 贺谔 皮时 李诚 吴遂 文哲 缪丙 徐浩 程宝 倪秘 叶坚 丘德 朱得 张朝 万程 辛亚 杨彦 黎卿 傅党 毛梓 石政 洪充 虞程'.split(' '),
+ TS_EN='Jin Bian,Chen Cai,Geng Zhang,Shen Xing,Zhao Da,Guo Can,Wang Qing,Li Su,Liu Wang,Kang Zhi,Shi Guang,Ren Bao,Guo Jia,Wang Wen,Zeng Guang,Wu Zhong,Dong De,Zheng Dan,Lu Ming,Wei Ren,Fang Jie,Jiang Chong,Bai Min,Feng Qi,Zou Dang,Fu You,Wu Huan,Fan Ning,Peng Tai,Xu Dan,Zhang Ci,Yang Xian,Guan Zhong,Tang Jie,Jiang Wu,Xie Tai,Lu Mi,Yang Xin,He E,Pi Shi,Li Cheng,Wu Sui,Wen Zhe,Miao Bing,Xu Hao,Cheng Bao,Ni Mi,Ye Jian,Qiu De,Zhu De,Zhang Chao,Wan Cheng,Xin Ya,Yang Yan,Li Qing,Fu Dang,Mao Zi,Shi Zheng,Hong Chong,Yu Cheng'.split(',');
+function suiIdx(d=new Date()){let y=d.getFullYear();if(d.getMonth()===0||(d.getMonth()===1&&d.getDate()<4))y--;return((y-4)%60+60)%60;}
+// 与值年地支的关系：值（本命）、冲、害（六害）、破（六破）、刑（三刑与自刑）
+const HAI=[7,6,5,4,3,2,1,0,11,10,9,8],PO=[9,4,11,6,1,8,3,10,5,0,7,2],XING=[[3],[10,7],[5,8],[0],[4],[2,8],[6],[1,10],[2,5],[9],[1,7],[11]];
+const fanTS=(y,z)=>[[z===y,'值','own year'],[z===(y+6)%12,'冲','clash'],[HAI[y]===z,'害','harm'],[PO[y]===z,'破','break'],[XING[y].includes(z),'刑','punishment']].filter(r=>r[0]);
+P.dao=SV.dao|0;P.ts=SV.ts&&typeof SV.ts==='object'?SV.ts:null;
+const tsLamp=new THREE.Group();{const cup=new THREE.Mesh(new THREE.CylinderGeometry(.09,.06,.1,12),M.gold),fl=new THREE.Mesh(tipG,lampM),tg=new THREE.Mesh(new THREE.BoxGeometry(.13,.24,.012),M.redc);
+ cup.position.y=.05;fl.scale.set(5,8,5);fl.position.y=.17;tg.position.set(0,.13,.1);tsLamp.add(cup,fl,tg);tsLamp.position.copy(SP.tsLamp);scene.add(tsLamp);}
+const showTsLamp=()=>{tsLamp.visible=!!P.ts&&P.ts.y===suiIdx();};showTsLamp();
+const DAO=[['道法自然','人法地，地法天，天法道，道法自然。'],['上善若水','水善利万物而不争。'],['知足常乐','知足不辱，知止不殆，可以长久。'],['致虚守静','致虚极，守静笃。'],
+ ['见素抱朴','见素抱朴，少私寡欲。'],['柔弱胜刚强','天下之至柔，驰骋天下之至坚。'],['大器晚成','大方无隅，大器晚成。'],['福生无量','福生无量天尊。']];
+let daoI=Math.random()*DAO.length|0;
+IA.push({p:SP.sanqing,r:3.8,label:()=>'拜三清',act(){bowTo(SP.sanqing,()=>{P.dao++;save();const c=DAO[daoI++%DAO.length];sfx.bowl(.12);sparkle(SP.sanqing,16,0xffe4a0);banner(c[0],c[1]);});}});
+IA.push({p:SP.taisui,r:3.6,label:()=>'拜太岁',act(){const en=window.LANG==='en',yi=suiIdx(),yb=yi%12,gz=en?`${GAN_EN[yi%10]}-${ZHI_EN[yb]}`:GAN[yi%10]+ZHI[yb],nm=en?TS_EN[yi]:TS[yi];
+ showCard({title:'拜太岁',sub:en?`${gz} year · Tai Sui General ${nm} · What is your zodiac sign?`:`${gz}年 · 太岁${nm}大将军 · 你属什么？`,opts:[...ZOD],onPick(z){bowTo(SP.taisui,()=>{
+  const f=fanTS(yb,z);P.ts={y:yi,z};P.dao++;save();showTsLamp();sfx.light();sfx.bowl(.1);sparkle(SP.taisui,14,0xffc26a);
+  const body=en?(f.length?`<p>Born in the year of the ${ZOD_EN[z]}, you offend Tai Sui this year: ${f.map(r=>r[2]).join(', ')}.</p><p>A lamp of peace has been lit for you.</p><p>Do good, speak gently, and the year will go well.</p>`:`<p>Born in the year of the ${ZOD_EN[z]}, you do not offend Tai Sui this year.</p><p>A lamp of peace has still been lit for a smooth year.</p>`)
+   :(f.length?`<p>属${ZOD[z]}，今年${f.map(r=>r[1]+'太岁').join('、')}。</p><p>已为你点上一盏平安灯。</p><p>宜行善积德，谨言慎行，岁岁平安。</p>`:`<p>属${ZOD[z]}，今年不犯太岁。</p><p>也为你点上一盏平安灯，祈一年顺遂。</p>`);
+  showCard({title:en?`Tai Sui of the ${gz} year · General ${nm}`:`${gz}年太岁 · ${nm}大将军`,sub:'太岁殿 · 平安灯',body});});}});}});
+// 礼斗：本命星按生肖地支配北斗七星
+const STAR=['贪狼','巨门','禄存','文曲','廉贞','武曲','破军'],STAR2=['天枢','天璇','天玑','天权','玉衡','开阳','摇光'],
+ STAR_EN=['Tanlang','Jumen','Lucun','Wenqu','Lianzhen','Wuqu','Pojun'],STAR2_EN=['Dubhe','Merak','Phecda','Megrez','Alioth','Mizar','Alkaid'],BEN=[0,1,2,3,4,5,6,5,4,3,2,1];
+IA.push({p:SP.doumu,r:3.6,label:()=>tod.stars>.5?'礼斗 · 北斗当空':'礼斗',act(){
+ showCard({title:'礼斗',sub:'斗姆元君 · 北斗七星 · 你属什么？',opts:[...ZOD],onPick(z){bowTo(SP.doumu,()=>{const k=BEN[z],night=tod.stars>.5,en=window.LANG==='en';P.dao++;save();DIP.hl(k);sfx.bowl(.12);sparkle(SP.doumu,14,0xcfe0ff);
+  if(en)banner(`Your birth star · ${STAR_EN[k]}`,`Star ${k+1} of the Dipper (${STAR2_EN[k]}) · ${night?'look to the northern sky':'it shows in the north after dark'}`);
+  else banner(`本命星 · ${STAR[k]}星君`,`北斗第${k+1}星「${STAR2[k]}」· ${night?'抬头看北方天空':'入夜后北方天空可见'}`);});}});}});
+// 《道德经》碑：一天一章（按本地日期轮换）
+const DDJ=[[1,'道可道，非常道；名可名，非常名。无名天地之始，有名万物之母。'],[2,'天下皆知美之为美，斯恶已；皆知善之为善，斯不善已。'],[8,'上善若水。水善利万物而不争，处众人之所恶，故几于道。'],
+ [9,'金玉满堂，莫之能守；富贵而骄，自遗其咎。功遂身退，天之道。'],[11,'三十辐共一毂，当其无，有车之用。……故有之以为利，无之以为用。'],[12,'五色令人目盲；五音令人耳聋；五味令人口爽。'],
+ [16,'致虚极，守静笃。万物并作，吾以观复。'],[19,'见素抱朴，少私寡欲。'],[22,'曲则全，枉则直，洼则盈，敝则新，少则得，多则惑。'],[24,'企者不立，跨者不行；自见者不明，自是者不彰。'],
+ [25,'人法地，地法天，天法道，道法自然。'],[28,'知其雄，守其雌，为天下谿。'],[33,'知人者智，自知者明。胜人者有力，自胜者强。知足者富。'],[37,'道常无为而无不为。'],
+ [40,'反者道之动，弱者道之用。天下万物生于有，有生于无。'],[41,'大方无隅，大器晚成，大音希声，大象无形。'],[42,'道生一，一生二，二生三，三生万物。万物负阴而抱阳，冲气以为和。'],
+ [43,'天下之至柔，驰骋天下之至坚。'],[44,'知足不辱，知止不殆，可以长久。'],[46,'祸莫大于不知足；咎莫大于欲得。故知足之足，常足矣。'],[48,'为学日益，为道日损。损之又损，以至于无为。'],
+ [56,'知者不言，言者不知。'],[58,'祸兮福之所倚，福兮祸之所伏。'],[60,'治大国，若烹小鲜。'],[63,'天下难事，必作于易；天下大事，必作于细。'],[64,'合抱之木，生于毫末；九层之台，起于累土；千里之行，始于足下。'],
+ [67,'我有三宝，持而保之：一曰慈，二曰俭，三曰不敢为天下先。'],[71,'知不知，上；不知知，病。'],[73,'天网恢恢，疏而不失。'],[76,'人之生也柔弱，其死也坚强。'],[77,'天之道，损有余而补不足。'],
+ [78,'天下莫柔弱于水，而攻坚强者莫之能胜。'],[81,'信言不美，美言不信。……天之道，利而不害；圣人之道，为而不争。']];
+const dayNo=()=>Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);
+IA.push({p:SP.stele,r:2.8,label:()=>'读道德经',act(){const[n,t]=DDJ[dayNo()%DDJ.length],en=window.LANG==='en';sfx.take();showCard({title:'道德经',sub:en?`Chapter ${n} · today's chapter`:`第${n}章 · 今日一章`,body:lines(t)});}});
 // lantern halos, fireflies, cranes, roaming hall light
 const haloM=new THREE.PointsMaterial({map:softT,color:0xff8a3a,size:2.4,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending});
 const halo=new THREE.Points(new THREE.BufferGeometry().setAttribute('position',new THREE.Float32BufferAttribute(LG,3)),haloM);halo.frustumCulled=false;scene.add(halo);
@@ -1529,7 +1729,7 @@ function daily(){return[['敬香',Math.min(1,P.merit-DAY.m),1,''],['静坐',Math
 function dailyText(){const y=new Date();y.setDate(y.getDate()-1);const live=P.lastDone===today()||P.lastDone===ymd(y);return'今日功课 · '+(DAY.done?'已圆满':daily().map(a=>`${a[0]} ${Math.max(0,a[1])}/${a[2]}${a[3]}`).join(' · '))+(live&&P.streak?` · 连续 ${P.streak} 日`:'');}
 function checkDaily(){if(DAY.d!==today()){DAY={d:today(),m:P.merit,s:Math.floor(P.sat),b:P.bows,k:BEADS.total,done:false};saveKV({day:DAY});}if(DAY.done||daily().some(a=>a[1]<a[2]))return;DAY.done=true;const y=new Date();y.setDate(y.getDate()-1);P.streak=P.lastDone===ymd(y)?P.streak+1:1;P.lastDone=today();saveKV({day:DAY,streak:P.streak,lastDone:P.lastDone});sfx.bowl(.2);banner('今日功课圆满',`连续 ${P.streak} 日`);}
 // stamps
-const STAMPS=['山门','前院','钟楼','鼓楼','月台','演武场','大雄宝殿','观音殿','祖师殿','镇岳塔','塔顶 · 凌云台','听松亭','藏经阁','舍身崖 · 观云台','财神殿','月老祠','文昌阁','状元桥','禅茶寮'];
+const STAMPS=['山门','前院','钟楼','鼓楼','月台','演武场','大雄宝殿','观音殿','祖师殿','镇岳塔','塔顶 · 凌云台','听松亭','藏经阁','舍身崖 · 观云台','财神殿','月老祠','文昌阁','状元桥','禅茶寮','三清观','三清殿','太岁殿','斗姆阁','太极坪'];
 P.stamps=Array.isArray(SV.stamps)?SV.stamps.filter(n=>n>=0&&n<STAMPS.length):[];let lastLoc='';
 function checkStamp(){const n=locName();if(n===lastLoc)return;lastLoc=n;const i=STAMPS.indexOf(n);if(i<0||P.stamps.includes(i))return;P.stamps.push(i);saveKV({stamps:P.stamps});sfx.bowl(.07);
  if(P.stamps.length===STAMPS.length)banner('朝山圆满','集齐全部印记');else msg(`朝山印记 · ${n}（${P.stamps.length}/${STAMPS.length}）`);}
@@ -1556,7 +1756,7 @@ function updFeat(dt){for(const o of skyL){o.t+=dt;o.g.position.y+=dt*(.5+Math.mi
  if(feedT>0){feedT-=dt;const w=clamp(Math.min((7-feedT)/1.2,feedT/1.2),0,1);for(const k of koi){const a=tA*k.s*2.2+k.o;k.m.position.x=lerp(k.m.position.x,feedP.x+Math.cos(a)*.45,w);k.m.position.z=lerp(k.m.position.z,feedP.z+Math.sin(a)*.45,w);if(Math.random()<dt*2){_h.set(feedP.x+mr(-.4,.4),.36,feedP.z+mr(-.4,.4));puff(_h,0,.25,0,.5,.1,0xe8f4f4,.5,1.2);}}}
  slowT-=dt;if(slowT<=0){slowT=.5;checkStamp();checkDaily();}
  if(M.water.bumpMap){M.water.bumpMap.offset.x+=dt*.02;M.water.bumpMap.offset.y+=dt*.013;}}
-const MS=[t=>[Math.sin(t*.03+.5)*62,23,8+Math.cos(t*.03+.5)*74,0,7,-14],t=>[0,2+t*.06,60-t*1.3,0,5.5,24],t=>[-13+t*.9,4.6,25-t*.25,0,6.5,-7],t=>[50+t*.7,6.5,37-t*.5,65.5,2.5,8],t=>[-22+t*.5,25+t*.2,-22,0,15,-51],t=>[-52-t*.6,5.5,36-t*.4,-65.5,3,6]];
+const MS=[t=>[Math.sin(t*.03+.5)*62,23,8+Math.cos(t*.03+.5)*74,0,7,-14],t=>[0,2+t*.06,60-t*1.3,0,5.5,24],t=>[-13+t*.9,4.6,25-t*.25,0,6.5,-7],t=>[50+t*.7,6.5,37-t*.5,65.5,2.5,8],t=>[-22+t*.5,25+t*.2,-22,0,15,-51],t=>[-52-t*.6,5.5,36-t*.4,-65.5,3,6],t=>[84-t*.45,10,-3.5-t*.5,64,3,-45]];
 $('daily').textContent=tr(dailyText());
 
 /* ---------- tap-to-walk ---------- */
@@ -1632,7 +1832,8 @@ function updCamera(dt){const hs=Math.hypot(P.vel.x,P.vel.z),bobA=P.mode==='walk'
   if(P.inc===2){incT-=dt;if(incT<=0){incT=.07;camera.getWorldDirection(_f);_r.crossVectors(_f,camera.up).normalize();_u.crossVectors(_r,_f);_h.copy(camera.position).addScaledVector(_f,.62).addScaledVector(_u,lerp(.02,.12,handK)).addScaledVector(_r,mr(-.02,.02));puff(_h,mr(-.03,.03),mr(.25,.4),mr(-.03,.03),mr(1.6,2.6),.035,0xdfe2e6,.3,7);}}}
  const pk=Math.max(P.greetK,P.mode==='sit'&&P.autoBow?1:0);palms.visible=!third&&P.inc===0&&pk>.02;if(palms.visible)palms.position.set(0,-.33+pk*.15,-.36);
  vmSun.position.copy(curDir).applyQuaternion(camera.quaternion.clone().invert());}
-function locName(){const{x,y,z}=P.pos;if(y>15&&z<-40)return'塔顶 · 凌云台';if(x>45)return z<8.5&&y>.5?'财神殿':x>74&&z>19&&z<31&&y>.5?'月老祠':'财神院';if(x<-45)return z<8.5&&y>.5?'文昌阁':x<-74&&z>19&&z<31&&y>.5?'禅茶寮':Math.abs(x+65.5)<3&&Math.abs(z-22)<4?'状元桥':'文昌院';if(z>41)return'山门外 · 苍龙岭';if(z>37)return'山门';if(y>3.2&&z<-26)return Math.hypot(x,z+51)<9?'镇岳塔':x<-14&&z>-45?'听松亭':x>10&&z>-50&&z<-40&&y>3.9?'藏经阁':x<-13&&x>-27.5&&z<-53.8&&z>-64?'禅堂':z<-64?'舍身崖 · 观云台':'塔院';
+function locName(){const{x,y,z}=P.pos;if(y>15&&z<-40)return'塔顶 · 凌云台';if(x>44.8&&z<-8.6){if(y>1.7&&Math.abs(x-65.5)<10.2&&z<-51.3&&z>-61.6)return'三清殿';if(y>.5&&x>74.9&&z<-21.9&&z>-34.1)return'太岁殿';if(y>.5&&x<56.1&&z<-21.9&&z>-34.1)return'斗姆阁';return Math.hypot(x-65.5,z+28)<7.2?'太极坪':'三清观';}
+ if(x>45)return z<8.5&&y>.5?'财神殿':x>74&&z>19&&z<31&&y>.5?'月老祠':'财神院';if(x<-45)return z<8.5&&y>.5?'文昌阁':x<-74&&z>19&&z<31&&y>.5?'禅茶寮':Math.abs(x+65.5)<3&&Math.abs(z-22)<4?'状元桥':'文昌院';if(z>41)return'山门外 · 苍龙岭';if(z>37)return'山门';if(y>3.2&&z<-26)return Math.hypot(x,z+51)<9?'镇岳塔':x<-14&&z>-45?'听松亭':x>10&&z>-50&&z<-40&&y>3.9?'藏经阁':x<-13&&x>-27.5&&z<-53.8&&z>-64?'禅堂':z<-64?'舍身崖 · 观云台':'塔院';
  if(y>2.2&&Math.abs(x)<12.2&&z<-3&&z>-13.2)return'大雄宝殿';if(y<1.2&&x>31.5&&x<44.4&&z<-30&&z>-44.5)return'演武场';if(y<2&&x>-42.6&&x<-32&&z<-38.5&&z>-51.5)return'五观堂';if(y>1.3&&Math.abs(x)<24.2&&z<10.2)return'月台';if(Math.abs(x)>31&&z>-15&&z<5&&y>.5)return x>0?'观音殿':'祖师殿';if(z>10)return x<-19&&z>20&&z<31?'钟楼':x>19&&z>20&&z<31?'鼓楼':'前院';return'松径';}
 let hudT=0;const actBtn=a=>document.querySelector(`#acts [data-a=${a}]`);
 function updHud(dt){hudT-=dt;if(hudT<=0){hudT=.25;$('locn').textContent=tr(locName());$('me').textContent=tr('我 · '+P.name);$('mr').textContent=P.merit;$('mb').textContent=P.bows;$('mk').textContent=BEADS.total;$('mg').textContent=P.gongde;$('fc').textContent=tr('功德 '+P.gongde);
