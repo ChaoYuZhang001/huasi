@@ -5,6 +5,13 @@
   "name": "huasi",
   "main": "server/worker.js",
   "compatibility_date": "2025-06-01",
+  // Custom domains switch workers.dev off unless it is kept on explicitly; the
+  // GitHub Pages copy of the site connects to the relay on the workers.dev host.
+  "workers_dev": true,
+  "routes": [
+    { "pattern": "sansitemple.com", "custom_domain": true },
+    { "pattern": "www.sansitemple.com", "custom_domain": true }
+  ],
   "assets": { "directory": ".", "binding": "ASSETS" },
   "durable_objects": { "bindings": [{ "name": "ROOMS", "class_name": "Room" }] },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }],
