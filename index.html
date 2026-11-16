@@ -1116,7 +1116,7 @@ const tod={i:hourIdx(),from:hourIdx(),k:1,lamp:.35,stars:0},curDir=new V3(),_w=n
 function applyTod(){const a=TOD[tod.from],b=TOD[tod.i],k=tod.k*tod.k*(3-2*tod.k),L=(x,y)=>x+(y-x)*k;
  curDir.copy(a.dir).lerp(b.dir,k).normalize();sun.position.copy(curDir).multiplyScalar(220).add(sun.target.position);sun.color.copy(a.sunC).lerp(b.sunC,k);sun.intensity=L(a.sunI,b.sunI)*(1-.75*Math.sin(Math.PI*k)*(a.dir.dot(b.dir)<.5?1:0));
  hemi.color.copy(a.hS).lerp(b.hS,k);hemi.groundColor.copy(a.hG).lerp(b.hG,k);hemi.intensity=L(a.hI,b.hI);vmHemi.color.copy(hemi.color);vmHemi.groundColor.copy(hemi.groundColor);vmHemi.intensity=hemi.intensity*1.3;vmSun.color.copy(sun.color);vmSun.intensity=sun.intensity*.8;
- scene.fog.color.copy(a.fog).lerp(b.fog,k);scene.fog.density=L(a.dens,b.dens);skyU.sun.value.copy(curDir);skyU.hor.value.copy(scene.fog.color);skyU.zen.value.copy(a.zen).lerp(b.zen,k);skyU.glow.value.copy(a.glow).lerp(b.glow,k);skyU.stars.value=tod.stars=L(a.stars,b.stars);
+ skyU.glow.value.copy(a.glow).lerp(b.glow,k);scene.fog.color.copy(a.fog).lerp(b.fog,k).lerp(skyU.glow.value,(1-Math.max(curDir.y,0))*.22);scene.fog.density=L(a.dens,b.dens);skyU.sun.value.copy(curDir);skyU.hor.value.copy(scene.fog.color);skyU.zen.value.copy(a.zen).lerp(b.zen,k);skyU.glow.value.copy(a.glow).lerp(b.glow,k);skyU.stars.value=tod.stars=L(a.stars,b.stars);
  renderer.toneMappingExposure=L(a.exp,b.exp);const lamp=tod.lamp=L(a.lamp,b.lamp);M.lantern.emissiveIntensity=.7+lamp*1.3;M.glow.emissiveIntensity=1.2+lamp*2.2;lampL.forEach(l=>l.intensity=l.userData.b*lamp);hallL.forEach(l=>l.intensity=l.userData.b*(.6+lamp*.5));
  cloudM.forEach(m=>m.color.copy(scene.fog.color).lerp(_w,.5-.3*tod.stars));}
 function nextTod(){if(tod.k<1)return;tod.from=tod.i;tod.i=(tod.i+1)%TOD.length;tod.k=0;saveKV({todAt:Date.now()});save();$('tod').textContent=TOD[tod.i].n;msg(['晨光初照','日正当空','暮色归山','月夜山寺'][tod.i]);if(tod.i===0||tod.i===2)sfx.bell();}
@@ -1371,7 +1371,7 @@ const koiG=new THREE.SphereGeometry(.07,8,6),koi=[0xe8672a,0xf2efe6,0xd9482a,0xf
 let petalT=0;
 function updLife(dt){for(const k of koi){const a=tA*k.s+k.o,r=k.r+Math.sin(tA*.4+k.o)*.2;k.m.position.set(SP.pond.x+Math.cos(a)*r,.22+Math.sin(tA*.7+k.o)*.03,SP.pond.z+Math.sin(a)*r);k.m.rotation.y=-a+(k.s>0?0:Math.PI);}
  petalT-=dt;if(petalT<=0){petalT=.4;_h.set(SP.blossom.x+mr(-1.8,1.8),SP.blossom.y+mr(-.4,.6),SP.blossom.z+mr(-1.8,1.8));puff(_h,mr(-.1,.1),-.28,mr(-.1,.1),6,.05,0xffc4d8,.95,0);}
- const cp=camera.position;for(const q of npcs)if(q.f.tag)q.f.tag.visible=q.p.distanceTo(cp)<18;if(av.tag)av.tag.visible=false;updCats(dt);
+ const cp=camera.position;for(const q of npcs)if(q.f.tag){const d2=q.p.distanceTo(cp),v=d2<19;if(q.f.tag.visible!==v)q.f.tag.visible=v;if(v)q.f.tag.material.opacity=clamp((19-d2)/3,0,1);}if(av.tag)av.tag.visible=false;updCats(dt);
  for(const m of wishMs)m.rotation.y=Math.sin(tA*1.3+m.userData.k)*.25;}
 
 /* ---------- statue sheen, monks, abbot ---------- */
