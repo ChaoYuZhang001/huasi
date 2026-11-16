@@ -567,18 +567,18 @@ function S(r,x,y,z,m,sx=1,sy=1,sz=1,ws=8,hs=6){const g=new THREE.SphereGeometry(
 function stairs(xc,z0,width,y0,y1,m=M.ashlar){const n=Math.max(1,Math.round((y1-y0)/.17)),rise=(y1-y0)/n,run=.42;
  for(let i=1;i<n;i++)B(width,y1-i*rise-y0,run,xc,y0,z0+(i-.5)*run,m);
  const L=(n-1)*run;if(L>1.2){B(.45,(y1-y0)*.55+.35,L*.5,xc-width/2-.22,y0,z0+L*.25,M.marble);B(.45,(y1-y0)*.55+.35,L*.5,xc+width/2+.22,y0,z0+L*.25,M.marble);B(.45,.45,L*.5,xc-width/2-.22,y0,z0+L*.75,M.marble);B(.45,.45,L*.5,xc+width/2+.22,y0,z0+L*.75,M.marble);}}
-function roofGeo(Wd,D,H,up,hole=0){const a=Wd/2,b=D/2,m=Math.min(a,b);
+function roofGeo(Wd,D,H,up,hole=0){const a=Wd/2,b=D/2,m=Math.min(a,b),box=Array.isArray(hole),[hx,hz]=box?hole:[hole,hole];
  const f=(x,z)=>{const t=clamp(Math.min(a-Math.abs(x),b-Math.abs(z))/m,0,1);const c=Math.abs(x)/a*Math.abs(z)/b;return H*Math.pow(t,1.45)+up*Math.pow(c,4);};
  const nx=clamp(Math.round(Wd/.7),10,44)*2,nz=clamp(Math.round(D/.7),10,36)*2,pos=[],nor=[],uv=[];
  const vert=(x,z,hip)=>{const y=f(x,z),e=.04,dx=(f(x+e,z)-f(x-e,z))/(2*e),dz=(f(x,z+e)-f(x,z-e))/(2*e),l=Math.hypot(dx,1,dz);pos.push(x,y,z);nor.push(-dx/l,1/l,-dz/l);
   if(hip)uv.push(z/1.4,(a-Math.abs(x))*1.25/1.4);else uv.push(x/1.4,(b-Math.abs(z))*1.25/1.4);};
- for(let i=0;i<nx;i++)for(let j=0;j<nz;j++){const x0=-a+i*Wd/nx,x1=x0+Wd/nx,z0=-b+j*D/nz,z1=z0+D/nz,cx=(x0+x1)/2,cz=(z0+z1)/2,hip=(a-Math.abs(cx))<(b-Math.abs(cz));if(hole&&Math.abs(cx)<hole&&Math.abs(cz)<hole)continue;
+ for(let i=0;i<nx;i++)for(let j=0;j<nz;j++){const x0=-a+i*Wd/nx,x1=x0+Wd/nx,z0=-b+j*D/nz,z1=z0+D/nz,cx=(x0+x1)/2,cz=(z0+z1)/2,hip=(a-Math.abs(cx))<(b-Math.abs(cz));if(hole&&(box?Math.max(-x0,x1)<=hx+1e-6&&Math.max(-z0,z1)<=hz+1e-6:Math.abs(cx)<hx&&Math.abs(cz)<hz))continue;
   vert(x0,z0,hip);vert(x0,z1,hip);vert(x1,z0,hip);vert(x1,z0,hip);vert(x0,z1,hip);vert(x1,z1,hip);}
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(nor,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));return{g,f,a,b,m};}
-function roof(Wd,D,H,up,x,y,z,hole=0){const{g,f,a,b,m}=roofGeo(Wd,D,H,up,hole);G(g,M.tile,x,y,z);
- if(hole){for(const s of[-1,1]){const dz=(D-1.3)/2-hole,dx=(Wd-1.3)/2-hole;B(Wd-1.3,.28,dz,x,y-.28,z+s*(hole+dz/2),M.eave,false);B(dx,.28,2*hole,x+s*(hole+dx/2),y-.28,z,M.eave,false);col(Wd,.4,D/2-hole,x,y-.28,z+s*(hole+(D/2-hole)/2));col(Wd/2-hole,.4,2*hole,x+s*(hole+(Wd/2-hole)/2),y-.28,z);}}else B(Wd-1.3,.28,D-1.3,x,y-.28,z,M.eave,false);
- for(const sx of[-1,1])for(const sz of[-1,1]){const pts=[];for(let i=0;i<=8;i++){const s=i/8,px=sx*((a-m)+s*m),pz=sz*((b-m)+s*m);pts.push(new V3(px,f(px,pz)+.1,pz));}
-  G(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),12,.14,5),M.ridge,x,y,z);S(.2,x+sx*a,y+f(a,b)+.22,z+sz*b,M.ridge,1,1.6,1);for(const i of[5,6,7])S(.085,x+pts[i].x,y+pts[i].y+.2,z+pts[i].z,M.ridge,1,1.5,1,6,5);C(.05,.08,.14,x+sx*a,y+f(a,b)-.2,z+sz*b,M.gold,false,6);}
+function roof(Wd,D,H,up,x,y,z,hole=0){const{g,f,a,b,m}=roofGeo(Wd,D,H,up,hole);G(g,M.tile,x,y,z);const box=Array.isArray(hole),[hx,hz]=box?hole:[hole,hole],s0=box?clamp(Math.min((hx-a+m)/m,(hz-b+m)/m),0,1):0;
+ if(hole){for(const s of[-1,1]){const dz=(D-1.3)/2-hz,dx=(Wd-1.3)/2-hx;B(Wd-1.3,.28,dz,x,y-.28,z+s*(hz+dz/2),M.eave,false);B(dx,.28,2*hz,x+s*(hx+dx/2),y-.28,z,M.eave,false);col(Wd,.4,D/2-hz,x,y-.28,z+s*(hz+(D/2-hz)/2));col(Wd/2-hx,.4,2*hz,x+s*(hx+(Wd/2-hx)/2),y-.28,z);}}else B(Wd-1.3,.28,D-1.3,x,y-.28,z,M.eave,false);
+ for(const sx of[-1,1])for(const sz of[-1,1]){const P=s=>{const px=sx*((a-m)+s*m),pz=sz*((b-m)+s*m);return new V3(px,f(px,pz)+.1,pz);},pts=[];for(let i=0;i<=8;i++)pts.push(P(s0+i/8*(1-s0)));if(s0)S(.15,x+pts[0].x,y+pts[0].y,z+pts[0].z,M.ridge,1,1,1,8,6);
+  G(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),12,.14,5),M.ridge,x,y,z);S(.2,x+sx*a,y+f(a,b)+.22,z+sz*b,M.ridge,1,1.6,1);for(const i of[5,6,7]){const p=P(i/8);S(.085,x+p.x,y+p.y+.2,z+p.z,M.ridge,1,1.5,1,6,5);}C(.05,.08,.14,x+sx*a,y+f(a,b)-.2,z+sz*b,M.gold,false,6);}
  if(hole);else if(Wd-D>.2){B(Wd-D+.9,.42,.32,x,y+H-.08,z,M.ridge,false);for(const sx of[-1,1]){B(.4,.95,.42,x+sx*((Wd-D)/2+.45),y+H-.08,z,M.ridge,false);B(.22,.4,.3,x+sx*((Wd-D)/2+.2),y+H+.75,z,M.gold,false);}}
  else{C(.1,.3,.5,x,y+H-.1,z,M.ridge,false,8);S(.26,x,y+H+.55,z,M.gold);C(.02,.1,.7,x,y+H+.7,z,M.gold,false,6);}
  if(hole)return;col(Wd,.4,D,x,y-.28,z);col(Wd-m*.9,H*.5,D-m*.9,x,y+.1,z);col(Math.max(.6,Wd-m*1.6),H*.42,Math.max(.6,D-m*1.6),x,y+H*.5,z);}
@@ -600,7 +600,7 @@ function hall(x,z,y0,r,Wd,D,o={}){at(x,y0,z,r);
  B(Wd+2.4,ph,D+2.4,0,0,0,M.ashlar);B(Wd+2.6,.12,D+2.6,0,ph-.12,0,M.marble,false);
  stairs(0,D/2+1.2,doors===3?10:4.6,0,ph);
  let nx=Math.round(Wd/3.3);if(nx%2===0)nx++;const bw=Wd/nx,nz=Math.max(2,Math.round(D/3.3));
- const pc=(cx,cz)=>{C(.3,.36,.25,cx,ph,cz,M.marble,false,10);C(.21,.24,ch-.25,cx,ph+.25,cz,M.wood,true,12);};
+ const pc=(cx,cz,h=ch)=>{C(.3,.36,.25,cx,ph,cz,M.marble,false,10);C(.21,.24,h-.25,cx,ph+.25,cz,M.wood,true,12);};
  for(let i=0;i<=nx;i++){pc(-Wd/2+i*bw,D/2);pc(-Wd/2+i*bw,-D/2);}
  for(let j=1;j<nz;j++){pc(-Wd/2,-D/2+j*D/nz);pc(Wd/2,-D/2+j*D/nz);}
  const zf=D/2-porch;
@@ -610,20 +610,29 @@ function hall(x,z,y0,r,Wd,D,o={}){at(x,y0,z,r);
    else{B(bw,1,.3,xc,ph,zw,M.red);B(bw,2.1,.12,xc,ph+1,zw,M.lattice);}}};
  bays(zf,true);if(o.through)bays(-D/2,true);else B(Wd,ch,.3,0,ph,-D/2,M.red);
  B(Wd+.5,.55,.3,0,ph+ch-.55,D/2,M.paint,false);B(Wd+.5,.55,.3,0,ph+ch-.55,-D/2,M.paint,false);B(.3,.55,D+.5,-Wd/2,ph+ch-.55,0,M.paint,false);B(.3,.55,D+.5,Wd/2,ph+ch-.55,0,M.paint,false);
- B(Wd+1.2,.5,D+1.2,0,ph+ch,0,M.paint);
+ // 重檐殿：下檐只罩一圈周围廊，当中几间直通上檐柱头，天花也抬到那里，主尊连背光才放得下。
+ // 内墙都在上层墙身的投影之内，从外面看不出变化；下檐屋面在这块投影里开洞（roof 的矩形 hole）。
+ const iw=Wd/2-1,id=D/2-1,lo=ph+ch,hc=lo+2.3;
+ // ix/iz 是高处内墙的内表面；内墙离上层墙皮（±iw、-id）留几厘米，避免两张面重合闪烁。
+ if(o.double){const ft=zf-.15,ix=iw-.4,iz=.2-id,W=2*ix+.5,wl=(w,d,x,z)=>{B(w,hc-lo-1.05,d,x,lo+.5,z,M.red);B(w,.55,d,x,hc-.55,z,M.paint);};
+  B(Wd+1.2,.5,D/2+.6-ft,0,lo,(D/2+.6+ft)/2,M.paint);B(Wd+1.2,.5,D/2+.6+iz,0,lo,-(D/2+.6-iz)/2,M.paint);
+  for(const sx of[-1,1]){B(Wd/2+.6-ix,.5,ft-iz,sx*(Wd/2+.6+ix)/2,lo,(ft+iz)/2,M.paint);wl(.25,ft-iz,sx*(ix+.125),(ft+iz)/2);}
+  wl(W,.3,0,zf);wl(W,.08,0,iz-.04);B(W,.25,ft+.38-iz,0,hc,(ft+.22+iz)/2,M.paint);
+  if(o.statue)for(const sx of[-1,1])B(.32,.5,ft-iz,sx*bw*1.5,hc-.5,(ft+iz)/2,M.paint,false);}
+ else B(Wd+1.2,.5,D+1.2,0,ph+ch,0,M.paint);
  {const n=Math.round((Wd+1)/1.15),m=Math.round((D+1)/1.15);for(const s of[-1,1]){for(let i=0;i<=n;i++){const xc=-Wd/2-.5+i*(Wd+1)/n;B(.24,.16,.5,xc,ph+ch+.06,s*(D/2+.8),M.wood,false);B(.5,.13,.2,xc,ph+ch+.26,s*(D/2+.98),M.wood,false);B(.1,.1,.03,xc,ph+ch+.09,s*(D/2+1.06),M.gold,false);}
   for(let j=1;j<m;j++){const zc=-D/2-.5+j*(D+1)/m;B(.5,.16,.24,s*(Wd/2+.8),ph+ch+.06,zc,M.wood,false);B(.2,.13,.5,s*(Wd/2+.98),ph+ch+.26,zc,M.wood,false);}}}
  const yR=ph+ch+.5;
- if(o.double){roof(Wd+5.4,D+5.4,2.1,1,0,yR,0);B(Wd-2,2.1,D-2,0,yR,0,M.red,false);B(Wd-1.5,.6,D-1.5,0,yR+2.1,0,M.paint,false);roof(Wd+2.4,D+2.4,(D+2.4)*.37,1.1,0,yR+2.7,0);plaque(o.name,0,yR+1.55,D/2-.9,{h:1.15,tilt:.12});}
+ if(o.double){roof(Wd+5.4,D+5.4,2.1,1,0,yR,0,[iw,id]);for(const s of[-1,1]){B(Wd-2,2.1,.1,0,yR,s*(id-.05),M.red,false);B(.1,2.1,D-2.2,s*(iw-.05),yR,0,M.red,false);}B(Wd-1.5,.6,D-1.5,0,yR+2.1,0,M.paint,false);roof(Wd+2.4,D+2.4,(D+2.4)*.37,1.1,0,yR+2.7,0);plaque(o.name,0,yR+1.55,D/2-.9,{h:1.15,tilt:.12});}
  else{roof(Wd+4.6,D+4.6,(D+4.6)*.36,1,0,yR,0);plaque(o.name,0,ph+ch+.2,D/2+.75,{h:.95,tilt:.2});}
  if(o.double)plaque(o.inner||'佛光普照',0,ph+ch-.15,zf+.3,{h:.8,bg:'#3a0d0a'});
  if(o.couplet){plaque(o.couplet[0],bw/2,ph+2.35,D/2+.27,{vertical:true,h:2.9,bg:'#0d0d0d'});plaque(o.couplet[1],-bw/2,ph+2.35,D/2+.27,{vertical:true,h:2.9,bg:'#0d0d0d'});}
  for(let i=0;i<nx;i++){const xc=-Wd/2+(i+.5)*bw;if(i===(nx-1)/2&&!o.double)continue;B(.02,.5,.02,xc,ph+ch-.45,D/2+1.3,M.iron,false);S(.3,xc,ph+ch-.75,D/2+1.3,M.lantern,1,.82,1,10,8);lg(xc,ph+ch-.75,D/2+1.3);C(.14,.14,.07,xc,ph+ch-.53,D/2+1.3,M.gold,false,8);C(.12,.12,.07,xc,ph+ch-1.03,D/2+1.3,M.gold,false,8);}
  if(o.empty)return;
  const zb=-D/2;
- if(o.statue){B(6,1.1,2.6,0,ph,zb+1.7,M.ashlar);B(5,ch-1.6,.12,0,ph+1.1,zb+.3,M.paint,false);
+ if(o.statue){B(6,1.1,2.6,0,ph,zb+2,M.ashlar);B(5,ch-1.6,.12,0,ph+1.1,zb+.25,M.paint,false);
   B(3.8,1,1.1,0,ph,zb+4.4,M.woodDark);C(.32,.24,.35,0,ph+1,zb+4.4,M.bronze,false,10);for(const sx of[-1.3,1.3]){C(.05,.05,.4,sx,ph+1,zb+4.4,M.lantern,false,6);S(.06,sx,ph+1.46,zb+4.4,M.glow);}
-  for(const sx of[-1,1])for(const cz of[zb+3.4,zf-2.6])pc(sx*bw*1.5,cz);
+  for(const sx of[-1,1])for(const cz of[zb+3.4,zf-2.6])pc(sx*bw*1.5,cz,o.double?hc-ph:ch);
   for(const sx of[-1,1]){B(1.2,1.5,3,sx*(Wd/2-1.2),ph,zb+3,M.woodDark);B(2.6,.9,.9,sx*(Wd/2-4.6),ph,zf-1.2,M.woodDark);}
   plight(0,ph+2.8,zb+4.6,0xffa858,60,20);}
  else{B(3,1,1,0,ph,zb+.9,M.woodDark);if(!o.custom){B(2,2,.6,0,ph+1,zb+.7,M.wood,false);S(.5,0,ph+2,zb+1.05,M.gold,1,1.3,.7,10,8);B(2.2,.2,.8,0,ph+3,zb+.7,M.gold,false);}
@@ -850,7 +859,7 @@ function standFig(x,y,z,s,m,o={}){lotus(x,y,z,.5*s,o.lotusM||M.gold,o.petalM);co
  if(o.crown){C(.07*s,.13*s,.2*s,x,b+1.95*s,z,M.gold,false,10);shape(new THREE.SphereGeometry(.22*s,10,8),o.veil||m,x,b+1.72*s,z-.09*s,1,1.6,.85);}
  if(o.halo)disc(.36*s,x,b+1.82*s,z-.22*s,o.haloM||M.gold);
  if(o.vase){S(.05*s,x+.07*s,b+1.32*s,z+.3*s,M.white,1,1.6,1);C(.008*s,.008*s,.22*s,x+.07*s,b+1.38*s,z+.3*s,M.pad,false,4);}}
-at(0,1.5,-7);(()=>{const y=.85+1.1,z=-6+1.7;
+at(0,1.5,-7);(()=>{const y=.85+1.1,z=-6+2;
  // Hierarchy: the main image must dominate its two attendants from the doorway.
  seatedFig(0,y,z,1.15,M.gold,{buddha:true,halo:true,petalM:M.gold2,trim:M.gold2});
  standFig(-2.75,y,z+.3,.78,M.gold,{halo:true,haloM:M.gold2});standFig(2.75,y,z+.3,.78,M.gold,{halo:true,haloM:M.gold2});})();
