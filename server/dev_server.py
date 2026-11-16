@@ -3,18 +3,25 @@
 
 Speaks the same JSON protocol over WebSocket. Everyone who connects is treated
 as being in the same place, and a few scripted pilgrims walk around the gate
-court so there is something to look at with a single browser tab.
+court so there is something to look at with a single browser tab. ?c=world is
+answered as the shared "whole mountain" room, and /api/xiang keeps an in-memory
+daily incense count (GET reads it, POST adds one).
 
     python3 dev_server.py            # ws://127.0.0.1:8849
     open http://localhost:8848/index.html?mp=ws://127.0.0.1:8849
 
 Standard library only. Not for production: no TLS, no origin check.
 """
-import asyncio, base64, hashlib, json, math, struct, sys, uuid
+import asyncio, base64, datetime, hashlib, json, math, struct, sys, uuid
 
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8849
 BOTS = [("云游客", 3, 0.0), ("听泉人", 7, 2.1), ("晚归人", 13, 4.2)]
 clients = {}  # id -> (writer, name, k)
+xiang = {}    # China date -> sticks of incense offered
+
+
+def china_day():
+    return (datetime.datetime.utcnow() + datetime.timedelta(hours=8)).date().isoformat()
 
 
 def frame(text):
@@ -54,8 +61,21 @@ def others(me):
 
 async def handle(r, w):
     req = await r.readuntil(b"\r\n\r\n")
+    head = req.decode(errors="replace").split("\r\n")
+    method, _, rest = head[0].partition(" ")
+    path = rest.split(" ")[0]
+    if path.startswith("/api/xiang"):
+        day = china_day()
+        if method == "POST":
+            xiang[day] = xiang.get(day, 0) + 1
+        body = b"" if method == "OPTIONS" else json.dumps({"d": day, "n": xiang.get(day, 0)}).encode()
+        w.write(("HTTP/1.1 %s\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: GET, POST\r\n"
+                 "Content-Type: application/json\r\nContent-Length: %d\r\nConnection: close\r\n\r\n"
+                 % ("204 No Content" if method == "OPTIONS" else "200 OK", len(body))).encode() + body)
+        await w.drain(); w.close(); return
+    world = "c=world" in path
     key = None
-    for line in req.decode(errors="replace").split("\r\n"):
+    for line in head:
         if line.lower().startswith("sec-websocket-key:"):
             key = line.split(":", 1)[1].strip()
     if not key:
@@ -79,7 +99,7 @@ async def handle(r, w):
                 name = str(d.get("name") or "香客")[:12]
                 k = int(d.get("k") or 0) % 60
                 clients[me] = (w, name, k)
-                send(w, {"t": "hi", "id": me, "n": len(clients) - 1 + len(BOTS), "precise": "lat" in d})
+                send(w, {"t": "hi", "id": me, "n": len(clients) - 1 + len(BOTS), "precise": "lat" in d, "w": 1 if world else 0})
                 for i, (ow, on, ok) in others(me):
                     send(ow, {"t": "in", "id": me, "name": name, "k": k})
                     send(w, {"t": "in", "id": i, "name": on, "k": ok})

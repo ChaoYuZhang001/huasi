@@ -7,12 +7,19 @@
 //  - they are rounded to ~100 m, kept in memory for the life of the socket,
 //    never written to storage and never sent to any other visitor;
 //  - a peer only ever receives: an opaque id, a display name, a look seed, a pose.
+//  - the shared "whole mountain" room (?c=world) is joined by people with nobody
+//    within RADIUS_KM; it takes no coordinates at all and everyone in it sees everyone.
+//  - the daily incense counter keeps one number per day in storage; the per-IP
+//    rate limit behind it lives in memory only and is never written anywhere.
 
 const RADIUS_KM = 3;      // who can see whom
 const CELL_DEG = 0.5;     // routing cell (~55 km); one Durable Object per cell
 const MAX_ROOM = 400;     // sockets per cell
 const MAX_RATE = 15;      // messages per second per socket
 const MAX_NAME = 12;
+const WORLD_MAX = 120;    // sockets in the shared "whole mountain" room
+const XIANG_GAP = 15000;  // ms between counted offerings from one IP
+const XIANG_DAY = 60;     // counted offerings per IP per day
 
 const num = v => (typeof v === 'number' && Number.isFinite(v) ? v : NaN);
 const okLat = v => v >= -90 && v <= 90;
@@ -29,6 +36,7 @@ export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     if (url.pathname === '/health') return new Response('ok');
+    if (url.pathname === '/api/xiang') return xiang(req, env, url);
     // Anything that is not a websocket upgrade on /ws is the website itself.
     if (url.pathname !== '/ws' || req.headers.get('Upgrade') !== 'websocket') {
       return env.ASSETS ? env.ASSETS.fetch(req) : new Response('huashan nearby relay', { status: 426 });
@@ -50,17 +58,39 @@ export default {
     // Optional coarse cell computed by the client from its own GPS fix, so two
     // neighbours land in the same cell even if their IPs geolocate elsewhere.
     let cell = '';
-    const c = /^(-?\d{1,3})_(-?\d{1,3})$/.exec(url.searchParams.get('c') || '');
-    if (c) cell = c[1] + '_' + c[2];
+    const cq = url.searchParams.get('c') || '';
+    const c = /^(-?\d{1,3})_(-?\d{1,3})$/.exec(cq);
+    if (cq === 'world') cell = 'world';
+    else if (c) cell = c[1] + '_' + c[2];
     else if (hasIp) cell = Math.floor(ipLat / CELL_DEG) + '_' + Math.floor(ipLon / CELL_DEG);
     else return new Response('location unavailable', { status: 400 });
 
     const h = new Headers(req.headers);
     h.set('x-lat', hasIp ? String(ipLat) : '');
     h.set('x-lon', hasIp ? String(ipLon) : '');
+    h.set('x-world', cell === 'world' ? '1' : '');
     return env.ROOMS.get(env.ROOMS.idFromName(cell)).fetch(new Request(req.url, { headers: h }));
   },
 };
+
+// GET: today's count. POST: one more stick of incense (rate-limited per IP).
+async function xiang(req, env, url) {
+  const origin = req.headers.get('Origin') || '';
+  let same = false;
+  try { same = !!origin && new URL(origin).host === url.host; } catch (_) {}
+  const allowed = (env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
+  const ok = same || allowed.includes(origin);
+  const cors = ok ? { 'Access-Control-Allow-Origin': origin, Vary: 'Origin' } : {};
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: { ...cors, 'Access-Control-Allow-Methods': 'GET, POST', 'Access-Control-Max-Age': '86400' } });
+  if (req.method !== 'GET' && req.method !== 'POST') return new Response('method not allowed', { status: 405 });
+  if (req.method === 'POST' && !ok) return new Response('forbidden', { status: 403 });
+  const h = new Headers({ 'x-ip': req.headers.get('CF-Connecting-IP') || '' });
+  const r = await env.ROOMS.get(env.ROOMS.idFromName('stats')).fetch(new Request(url.origin + '/api/xiang', { method: req.method, headers: h }));
+  const out = new Response(r.body, r);
+  for (const [k, v] of Object.entries(cors)) out.headers.set(k, v);
+  out.headers.set('Cache-Control', 'no-store');
+  return out;
+}
 
 export class Room {
   constructor(state) {
@@ -80,7 +110,7 @@ export class Room {
     for (const o of this.state.getWebSockets()) {
       if (o === ws) continue;
       const b = this.m(o);
-      if (b.ready && km(a, b) <= RADIUS_KM) out.push([o, b]);
+      if (b.ready && (a.world || km(a, b) <= RADIUS_KM)) out.push([o, b]);
     }
     return out;
   }
@@ -88,10 +118,12 @@ export class Room {
   send(ws, obj) { try { ws.send(JSON.stringify(obj)); } catch (_) {} }
 
   async fetch(req) {
-    if (this.state.getWebSockets().length >= MAX_ROOM) return new Response('room full', { status: 503 });
+    if (new URL(req.url).pathname === '/api/xiang') return this.xiang(req);
+    const world = req.headers.get('x-world') === '1';
+    if (this.state.getWebSockets().length >= (world ? WORLD_MAX : MAX_ROOM)) return new Response('room full', { status: 503 });
     const pair = new WebSocketPair();
-    const lat = parseFloat(req.headers.get('x-lat')), lon = parseFloat(req.headers.get('x-lon'));
-    const a = { id: crypto.randomUUID().slice(0, 8), lat: okLat(lat) ? lat : NaN, lon: okLon(lon) ? lon : NaN, precise: false, ready: false, name: '', k: 0, w: 0, c: 0 };
+    const lat = world ? NaN : parseFloat(req.headers.get('x-lat')), lon = world ? NaN : parseFloat(req.headers.get('x-lon'));
+    const a = { id: crypto.randomUUID().slice(0, 8), lat: okLat(lat) ? lat : NaN, lon: okLon(lon) ? lon : NaN, precise: false, ready: false, world, name: '', k: 0, w: 0, c: 0 };
     this.state.acceptWebSocket(pair[1]);
     pair[1].serializeAttachment(a);
     this.meta.set(pair[1], a);
@@ -108,14 +140,14 @@ export class Room {
 
     if (d.t === 'hi' && !a.ready) {
       const la = num(d.lat), lo = num(d.lon);
-      if (okLat(la) && okLon(lo)) { a.lat = Math.round(la * 1000) / 1000; a.lon = Math.round(lo * 1000) / 1000; a.precise = true; }
-      if (!okLat(a.lat) || !okLon(a.lon)) { ws.close(1008, 'no location'); return; }
+      if (!a.world && okLat(la) && okLon(lo)) { a.lat = Math.round(la * 1000) / 1000; a.lon = Math.round(lo * 1000) / 1000; a.precise = true; }
+      if (!a.world && (!okLat(a.lat) || !okLon(a.lon))) { ws.close(1008, 'no location'); return; }
       a.name = String(d.name || '').replace(/[\u0000-\u001f<>]/g, '').slice(0, MAX_NAME) || '香客';
       a.k = (d.k | 0) % 60; if (a.k < 0) a.k = 0;
       a.ready = true;
       ws.serializeAttachment(a);
       const nb = this.near(ws, a);
-      this.send(ws, { t: 'hi', id: a.id, n: nb.length, precise: a.precise });
+      this.send(ws, { t: 'hi', id: a.id, n: nb.length, precise: a.precise, w: a.world ? 1 : 0 });
       for (const [o, b] of nb) {
         this.send(o, { t: 'in', id: a.id, name: a.name, k: a.k });
         this.send(o, { t: 'n', n: this.near(o, b).length });
@@ -141,11 +173,25 @@ export class Room {
     for (const o of this.state.getWebSockets()) {
       if (o === ws) continue;
       const b = this.m(o);
-      if (b.ready && km(a, b) <= RADIUS_KM) {
+      if (b.ready && (a.world || km(a, b) <= RADIUS_KM)) {
         this.send(o, { t: 'out', id: a.id });
         this.send(o, { t: 'n', n: Math.max(0, this.near(o, b).filter(([x]) => x !== ws).length) });
       }
     }
+  }
+
+  // Only the instance named 'stats' is asked this. One number per (China) day.
+  async xiang(req) {
+    const day = new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10), key = 'x:' + day;
+    let n = (await this.state.storage.get(key)) || 0;
+    if (req.method === 'POST') {
+      const ip = req.headers.get('x-ip') || '', now = Date.now();
+      if (!this.ips || this.ips.size > 20000) this.ips = new Map();
+      const r = this.ips.get(ip) || { t: 0, c: 0, d: day };
+      if (r.d !== day) { r.d = day; r.c = 0; }
+      if (now - r.t >= XIANG_GAP && r.c < XIANG_DAY) { r.t = now; r.c++; this.ips.set(ip, r); n++; await this.state.storage.put(key, n); }
+    }
+    return Response.json({ d: day, n });
   }
 
   webSocketClose(ws) { this.leave(ws); }

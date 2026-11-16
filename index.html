@@ -239,6 +239,7 @@ let L='zh';try{L=localStorage.getItem('huashan-lang')||(/^zh/i.test(navigator.la
 if(/[?&]lang=en/.test(location.search))L='en';if(/[?&]lang=zh/.test(location.search))L='zh';
 window.LANG=L;
 const E={
+'全山 · # 人在线':'Whole mountain · # online','今日香火':'incense today','香火 +# · 今日全山第 # 炷':'Incense +# · stick no. # on the mountain today',
 '三清观':'Sanqing Daoist Court','三清殿':'Hall of the Three Pure Ones','太岁殿':'Hall of Tai Sui','斗姆阁':'Pavilion of Doumu','太极坪':'Taiji Terrace',
 '拜三清':'Bow to the Three Pure Ones','拜太岁':'Pay respects to Tai Sui','礼斗':'Worship the Dipper','北斗当空':'the Dipper is overhead','读道德经':'Read the Daodejing','问讯道长':'Greet the Daoist',
 '道长 · 清虚':'Daoist Qingxu','道长 · 明玄':'Daoist Mingxuan','道童 · 青松':'Acolyte Qingsong','知客 · 守一':'Guest master Shouyi',
@@ -1494,7 +1495,7 @@ function updCirc(){const dx=P.pos.x,dz=P.pos.z+51,d=Math.hypot(dx,dz);if(P.pos.y
 const eyeM=new THREE.MeshBasicMaterial({color:0x1a1411}),blushM=new THREE.MeshBasicMaterial({color:0xe8867a,transparent:true,opacity:.45}),whiteM=mat(null,1,{c:0xf2ede2,r:1});
 const eyeG=new THREE.SphereGeometry(.017,8,6),blushG=new THREE.SphereGeometry(.024,8,6),collarG=new THREE.TorusGeometry(.078,.017,6,14),hemG=new THREE.CylinderGeometry(.336,.34,.06,14),smileG=new THREE.TorusGeometry(.022,.005,4,8,Math.PI);
 function charm(f){return f;}
-function tag(f,text,gold){text=tr(text);const c=document.createElement('canvas');c.width=256;c.height=64;const g=c.getContext('2d');g.font='30px "Kaiti SC","STKaiti","KaiTi","PingFang SC",sans-serif';g.textAlign='center';g.textBaseline='middle';g.shadowColor='rgba(0,0,0,.9)';g.shadowBlur=6;g.fillStyle=gold?'#f0cf6a':'#ffffff';g.fillText(text,128,34,248);g.fillText(text,128,34,248);
+function tag(f,text,gold){text=tr(text);const c=document.createElement('canvas');c.width=256;c.height=64;const g=c.getContext('2d');g.font='30px "Kaiti SC","STKaiti","KaiTi","PingFang SC",sans-serif';g.textAlign='center';g.textBaseline='middle';g.shadowColor='rgba(0,0,0,.9)';g.shadowBlur=6;g.fillStyle=gold==='peer'?'#a6ecc9':gold?'#f0cf6a':'#ffffff';g.fillText(text,128,34,248);g.fillText(text,128,34,248);
  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthWrite:false}));s.scale.set(1.25,.31,1);s.position.y=2.2;f.g.add(s);f.tag=s;}
 const pool=NAMES.filter(n=>n!==P.name);
 npcs.forEach((q,i)=>{charm(q.f);q.f.g.scale.setScalar(.93+((i*37)%10)/90);tag(q.f,pool[i%pool.length]);});
@@ -1793,7 +1794,7 @@ function updPlayer(dt){
   if(keys.Space){keys.Space=false;standUp();}return;}
  P.prK=Math.max(0,P.prK-dt*2);
  if(P.mode==='bow'){bowT+=dt;yawTo(bowYaw,Math.min(1,dt*4));P.pitch+=((P.view==='third'?-.15:0)-P.pitch)*Math.min(1,dt*4);bowK=bowT<5.4?Math.pow(Math.sin(Math.PI*(bowT%1.8)/1.8),2):0;
-  if(bowT>=5.4&&bowT-dt<5.4){placeIncense(bowB);P.inc=0;P.merit++;save();sfx.bowl();banner(BLESS[Math.random()*BLESS.length|0],'香火 +1');setGuide(3);}
+  if(bowT>=5.4&&bowT-dt<5.4){placeIncense(bowB);P.inc=0;P.merit++;save();sfx.bowl();const bl=BLESS[Math.random()*BLESS.length|0];banner(bl,'香火 +1');setGuide(3);MP.xiang(n=>{if(bannerT>1)banner(bl,'香火 +1 · 今日全山第 '+n+' 炷');});}
   if(bowT>=6.2){P.mode='walk';bowK=0;}P.eye+=(1.65-P.eye)*Math.min(1,dt*6);return;}
  if(P.mode==='sbow'){P.sbT+=dt;bowK=Math.pow(Math.sin(Math.PI*Math.min(1,P.sbT/1.8)),2);P.vel.x=P.vel.z=0;if(P.sbT>=1.8){P.mode='walk';bowK=0;P.bows++;onBow();}return;}
  bowK=0;P.eye+=(1.65-P.eye)*Math.min(1,dt*5);
@@ -1918,43 +1919,51 @@ $('load').style.display='none';
    Connects on its own when served from the project's Cloudflare Worker (relay at /ws on the
    same host); elsewhere it stays off unless window.HUASHAN_MP is set (see server/README.md).
    The server matches people within 3 km; coordinates go to the server only and are
-   never relayed to other visitors - peers receive a name and a pose, nothing else. */
+   never relayed to other visitors - peers receive a name and a pose, nothing else.
+   Nobody within 3 km after a few seconds: move to the shared "whole mountain" room
+   (?c=world, no coordinates sent), where everyone with an empty neighbourhood meets.
+   Real people wear a jade name tag with a dot, so they never pass for scripted pilgrims. */
 const MP=(()=>{
  const local=/^(localhost|127\.0\.0\.1)$/.test(location.hostname);let url=window.HUASHAN_MP||'';
  if(!url){if(/(^|\.)(workers\.dev|sansitemple\.com)$/.test(location.hostname))url='wss://'+location.host+'/ws';else if(location.hostname==='chaoyuzhang001.github.io')url='wss://huasi.zhangchaoyu123456.workers.dev/ws';}
  if(local){const q=new URLSearchParams(location.search).get('mp');if(q)url=q;}
  if(!/^wss?:\/\/[^\s]+$/.test(url))url='';
- const peers=new Map(),btn=$('mpBtn'),chip=$('mpN'),MAXP=24;
- let ws=null,on=false,ever=false,sendT=0,lastK='',lastS=-9,retry=0,rT=null,geo=null,n=0,precise=false,want=SV.mp!==0;
- const lbl=()=>{if(btn)btn.textContent=tr(want?'附近的人 · 开':'附近的人 · 关');if(chip){chip.style.display=want&&url&&(on||ever)?'inline':'none';chip.textContent=!on?tr('附近 3km · 连接中'):tr((precise?'附近 3km · ':'同城 · ')+n+' 人');}};
+ const peers=new Map(),known=new Map(),btn=$('mpBtn'),chip=$('mpN'),MAXP=24,api=url?url.replace(/^ws/,'http').replace(/\?.*$/,'').replace(/\/(ws)?$/,'')+'/api/xiang':'';
+ let ws=null,on=false,ever=false,sendT=0,lastK='',lastS=-9,retry=0,rT=null,wT=null,geo=null,n=0,precise=false,want=SV.mp!==0,world=false,toWorld=false,xn=0,xT=0;
+ const lbl=()=>{if(btn)btn.textContent=tr(want?'附近的人 · 开':'附近的人 · 关');if(chip){chip.style.display=want&&url&&(on||ever)?'inline':'none';chip.textContent=(!on?tr('附近 3km · 连接中'):world?tr('全山 · '+n+' 人在线'):tr((precise?'附近 3km · ':'同城 · ')+n+' 人'))+(xn>0?' · '+tr('今日香火')+' '+xn:'');}};
  function drop(id){const q=peers.get(id);if(!q)return;scene.remove(q.f.g);if(q.f.tag){q.f.tag.material.map.dispose();q.f.tag.material.dispose();}peers.delete(id);}
  function add(id,name,k){if(peers.has(id)||peers.size>=MAXP)return;k=k|0;const f=mkFigure({robe:robeMs[k%robeMs.length],hat:k%3===0,bun:k%3===1,long:k%4===2,bag:k%2===0});
-  tag(f,String(name||'').replace(/[\u0000-\u001f<>]/g,'').slice(0,12)||'香客');f.g.visible=false;scene.add(f.g);peers.set(id,{f,t:new V3(),yaw:0,a:[0,0,0],seen:false,last:tA});}
+  tag(f,'● '+(String(name||'').replace(/[\u0000-\u001f<>]/g,'').slice(0,12)||'香客'),'peer');f.g.visible=false;scene.add(f.g);peers.set(id,{f,t:new V3(),yaw:0,a:[0,0,0],seen:false,last:tA});}
  function onMsg(e){let m;try{m=JSON.parse(e.data);}catch(_){return;}if(!m||typeof m!=='object')return;
-  if(m.t==='hi'){on=true;ever=true;retry=0;n=m.n|0;precise=!!m.precise;lbl();}
+  if(m.t==='hi'){on=true;ever=true;retry=0;n=m.n|0;precise=!!m.precise;world=!!m.w;xget();lbl();
+   clearTimeout(wT);if(!world)wT=setTimeout(()=>{if(on&&!world&&n===0&&!peers.size){toWorld=true;close();open();}},6000);}
   else if(m.t==='n'){n=m.n|0;lbl();}
-  else if(m.t==='in')add(m.id,m.name,m.k);
-  else if(m.t==='out')drop(m.id);
-  else if(m.t==='s'){const q=peers.get(m.id),p=m.p,a=m.a;if(!q||!Array.isArray(p)||p.length!==3||!p.every(Number.isFinite)||!Number.isFinite(m.r))return;
+  else if(m.t==='in'){known.set(m.id,[m.name,m.k]);add(m.id,m.name,m.k);}
+  else if(m.t==='out'){known.delete(m.id);drop(m.id);}
+  else if(m.t==='s'){if(!peers.has(m.id)&&known.has(m.id))add(m.id,...known.get(m.id));const q=peers.get(m.id),p=m.p,a=m.a;if(!q||!Array.isArray(p)||p.length!==3||!p.every(Number.isFinite)||!Number.isFinite(m.r))return;
    q.t.set(p[0],p[1],p[2]);q.yaw=m.r;if(Array.isArray(a)&&a.length===3)q.a=a.map(v=>clamp(+v||0,0,1));q.last=tA;if(!q.seen){q.seen=true;q.f.g.position.copy(q.t);q.f.g.rotation.y=q.yaw;q.f.g.visible=true;}}}
- function close(){clearTimeout(rT);if(ws){ws.onclose=ws.onmessage=ws.onerror=null;try{ws.close();}catch(_){}}ws=null;on=false;n=0;[...peers.keys()].forEach(drop);lbl();}
- function open(){if(!url||!want||ws)return;let u=url;if(geo)u+=(u.includes('?')?'&':'?')+'c='+Math.floor(geo[0]*2)+'_'+Math.floor(geo[1]*2);
+ function close(){clearTimeout(rT);clearTimeout(wT);if(ws){ws.onclose=ws.onmessage=ws.onerror=null;try{ws.close();}catch(_){}}ws=null;on=false;n=0;known.clear();[...peers.keys()].forEach(drop);lbl();}
+ // 今日全山香火：一天一个数，按中国日期；POST 由服务器按 IP 限速
+ function xreq(post,cb){if(!api)return;fetch(api,post?{method:'POST'}:{}).then(r=>r.ok?r.json():null).then(j=>{if(j&&Number.isFinite(j.n)){xn=j.n;lbl();cb&&cb(j.n);}}).catch(()=>{});}
+ function xget(){xT=300;xreq(false);}
+ function open(){if(!url||!want||ws)return;let u=url;if(toWorld)u+=(u.includes('?')?'&':'?')+'c=world';else if(geo)u+=(u.includes('?')?'&':'?')+'c='+Math.floor(geo[0]*2)+'_'+Math.floor(geo[1]*2);
   try{ws=new WebSocket(u);}catch(_){ws=null;return;}
-  ws.onopen=()=>{lastK='';const h={t:'hi',name:P.name,k:(P.name.charCodeAt(0)+P.name.length*7)%60};if(geo){h.lat=geo[0];h.lon=geo[1];}ws.send(JSON.stringify(h));};
-  ws.onmessage=onMsg;ws.onclose=()=>{ws=null;on=false;[...peers.keys()].forEach(drop);lbl();if(want){retry=Math.min(retry+1,6);rT=setTimeout(open,1000*2**retry);}};ws.onerror=()=>{};lbl();}
- function locate(){if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(g=>{geo=[g.coords.latitude,g.coords.longitude];if(want){close();open();}},()=>{},{maximumAge:6e5,timeout:8000,enableHighAccuracy:false});}
- if(btn&&url){btn.style.display='';btn.addEventListener('click',()=>{want=!want;saveKV({mp:want?1:0});if(want){open();locate();}else close();lbl();});}
+  ws.onopen=()=>{lastK='';const h={t:'hi',name:P.name,k:(P.name.charCodeAt(0)+P.name.length*7)%60};if(geo&&!toWorld){h.lat=geo[0];h.lon=geo[1];}ws.send(JSON.stringify(h));};
+  ws.onmessage=onMsg;ws.onclose=()=>{ws=null;on=false;known.clear();[...peers.keys()].forEach(drop);lbl();if(want){retry=Math.min(retry+1,6);rT=setTimeout(open,1000*2**retry);}};ws.onerror=()=>{};lbl();}
+ function locate(){if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(g=>{geo=[g.coords.latitude,g.coords.longitude];if(want){toWorld=false;close();open();}},()=>{},{maximumAge:6e5,timeout:8000,enableHighAccuracy:false});}
+ if(btn&&url){btn.style.display='';btn.addEventListener('click',()=>{want=!want;saveKV({mp:want?1:0});toWorld=false;if(want){open();locate();}else close();lbl();});}
  addEventListener('pagehide',close);lbl();if(url&&want)open();
- return{get on(){return on;},get n(){return n;},peers,
-  upd(dt){if(!ws)return;
-   for(const[id,q]of peers){if(tA-q.last>10){drop(id);continue;}if(!q.seen)continue;const f=q.f,g=f.g,dx=q.t.x-g.position.x,dz=q.t.z-g.position.z,d=Math.hypot(dx,dz);
+ return{get on(){return on;},get n(){return n;},get world(){return world;},get xn(){return xn;},peers,xiang:cb=>xreq(true,cb),
+  upd(dt){if(!ws)return;if(on&&(xT-=dt)<=0)xget();
+   for(const[id,q]of peers){if(tA-q.last>20){drop(id);continue;}if(!q.seen)continue;const f=q.f,g=f.g,dx=q.t.x-g.position.x,dz=q.t.z-g.position.z,d=Math.hypot(dx,dz);
     if(d>6)g.position.copy(q.t);else{const k=Math.min(1,dt*6);g.position.x+=dx*k;g.position.z+=dz*k;g.position.y+=(q.t.y-g.position.y)*k;}
     g.rotation.y=turn(g.rotation.y,q.yaw,dt*8);f.sit+=(q.a[0]-f.sit)*Math.min(1,dt*4);f.bow+=(q.a[1]-f.bow)*Math.min(1,dt*7);f.palms+=(q.a[2]-f.palms)*Math.min(1,dt*8);
     const sp=d*6;if(sp>.3&&f.sit<.5){f.w+=sp*dt*2.1;f.swing=Math.sin(f.w)*.38*Math.min(1,sp/3);f.bob=Math.abs(Math.sin(f.w))*.03*Math.min(1,sp/3);}else{f.swing*=.85;f.bob*=.8;}
     poseFig(f);if(f.tag)f.tag.visible=camera.position.distanceToSquared(g.position)<324;}
-   sendT-=dt;if(sendT<=0&&on&&ws.readyState===1&&GS.state==='play'){sendT=.2;const g=av.g.position,r2=v=>Math.round(v*100)/100;
-    const p=[r2(g.x),r2(g.y),r2(g.z)],r=r2(av.g.rotation.y),a=[r2(av.sit),r2(av.bow),r2(av.palms)],k=p.concat(r,a).join();
-    if(k!==lastK||tA-lastS>3){lastK=k;lastS=tA;ws.send(JSON.stringify({t:'s',p,r,a}));}}}};
+   // First person never moves the avatar, so pose comes from the player there.
+   sendT-=dt;if(sendT<=0&&on&&ws.readyState===1&&GS.state==='play'){sendT=world?.4:.25;const third=P.view==='third',g=third?av.g.position:P.pos,r2=v=>Math.round(v*100)/100,yw=third?av.g.rotation.y:P.yaw+Math.PI;
+    const p=[r2(g.x),r2(g.y),r2(g.z)],r=r2(Math.atan2(Math.sin(yw),Math.cos(yw))),a=third?[r2(av.sit),r2(av.bow),r2(av.palms)]:[P.mode==='sit'?1:0,r2(Math.max(bowK,P.prK)),P.inc>0||P.mode==='sit'?.85:0],k=p.concat(r,a).join();
+    if(k!==lastK||tA-lastS>8){lastK=k;lastS=tA;ws.send(JSON.stringify({t:'s',p,r,a}));}}}};
 })();
 function fillSelf(){const i=$('nmIn');if(i){i.value=P.name;document.querySelectorAll('#self [data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g===P.gender));}}
 window.fillSelf=fillSelf;
