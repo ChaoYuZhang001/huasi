@@ -3,3 +3,6 @@
 These images are mesh-ready visual references, not runtime geometry. Runtime statues must be created as licensed or project-authored GLB assets, then validated for silhouette, materials, scale, collision and mobile performance before replacing the procedural figures.
 
 - `buddha-main-hall-reference.png`: front and back reference for the Main Hall seated Buddha.
+- `guanyin-reference.png`: standing Guanyin reference with vase and willow branch.
+- `caishen-reference.png`: seated God of Wealth reference with ingot and ceremonial robe.
+- `wenchang-reference.png`: seated Wenchang scholar reference with book and brush.
