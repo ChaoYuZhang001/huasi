@@ -16,4 +16,5 @@ export const {
 	SkinnedMesh, Sphere, SpotLight, Texture, TextureLoader, TriangleFanDrawMode, TriangleStripDrawMode,
 	TrianglesDrawMode, Vector2, Vector3, VectorKeyframeTrack, SRGBColorSpace, InstancedBufferAttribute,
 	Float32BufferAttribute,
+	DataTextureLoader, DataUtils, FloatType, HalfFloatType,
 } = T;
