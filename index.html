@@ -154,7 +154,7 @@ body.touch #cOpts i{display:none}
 #self .gsel{display:flex;gap:4px}#self .gsel button{font-family:inherit;font-size:12px;color:#f3e2b0;background:rgba(0,0,0,.3);border:1px solid rgba(232,196,90,.4);border-radius:999px;padding:4px 10px;cursor:pointer}
 #self .gsel button.on{background:rgba(232,196,90,.9);color:#1b1408;border-color:#e8c45a}
 #nmOk{font-family:inherit;font-size:12px;letter-spacing:3px;color:#1b1408;background:#e8c45a;border:0;border-radius:999px;padding:5px 14px;cursor:pointer}
-#how #steps{margin-bottom:8px}#how #keys{margin:0 auto 4px;display:inline-grid}body.touch #how #keys{display:none}#how #thelp{margin-bottom:6px}
+#credits{margin:10px 0 0;font-size:11px;line-height:1.6;opacity:.6}#credits a{color:inherit}#how #steps{margin-bottom:8px}#how #keys{margin:0 auto 4px;display:inline-grid}body.touch #how #keys{display:none}#how #thelp{margin-bottom:6px}
 #daily{font-size:12px;letter-spacing:2px;color:#f3e2b0;opacity:.92;margin-bottom:14px;max-width:92vw}
 #foot{font-size:11px;letter-spacing:1px;opacity:.5;margin-top:16px}
 #tPhoto{right:max(26px,env(safe-area-inset-right));top:134px;width:54px;height:54px;font-size:12px}
@@ -218,6 +218,7 @@ body.en #cBody,body.en #cTitle{font-family:Georgia,serif}
       <div><span>1</span>礼拜</div><div><span>2</span>念珠</div><div><span>3</span>木鱼</div><div><span>4</span>合十</div>
       <div><span>V</span>切换视角</div><div><span>T</span>更换时辰</div><div><span>空格</span>跳跃 / 起身</div><div><span>P</span>拍照</div>
     </div>
+    <p id="credits"><a href="https://commons.wikimedia.org/wiki/File:Chinese_guardian_lions_at_the_WIPO-High_poly.stl" target="_blank" rel="noopener">山门石狮：Rama 实物扫描</a>（Wikimedia Commons，<a href="https://creativecommons.org/licenses/by-sa/3.0/fr/" target="_blank" rel="noopener">CC BY-SA 3.0 FR</a>，已减面、镜像）· 石材与屋瓦贴图：Poly Haven / ambientCG（CC0）</p>
   </div>
   <div id="mix"><label>设备性能<select id="qMode"><option value="auto">自动</option><option value="smooth">流畅</option><option value="detailed">精细</option></select></label><label>音乐<input type="range" id="vM" min="0" max="1" step="0.05"></label><label>诵经<input type="range" id="vC" min="0" max="1" step="0.05"></label><label>山声<input type="range" id="vA" min="0" max="1" step="0.05"></label><label>法器<input type="range" id="vF" min="0" max="1" step="0.05"></label><label><input type="checkbox" id="cOn">诵经声</label></div>
   <div id="self">
@@ -239,6 +240,7 @@ let L='zh';try{L=localStorage.getItem('huashan-lang')||(/^zh/i.test(navigator.la
 if(/[?&]lang=en/.test(location.search))L='en';if(/[?&]lang=zh/.test(location.search))L='zh';
 window.LANG=L;
 const E={
+'山门石狮：Rama 实物扫描':'Gate lions: photogrammetry scan by Rama','（Wikimedia Commons，':' (Wikimedia Commons, ','，已减面、镜像）· 石材与屋瓦贴图：Poly Haven / ambientCG（CC0）':', reduced and mirrored) · stone and roof textures: Poly Haven / ambientCG (CC0)',
 '全山 · # 人在线':'Whole mountain · # online','今日香火':'incense today','香火 +# · 今日全山第 # 炷':'Incense +# · stick no. # on the mountain today',
 '三清观':'Sanqing Daoist Court','三清殿':'Hall of the Three Pure Ones','太岁殿':'Hall of Tai Sui','斗姆阁':'Pavilion of Doumu','太极坪':'Taiji Terrace',
 '拜三清':'Bow to the Three Pure Ones','拜太岁':'Pay respects to Tai Sui','礼斗':'Worship the Dipper','北斗当空':'the Dipper is overhead','读道德经':'Read the Daodejing','问讯道长':'Greet the Daoist',
@@ -592,6 +594,10 @@ function puffC(m,r,x,y,z){for(let k=0;k<3;k++){const v=new THREE.PlaneGeometry(2
 
 /* ---------- builder ---------- */
 const buckets=new Map(), cols=[];
+// Build fn() into its own group instead of the merged scene, so a loaded model can replace it later.
+function solo(fn){const k0=new Map([...buckets].map(([m,a])=>[m,a.length]));fn();const grp=new THREE.Group();
+ for(const[m,a]of buckets){const k=k0.get(m)||0;if(a.length<=k)continue;const part=a.splice(k),me=new THREE.Mesh(mergeGeometries(part,false),m);me.castShadow=me.receiveShadow=true;grp.add(me);part.forEach(g=>g.dispose());}
+ scene.add(grp);return grp;}
 const O={x:0,y:0,z:0,r:0};
 function at(x,y,z,r=0){O.x=x;O.y=y;O.z=z;O.r=r;}
 function Wp(x,z){switch(O.r){case 0:return[O.x+x,O.z+z];case 1:return[O.x+z,O.z-x];case 2:return[O.x-x,O.z-z];default:return[O.x-z,O.z+x];}}
@@ -792,8 +798,10 @@ tower(-25,25,'钟楼',true);tower(25,25,'鼓楼',false);
  B(5.6,.3,5.6,0,3.56,0,M.paint,false);roof(8.6,8.6,2.7,1.3,0,3.86,0);C(.6,.5,.75,0,.36,0,M.marble,true,12);plaque('听松',0,3.45,2.55,{h:.6});})();
 // props
 burner(0,0,24);burner(0,1.5,6.2);
-for(const s of[-1,1]){lantern(s*4.5,0,17);lantern(s*4.5,0,31);lantern(s*8.5,1.5,8);lantern(s*6,3.5,-29);lantern(s*4,0,46);
- at(s*5,0,44.6);B(1.3,1,1.7,0,0,0,M.ashlar);S(.55,0,1.5,0,M.marble,.9,1,1.25,10,8);S(.42,0,2.15,.42,M.marble,1,1,1,10,8);S(.2,0,1.25,.75,M.marble);}
+const GATE_LIONS=[];
+for(const s of[-1,1]){lantern(s*4.5,0,17);lantern(s*4.5,0,31);lantern(s*8.5,1.5,8);lantern(s*6,3.5,-29);lantern(s*7.2,0,46);
+ // 山门石狮：先放程序化的，扫描模型（文件末尾加载）到了就换掉；碰撞体按扫描的底座尺寸留着
+ GATE_LIONS.push({s,g:solo(()=>{at(s*5,0,44.6);B(1.3,1,1.7,0,0,0,M.ashlar);S(.55,0,1.5,0,M.marble,.9,1,1.25,10,8);S(.42,0,2.15,.42,M.marble,1,1,1,10,8);S(.2,0,1.25,.75,M.marble);col(1.2,2.7,1.66,0,0,0);})});}
 at(8.5,0,53);B(1.6,.5,.8,0,0,0,M.cliff);B(1.2,2.6,.4,0,.5,0,M.cliff);at(8.5,0,53,3);plaque('华山',0,1.8,.22,{vertical:true,h:2.1,bg:'#9c968b',fg:'#b3261c',noframe:true,side:0x9c968b});
 [[-13,0,21,7.5],[14,0,33,8.5],[-33,0,13,9],[33,0,17,8],[-38,0,33,10],[38,0,31,9],[39,0,-24,8],[-39,0,-30,9],[38,0,-52,10],[-37,0,-58,8.5],[25,3.5,-63,10],[-9,3.5,-34,7],[-10,0,48,7],[10.5,0,57,6.5],[-21,1.5,6,6]].forEach(p=>pine(...p));
 [[-28,0,31,1.6],[30,0,35,1.3],[-40,0,13,1.2],[42.6,0,-50,1.7],[-33,0,-60,1.4],[-11,0,56,1.1],[22,3.5,-33,1.2],[-26,3.5,-52,1.5],[16,0,14,1.0]].forEach(p=>boulder(...p));
@@ -1982,6 +1990,23 @@ document.querySelectorAll('#self [data-g]').forEach(b=>b.addEventListener('click
 window.__g={setSelf,mkAvatar,MP,tapWalk,get QL(){return QL;},get walking(){return !!walkF;},GS,P,camera,renderer,nextTod,interact,IA,tod,npcs,pois,bowKey,openBeads,toggleFish,greet,toggleView,knock,cushions,SP,cols,navH,cellOf};
 window.engineReady&&window.engineReady(TOUCH);
 frame();
+/* ---------- scanned stone lions at the mountain gate ----------
+   Rama's photogrammetry scan of a guardian lion at WIPO, Geneva (Wikimedia Commons,
+   CC BY-SA 3.0 FR; credits in models/CREDITS.md and the 玩法 panel), reduced from 835,585
+   to 17,997 faces with the hollows baked into vertex colour, meshopt-compressed to 147 KB.
+   The scan is the lioness (left paw on a cub), so the original stands on the west side, the
+   gate's right as seen from inside; the east lion is her mirror image. The simple lions stay
+   until the file arrives, and for good if it never does. Stone grain is a world-space noise
+   in the shader, because the scan has no UVs. */
+(async()=>{try{globalThis.__SHANSI_THREE=THREE;const[{GLTFLoader},{MeshoptDecoder}]=await Promise.all([import('./vendor/GLTFLoader.js'),import('./vendor/meshopt_decoder.module.js')]);
+ const ld=new GLTFLoader();ld.setMeshoptDecoder(MeshoptDecoder);const gl=await ld.loadAsync('./models/lion-wipo.glb'),tpl=gl.scene;
+ const m=new THREE.MeshStandardMaterial({color:0xbab6ac,roughness:.9,vertexColors:true});
+ m.onBeforeCompile=sh=>{sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vWp;').replace('#include <project_vertex>','#include <project_vertex>\nvWp=(modelMatrix*vec4(transformed,1.)).xyz;');
+  sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vWp;\nfloat h3(vec3 p){p=fract(p*.3183099+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}\nfloat n3(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);return mix(mix(mix(h3(i),h3(i+vec3(1,0,0)),f.x),mix(h3(i+vec3(0,1,0)),h3(i+vec3(1,1,0)),f.x),f.y),mix(mix(h3(i+vec3(0,0,1)),h3(i+vec3(1,0,1)),f.x),mix(h3(i+vec3(0,1,1)),h3(i+vec3(1,1,1)),f.x),f.y),f.z);}')
+   .replace('#include <color_fragment>','#include <color_fragment>\nfloat gn=n3(vWp*2.3)*.35+n3(vWp*11.)*.4+n3(vWp*37.)*.25;diffuseColor.rgb*=.86+.24*gn;');};
+ tpl.traverse(c=>{if(c.isMesh){c.material=m;c.castShadow=c.receiveShadow=true;}});
+ GATE_LIONS.forEach(({s,g},i)=>{const o=i?tpl.clone():tpl;o.position.set(s*5,0,44.6);o.scale.x=s>0?-1:1;scene.add(o);scene.remove(g);g.traverse(x=>{if(x.geometry)x.geometry.dispose();});});
+}catch(e){console.warn('lion scan unavailable; keeping the simple lions',e);}})();
 /* ---------- photographed surfaces ----------
    Real PBR scans (Poly Haven / ambientCG, CC0; see tex/CREDITS.md) replace the
    painted canvases once they arrive. Until then, or if a file fails, the
