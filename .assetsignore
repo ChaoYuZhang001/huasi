@@ -11,3 +11,10 @@ art
 wrangler.jsonc
 wrangler.toml
 README.md
+tests
+tools
+tex/*/granite_tile/color.jpg
+tex/*/granite_wall/color.jpg
+tex/*/cliff_side/color.jpg
+tex/*/grey_roof_tiles/color.jpg
+tex/*/mossy_paving/color.jpg

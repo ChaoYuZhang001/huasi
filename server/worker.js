@@ -6,11 +6,14 @@
 //  - coordinates are used only here, to decide who is near whom;
 //  - they are rounded to ~100 m, kept in memory for the life of the socket,
 //    never written to storage and never sent to any other visitor;
-//  - a peer only ever receives: an opaque id, a display name, a look seed, a pose.
+//  - peers receive an opaque id, display name, appearance, pose and in-game lantern flights, never wishes.
 //  - the shared "whole mountain" room (?c=world) is joined by people with nobody
 //    within RADIUS_KM; it takes no coordinates at all and everyone in it sees everyone.
 //  - the daily incense counter keeps one number per day in storage; the per-IP
 //    rate limit behind it lives in memory only and is never written anywhere.
+
+import {readPractice, samplePractice, readBench} from '../world/presence.js';
+import {readSkyRelease,nearRelease,RELEASE_GAP_MS} from '../world/sky-lantern.js';
 
 const RADIUS_KM = 3;      // who can see whom
 const CELL_DEG = 0.5;     // routing cell (~55 km); one Durable Object per cell
@@ -65,11 +68,16 @@ export default {
     else if (hasIp) cell = Math.floor(ipLat / CELL_DEG) + '_' + Math.floor(ipLon / CELL_DEG);
     else return new Response('location unavailable', { status: 400 });
 
+    // A place is a separate physical space even when the visitors are nearby.
+    // Keep the old temple key so clients already online retain their room.
+    const realm = url.searchParams.get('r') || 'temple';
+    if (!['temple', 'town', 'wudang', 'ming', 'beggar', 'emei', 'huashan', 'kunlun', 'kongtong', 'escort', 'roads', 'persia', 'vajra', 'wushan', 'sanjiang', 'fist', 'fivephoenix', 'eagle', 'sand', 'whale', 'islands'].includes(realm)) return new Response('unknown place', { status: 400 });
+    const roomKey = realm === 'temple' ? cell : realm + ':' + cell;
     const h = new Headers(req.headers);
     h.set('x-lat', hasIp ? String(ipLat) : '');
     h.set('x-lon', hasIp ? String(ipLon) : '');
     h.set('x-world', cell === 'world' ? '1' : '');
-    return env.ROOMS.get(env.ROOMS.idFromName(cell)).fetch(new Request(req.url, { headers: h }));
+    return env.ROOMS.get(env.ROOMS.idFromName(roomKey)).fetch(new Request(req.url, { headers: h }));
   },
 };
 
@@ -124,6 +132,7 @@ export class Room {
     const pair = new WebSocketPair();
     const lat = world ? NaN : parseFloat(req.headers.get('x-lat')), lon = world ? NaN : parseFloat(req.headers.get('x-lon'));
     const a = { id: crypto.randomUUID().slice(0, 8), lat: okLat(lat) ? lat : NaN, lon: okLon(lon) ? lon : NaN, precise: false, ready: false, world, name: '', k: 0, w: 0, c: 0 };
+    a.realm = new URL(req.url).searchParams.get('r') || 'temple';
     this.state.acceptWebSocket(pair[1]);
     pair[1].serializeAttachment(a);
     this.meta.set(pair[1], a);
@@ -144,24 +153,43 @@ export class Room {
       if (!a.world && (!okLat(a.lat) || !okLon(a.lon))) { ws.close(1008, 'no location'); return; }
       a.name = String(d.name || '').replace(/[\u0000-\u001f<>]/g, '').slice(0, MAX_NAME) || '香客';
       a.k = (d.k | 0) % 60; if (a.k < 0) a.k = 0;
+      a.g = d.g === 'f' || d.g === 'm' ? d.g : null;
       a.ready = true;
       ws.serializeAttachment(a);
       const nb = this.near(ws, a);
       this.send(ws, { t: 'hi', id: a.id, n: nb.length, precise: a.precise, w: a.world ? 1 : 0 });
       for (const [o, b] of nb) {
-        this.send(o, { t: 'in', id: a.id, name: a.name, k: a.k });
+        this.send(o, { t: 'in', id: a.id, name: a.name, k: a.k, g: a.g });
         this.send(o, { t: 'n', n: this.near(o, b).length });
-        this.send(ws, { t: 'in', id: b.id, name: b.name, k: b.k });
+        this.send(ws, { t: 'in', id: b.id, name: b.name, k: b.k, g: b.g || null });
+        // A new arrival sees stationary visitors immediately, without waiting
+        // for their eight-second heartbeat. Attachments survive hibernation;
+        // poses expire and are never written to Durable Object storage.
+        if (b.pose && now - b.poseAt < 20000) {
+          this.send(ws, {t: 's', id: b.id, ...b.pose, x: samplePractice(b.pose.x, (now - b.poseAt) / 1000)});
+        }
       }
+      return;
+    }
+
+    if (d.t === 'sky' && a.ready && a.realm === 'temple') {
+      const release = readSkyRelease(d);
+      if (!nearRelease(a.pose?.p, release) || now - a.poseAt > 10000 || now - (a.lastSky || 0) < RELEASE_GAP_MS) return;
+      a.lastSky = now;
+      ws.serializeAttachment(a);
+      for (const [other] of this.near(ws, a)) this.send(other, {t:'sky',id:a.id,...release});
       return;
     }
 
     if (d.t === 's' && a.ready) {
       const p = d.p, s = d.a;
-      if (!Array.isArray(p) || p.length !== 3 || !p.every(v => Number.isFinite(v) && Math.abs(v) < 600)) return;
+      if (!Array.isArray(p) || p.length !== 3 || !p.every((v,i) => Number.isFinite(v) && Math.abs(v) < (i===0 && a.realm==='roads'?815:600))) return;
       if (!Number.isFinite(d.r)) return;
       const act = Array.isArray(s) && s.length === 3 ? s.map(v => Math.max(0, Math.min(1, +v || 0))) : [0, 0, 0];
-      const msg = JSON.stringify({ t: 's', id: a.id, p, r: d.r, a: act });
+      a.pose = {p, r: d.r, a: act, x: readPractice(d.x), ...(act[0]>0&&readBench(d.b)?{b:1}:{})};
+      a.poseAt = now;
+      ws.serializeAttachment(a);
+      const msg = JSON.stringify({ t: 's', id: a.id, ...a.pose });
       for (const [o] of this.near(ws, a)) { try { o.send(msg); } catch (_) {} }
     }
   }
@@ -170,6 +198,8 @@ export class Room {
     const a = this.m(ws);
     this.meta.delete(ws);
     if (!a.ready) return;
+    a.ready = false;
+    ws.serializeAttachment(a); // close/error may both arrive; announce once
     for (const o of this.state.getWebSockets()) {
       if (o === ws) continue;
       const b = this.m(o);
@@ -194,6 +224,14 @@ export class Room {
     return Response.json({ d: day, n });
   }
 
-  webSocketClose(ws) { this.leave(ws); }
-  webSocketError(ws) { this.leave(ws); }
+  webSocketClose(ws) {
+    this.leave(ws);
+    // Our 2025 compatibility date predates automatic close replies. Without
+    // this, browsers remain CLOSING and their reconnect handler never runs.
+    try { ws.close(1000, 'departed'); } catch (_) {}
+  }
+  webSocketError(ws) {
+    this.leave(ws);
+    try { ws.close(1011, 'connection error'); } catch (_) {}
+  }
 }
