@@ -1,7 +1,7 @@
 {
   // One Worker serves the site (static assets) and the nearby-pilgrims relay (/ws).
   // Files that match a static asset are answered by the assets layer without
-  // running worker code; only /ws and /health reach server/worker.js.
+  // running worker code; the relay, counter, health check and legacy entry use server/worker.js.
   "name": "huasi",
   "main": "server/worker.js",
   "compatibility_date": "2025-06-01",
@@ -12,7 +12,11 @@
     { "pattern": "sansitemple.com", "custom_domain": true },
     { "pattern": "www.sansitemple.com", "custom_domain": true }
   ],
-  "assets": { "directory": ".", "binding": "ASSETS" },
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS",
+    "run_worker_first": ["/huashan-temple.html", "/huashan-temple", "/huashan-temple/"]
+  },
   "durable_objects": { "bindings": [{ "name": "ROOMS", "class_name": "Room" }] },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }],
   "vars": {

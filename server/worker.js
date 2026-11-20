@@ -38,6 +38,10 @@ function km(a, b) {
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
+    if (['/huashan-temple.html', '/huashan-temple', '/huashan-temple/'].includes(url.pathname)) {
+      url.pathname = '/';
+      return Response.redirect(url.href, 301);
+    }
     if (url.pathname === '/health') return new Response('ok');
     if (url.pathname === '/api/xiang') return xiang(req, env, url);
     // Anything that is not a websocket upgrade on /ws is the website itself.

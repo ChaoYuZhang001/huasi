@@ -21,8 +21,13 @@ async function verify(){
   await page.locator('#go').tap();await page.waitForSelector('[data-entry-state="ready"]',{timeout:90000});
   await page.locator('#share').tap();
   const invite=await page.evaluate(()=>window.sharedInvite);
+  assert.equal(invite.title,'Sansi');
+  assert.equal(await page.title(),'Sansi · A Jianghu Journey');
   assert.equal(invite.text,'Visit Shaolin, learn cloud hands at Wudang and identify tea buds at Emei.');
-  assert.equal(invite.url,page.url());
+  const expectedInvite=new URL('https://sansitemple.com/');
+  const language=new URL(page.url()).searchParams.get('lang');
+  if(language==='zh'||language==='en')expectedInvite.searchParams.set('lang',language);
+  assert.equal(invite.url,expectedInvite.href);
   await page.locator('#ttl').tap();assert.equal(await page.evaluate(()=>__g.GS.state),'menu');
   await page.locator('#howBtn').tap();assert.equal(await page.locator('#how').isVisible(),true);
   await page.locator('#howBtn').tap();

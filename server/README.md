@@ -44,7 +44,7 @@ curl -s https://sansitemple.com/health
 
 - 网站：`https://sansitemple.com`、`https://www.sansitemple.com`、`https://huasi.<账号子域>.workers.dev`；中转是各自地址下的 `/ws`。
 - 自定义域名在 `wrangler.jsonc` 的 `routes` 里声明，部署时自动创建解析记录和证书。声明自定义域名后 `workers.dev` 默认会被关闭，所以配置里显式写了 `"workers_dev": true`。
-- 页面从上述任一地址打开时自动连接同一地址的中转，不需要配置。GitHub Pages 副本（`chaoyuzhang001.github.io/huasi`）会跨域连接到 `workers.dev` 上的中转。
+- 页面从上述任一地址打开时自动连接同一地址的中转，不需要配置。GitHub Pages 副本（`chaoyuzhang001.github.io/huasi`）会跨域连接到 `workers.dev` 上的中转。副本从 Git 跟踪文件中按根目录的 `.assetsignore` 筛选发布内容，首页标记为 `noindex`，分享链接与规范网址均指向主站。玩家可在原域名继续本机存档。
 - `wrangler.jsonc` 的 `ALLOWED_ORIGINS` 列出允许跨域连接的网址；同源永远允许，没有 `Origin` 头的连接会被拒绝。
 
 ## 本地测试
