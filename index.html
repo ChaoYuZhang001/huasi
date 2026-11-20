@@ -447,7 +447,8 @@ $('go').addEventListener('click',event=>{if(failed){event.stopPropagation();loca
 })();
 </script>
 <script type="module" onerror="window.engineFail?.()">
-import {portrait,garments,schools,tailoredArm,footwear,visitorFabric} from './characters/wardrobe.js';
+import {portrait,garments,schools,tailoredArm,footwear} from './characters/wardrobe.js';
+import {clothingMaterial,mapCloth} from './characters/tailoring.js';
 import {dressPortrait,portraitResources} from './characters/visitor-head.js';
 import {readPractice,readBench} from './world/presence.js';
 import {readSkyRelease,flightAt,FLIGHT_SECONDS,RELEASE_GAP_MS} from './world/sky-lantern.js';
@@ -1280,7 +1281,7 @@ const FG={skirt:new THREE.CylinderGeometry(.19,.33,.95,14).translate(0,.475,0),f
  sleeve:new THREE.CylinderGeometry(.065,.1,.5,10).translate(0,-.25,0),hand:new THREE.SphereGeometry(.045,8,6),mala:new THREE.TorusGeometry(.16,.014,6,24)};
 Object.assign(FM,{lapel:mat(null,1,{c:0xf2ede2,r:1}),bagM:mat(null,1,{c:0xd9b23a,r:1})});Object.assign(FG,{shoulder:new THREE.SphereGeometry(.2,12,8),lapel:new THREE.BoxGeometry(.034,.3,.02),cuff:new THREE.CylinderGeometry(.104,.11,.06,10),bag:new THREE.BoxGeometry(.07,.19,.17),strap:new THREE.TorusGeometry(.2,.011,5,16)});
 const VM=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.92}),eyeM2=new THREE.MeshBasicMaterial({color:0x17110e}),eyeG2=new THREE.SphereGeometry(.0125,8,6),shoeG=new THREE.SphereGeometry(.06,8,6).scale(.8,.5,1.7),shoeM=new THREE.MeshStandardMaterial({color:0x1d1b19,roughness:1});
-const visitorCloth=visitorFabric(THREE,VM);
+const outfits={m:clothingMaterial(THREE,VM,false),f:clothingMaterial(THREE,VM,true)};
 function cg(g,hex){const c=new THREE.Color(hex),n=g.attributes.position.count,a=new Float32Array(n*3);for(let i=0;i<n;i++){a[i*3]=c.r;a[i*3+1]=c.g;a[i*3+2]=c.b;}g.setAttribute('color',new THREE.BufferAttribute(a,3));return g;}
 function mergeC(arr){const m=mergeGeometries(arr);let nv=0;for(const g of arr)nv+=g.attributes.position.count;const c=new Float32Array(nv*3);let o=0;for(const g of arr){c.set(g.attributes.color.array,o*3);o+=g.attributes.position.count;}m.setAttribute('color',new THREE.BufferAttribute(c,3));arr.forEach(g=>g.dispose());return m;}
 const P_=(g,hex,x=0,y=0,z=0,sx=1,sy=1,sz=1,rx=0,ry=0,rz=0)=>{g.scale(sx,sy,sz);if(rx)g.rotateX(rx);if(ry)g.rotateY(ry);if(rz)g.rotateZ(rz);g.translate(x,y,z);return cg(g,hex);};
@@ -1293,6 +1294,7 @@ let figureMotion=null;
 try{const {createFigureMotion}=await import('./characters/motion.js');figureMotion=createFigureMotion(THREE,{merge:mergeGeometries,
  floor(x,z,y,f){const c=cellOf(x,z),v=f===av?groundAt(x,z,y+.6,0):(c>=0?navH[c]:y);return Number.isFinite(v)&&Math.abs(v-y)<.62?v:y;}});
 }catch(error){console.warn('Character motion unavailable; using existing poses',error);}
+const restingArmAngle=player=>player==='f'?.095:player?.058:0;
 function mkFigure(o){const g=new THREE.Group(),rc=o.school?new THREE.Color(schools[o.school][0]).lerp(o.robe.color,.23).getHex():o.robe.color.getHex(),sc=o.skirt?o.skirt.color.getHex():rc,SK=o.skin||0xc99d7c,HR=o.hairC||0x1b1815,WH=0xf2ede2,DK=0x2b2622,Sp=THREE.SphereGeometry,Cy=THREE.CylinderGeometry,Bx=THREE.BoxGeometry,dark=new THREE.Color(sc).multiplyScalar(.55).getHex();
  // One lathe profile: hem at ankle height (so the shoes show), knee, hip, waist, chest.
  const V2p=(x,y)=>new THREE.Vector2(x,y);
@@ -1303,10 +1305,11 @@ function mkFigure(o){const g=new THREE.Group(),rc=o.school?new THREE.Color(schoo
   // folds deepen toward the hem; the hips sit back a little so the figure has a stance
   q=1+.05*k*Math.sin(a*8)+.018*k*Math.sin(a*3+1);
   const student=o.player==='f',pleat=((a/(Math.PI*2)*18)%1+1)%1,fold=student?1+.13*k*(pleat<.20?1-10*pleat:-1+2*(pleat-.20)/.80):1;sp.setXYZ(i,x*q*fold*(student?1+.09*k:1),student?.32+.68*y:y,z*q*fold*(student?.83:1)*lerp(.93,1,k)*(.99+.03*k));}sk.computeVertexNormals();
- const skirtG=P_(sk,sc,0,0,0),hemColor=new THREE.Color(dark),skc=skirtG.attributes.color;
+ if(o.player==='f'){sk.rotateY(Math.PI);mapCloth(sk,'lower',y=>(1-y)/.667);}
+ const skirtG=P_(sk,o.player==='f'?0xffffff:sc,0,0,0),hemColor=new THREE.Color(dark),skc=skirtG.attributes.color;
  for(let i=0;i<sp.count;i++)if(sp.getY(i)<.065)skc.setXYZ(i,hemColor.r,hemColor.g,hemColor.b);
  skirtG.userData.travelCut=o.player||'robe';
- const skirt=new THREE.Mesh(skirtG,o.player?visitorCloth:VM);skirt.castShadow=true;skirt.visible=o.player!=='m';g.add(skirt);
+ const skirt=new THREE.Mesh(skirtG,o.player?outfits[o.player]:VM);skirt.castShadow=true;skirt.visible=o.player!=='m';g.add(skirt);
  const feet=new THREE.Group();g.add(feet);for(const s of[-1,1]){const m=o.player?new THREE.Mesh(mergeC(footwear(THREE,P_,o.player==='f',SK)),VM):new THREE.Mesh(shoeG,shoeM);m.position.set(s*.1,.035,0);feet.add(m);}
  const upper=new THREE.Group();upper.position.y=.95;g.add(upper);
  const T=[P_(new Cy(.172,.2,.56,16,2),rc,0,.28,0,1,1,.74),P_(new Sp(.2,14,8),rc,0,.5,0,1.25,.4,.8),P_(new Cy(.208,.208,.075,16,1),DK,0,.035,0,1,1,.76),P_(new Bx(.05,.2,.02),DK,.03,-.07,.156),P_(new Bx(.04,.16,.02),DK,-.03,-.05,.156),
@@ -1315,7 +1318,7 @@ function mkFigure(o){const g=new THREE.Group(),rc=o.school?new THREE.Color(schoo
  if(o.mala)T.push(P_(new THREE.TorusGeometry(.15,.013,6,22),0x5a2a16,0,.37,.06,1,1,.8,1.25));
  if(o.bag){T.push(P_(new Bx(.07,.19,.17),0xd9b23a,-.235,.02,.02));T.push(P_(new THREE.TorusGeometry(.2,.011,5,16),DK,0,.3,0,1,.8,1,Math.PI/2,0,-.7));}
  if(o.player||o.school){if(o.player)T.splice(0).forEach(part=>part.dispose());T.push(...garments(THREE,P_,o,rc,SK));}
- const torso=new THREE.Mesh(mergeC(T),o.player?visitorCloth:VM);torso.castShadow=true;upper.add(torso);
+ const torso=new THREE.Mesh(mergeC(T),o.player?outfits[o.player]:VM);torso.castShadow=true;upper.add(torso);
  const head=new THREE.Group();head.position.y=o.player?.755:.74;head.scale.setScalar(1.1);upper.add(head);
  const Hd=o.player||o.school?portrait(THREE,P_,o,SK,HR):[P_(new Sp(.115,16,12),SK,0,0,0,.94,1.1,1),P_(new Sp(.09,12,10),SK,0,-.055,.012,.98,1,.95),P_(new Sp(.017,6,5),SK,0,-.012,.113,.9,1.4,1.1),P_(new Bx(.036,.006,.008),0x8a4a40,0,-.06,.1)];
  if(!o.player&&!o.school)for(const s of[-1,1]){Hd.push(P_(new Sp(.028,6,5),SK,s*.106,-.005,-.005,.45,1,.7));Hd.push(P_(new Sp(.02,8,6),0xf4f0ea,s*.043,.008,.097,1.15,.7,.5));Hd.push(P_(new Bx(.038,.007,.01),HR,s*.043,.042,.108,1,1,1,0,0,-s*.12));}
@@ -1337,19 +1340,20 @@ function mkFigure(o){const g=new THREE.Group(),rc=o.school?new THREE.Color(schoo
  // Two segments: shoulder group carries a short sleeve, elbow group a forearm with a
  // hanging cuff and a flattened hand. 合十 now bends instead of thrusting forward.
  const arm=s=>{const a=new THREE.Group();a.position.set(s*.195,.5,0);upper.add(a);
-  if(o.player){a.position.set(s*(o.player==='f'?.180:.201),.47,0);a.scale.y=o.player==='f'?1.035:1.08;const [sleeve,wrist]=tailoredArm(THREE,P_,rc,SK,s,o.player==='f'),el=new THREE.Group();el.position.y=-.26;a.add(new THREE.Mesh(mergeC(sleeve),visitorCloth),el);el.add(new THREE.Mesh(mergeC(wrist),visitorCloth));return [a,el];}
+  if(o.player){a.position.set(s*(o.player==='f'?.168:.191),o.player==='f'?.491:.476,0);a.scale.y=o.player==='f'?1.035:1.08;const [sleeve,wrist]=tailoredArm(THREE,P_,rc,SK,s,o.player==='f'),el=new THREE.Group();el.position.y=-.26;a.add(new THREE.Mesh(mergeC(sleeve),outfits[o.player]),el);el.add(new THREE.Mesh(mergeC(wrist),outfits[o.player]));return [a,el];}
   a.add(new THREE.Mesh(mergeC([P_(new Cy(.058,.072,.27,10,1),rc,0,-.13,0,1,1,.8),P_(new Sp(.075,10,7),rc,0,-.02,0,1,.9,.85)]),VM));
   const el=new THREE.Group();el.position.set(0,-.26,0);a.add(el);
   el.add(new THREE.Mesh(mergeC([P_(new Sp(.058,9,7),rc,0,0,0),P_(new Cy(.052,.062,.25,10,1),rc,0,-.13,0,1,1,.85),
    P_(new Cy(o.player?.052:.062,o.player?.05:.092,.11,12,1),o.player?rc:WH,0,-.28,0,1,1,.9),P_(new Sp(.038,8,6),SK,0,-.34,0,1.05,.75,.55)]),VM));
   return [a,el];};
  const [armR,elbR]=arm(1),[armL,elbL]=arm(-1);
+ if(o.player){const restingAngle=restingArmAngle(o.player);armR.rotation.z=restingAngle;armL.rotation.z=-restingAngle;elbR.rotation.x=elbL.rotation.x=-.12;}
  const inc=new THREE.Group();inc.position.set(0,.4,.45);upper.add(inc);inc.visible=false;const tips=[];
  for(let i=-1;i<=1;i++){const s=new THREE.Mesh(stickG,stickM);s.position.set(i*.03,.17,0);s.rotation.z=-i*.08;inc.add(s);const t=new THREE.Mesh(tipG,tipM);t.position.set(i*.044,.35,0);t.visible=false;inc.add(t);tips.push(t);}
- const f={g,upper,armL,armR,elbL,elbR,skirt,feet,head,inc,tips,eyes,blob,player:o.player,sit:0,bow:0,palms:0,swing:0,bob:0,moving:false,w:Math.random()*6,bk:Math.random()*4};f.portrait=!!(o.school||o.player);g.name=o.player?(o.player==='f'?'学生装女游客':'中山装男游客'):(o.role||o.school||'行人');figureMotion?.attach(f,o.player==='f'?SK:sc);return f;}
+ const f={g,upper,armL,armR,elbL,elbR,skirt,feet,head,inc,tips,eyes,blob,player:o.player,sit:0,bow:0,palms:0,swing:0,bob:0,moving:false,w:Math.random()*6,bk:Math.random()*4};f.portrait=!!(o.school||o.player);g.name=o.player?(o.player==='f'?'学生装女游客':'中山装男游客'):(o.role||o.school||'行人');figureMotion?.attach(f,o.player==='f'?SK:sc,o.player==='f'?VM:undefined);return f;}
 function poseFig(f,dt=1/60){figureMotion?.step(f,dt);const s=f.sit,p=f.palms;if(f.blob)f.blob.scale.set(.86+s*.42,1,.72+s*.42);f.skirt.scale.set(1+s*.4,1-s*.5,1+s*.4);f.feet.visible=s<.5;
  f.upper.position.y=.95-s*.45+f.bob;f.upper.rotation.x=f.bow*(s>.5?1.15:.75);
- const hang=f.player?.038:0;f.armR.rotation.set(lerp(f.swing,-.55,p),0,lerp(hang,-.28,p));f.armL.rotation.set(lerp(-f.swing,-.55,p),0,lerp(-hang,.28,p));
+ const hang=restingArmAngle(f.player);f.armR.rotation.set(lerp(f.swing,-.55,p),0,lerp(hang,-.28,p));f.armL.rotation.set(lerp(-f.swing,-.55,p),0,lerp(-hang,.28,p));
  if(f.elbR){f.elbR.rotation.set(lerp(-.12,-1.75,p),0,0);f.elbL.rotation.set(lerp(-.12,-1.75,p),0,0);}
  const fc=f.feet.children,sw=f.swing*(1-s);fc[0].position.z=.07+sw*.32;fc[1].position.z=.07-sw*.32;fc[0].position.y=.035+Math.max(0,sw)*.09;fc[1].position.y=.035+Math.max(0,-sw)*.09;
  f.head.rotation.z=Math.sin(tA*.7+f.bk)*.03;if(f.eyes){const phase=(tA*1.1+f.bk)%4.2,b=phase<.13?.15:1.3;f.eyes[0].scale.y=f.eyes[1].scale.y=b*(f.portrait?.34:1);if(f.eyelids)for(const lid of f.eyelids)lid.morphTargetInfluences[0]=phase<.18?Math.sin(Math.PI*phase/.18)**2:0;}figureMotion?.pose(f);if(f.post)f.post(f);if(f===av)WORLD.practice?.pose(f);}
@@ -2054,7 +2058,7 @@ try {
   builders:{THREE,M,at,B,C,G,S,solo,point:wpv,col,roof,headFig,limb,lathe,seatedFig,standFig,hall,plaque,pine,bamboo,boulder,crate,sacks,cushion,lantern,rail,plight,ginkgo,shrub,lstring,wall,
    palette(overrides,fn){const old={};for(const k in overrides){old[k]=M[k];M[k]=overrides[k];}try{return fn();}finally{Object.assign(M,old);}}},
   shared:o=>o===sun||o===sun.target||o===hemi||o===sky||o===sky2||o===av.g||o===ring||parts.some(p=>p.s===o)||cloudM.includes(o.material)||[...MP.peers.values()].some(p=>p.f.g===o),
-  sharedResources:()=>[...Object.values(M),...Object.values(T),...portraitResources,visitorCloth,VM,eyeM2,shoeM,hatM,blobM,stickM,tipM,...robeMs,...skirtMs,eyeG2,shoeG,hatG,blobG,stickG,tipG],
+  sharedResources:()=>[...Object.values(M),...Object.values(T),...portraitResources,...Object.values(outfits),VM,eyeM2,shoeM,hatM,blobM,stickM,tipM,...robeMs,...skirtMs,eyeG2,shoeG,hatG,blobG,stickG,tipG],
   captureNav:()=>({road:xStep===2,nearbyBoxes,h:navH,nb,list:navList,flow,lastCell}),
   restoreNav:n=>{navLayout(n.road);nearbyBoxes=n.nearbyBoxes;NC=cols.length;navH=n.h;nb=n.nb;navList=n.list;flow=n.flow;lastCell=n.lastCell;},
   rebuildNav:(spawn,id)=>{navLayout(id==='roads');rebuildNav(spawn);lastCell=cellOf(spawn[0],spawn[2]);},safePose:s=>{const[x,y,z]=s.p,c=cellOf(x,z);return c>=0&&Number.isFinite(navH[c])&&Math.abs(y-navH[c])<1.2&&!blocked(x,z,y+.5,y+1.7,.34);},updateCollisionCount:()=>{NC=cols.length;nearbyBoxes=collisionGrid(cols);},flush,

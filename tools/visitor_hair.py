@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 from PIL import Image
 from scipy.interpolate import PchipInterpolator
+from scipy.spatial import cKDTree
 from scipy.ndimage import distance_transform_edt, gaussian_filter1d
 
 
@@ -18,11 +19,18 @@ def hair_mask(image, bounds, eyebrow=None):
     return mask
 
 
-def bake_hair(sex, likeness):
+def bake_hair(sex, likeness, skin, triangles):
     src, camera = likeness.reference, likeness.camera
     female = sex == 'female'
     mask = hair_mask(src, (112,486,395,747) if female else (134,0,371,181),
                      [(314,637),(350,625),(357,638),(328,648),(311,649)] if female else None)
+    # Keep lighter streaks inside the crown. A luminance threshold alone
+    # removes these from the photographed albedo and flattens the part.
+    contours,_=cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+    crown=np.zeros_like(mask)
+    cv2.drawContours(crown,contours,-1,1,cv2.FILLED)
+    mask=np.where(np.indices(mask.shape)[0]<(632 if female else 99),crown,mask).astype(np.uint8)
+    hair_distance=cv2.distanceTransform(mask,cv2.DIST_L2,5)-cv2.distanceTransform(1-mask,cv2.DIST_L2,5)
     yy, xx = distance_transform_edt(1-mask, return_distances=False, return_indices=True)
     clean = src[yy, xx]
     # Horizontal sections measured against the skull, from nape to crown.
@@ -98,6 +106,23 @@ def bake_hair(sex, likeness):
     lo,hi=bounds(projected[:,0],shift_row(projected[:,1]))
     my,mx=np.nonzero(mask)
     pl,pr=bounds(mx,my)
+    # Rasterize the fitted skin in the portrait camera. Seat the roots against
+    # the forehead and pinna instead of suspending the outer shell above them.
+    skin_camera=skin@camera.rotation.T
+    pixel=camera.project(skin)
+    skin_depth=np.full(src.shape[:2],-.4,np.float32)
+    for tri in np.asarray(triangles).reshape(-1,3):
+        q=pixel[tri]
+        lower=np.maximum(np.floor(q.min(0)).astype(int),0)
+        upper=np.minimum(np.ceil(q.max(0)).astype(int),[src.shape[1]-1,src.shape[0]-1])
+        basis=(q[1:]-q[0]).T
+        if min(upper-lower)<0 or abs(np.linalg.det(basis))<1e-5:continue
+        xs,ys=np.meshgrid(np.arange(lower[0],upper[0]+1),np.arange(lower[1],upper[1]+1))
+        bary=(np.stack([xs,ys],-1)-q[0])@np.linalg.inv(basis).T
+        valid=(bary.min(-1)>=0)&(bary.sum(-1)<=1)
+        yy,xx=ys[valid],xs[valid]
+        z=skin_camera[tri,2]
+        skin_depth[yy,xx]=np.maximum(skin_depth[yy,xx],z[0]+bary[valid]@(z[1:]-z[0]))
     def hairstyle(u,v):
         xyz=cap(u,v)
         x,y=np.moveaxis(camera.project(xyz),-1,0)
@@ -110,7 +135,20 @@ def bake_hair(sex, likeness):
         dr=np.clip(at(pr)-right,-18,18)
         weight=np.clip((brow+30-sy)/38,0,1)
         dx=(dl*(1-ratio)+dr*ratio)*weight
-        return xyz+(dx[...,None]*camera.rotation[0]-(sy-y)[...,None]*camera.rotation[1])/camera.scale
+        phi=(u-.5)*2*np.pi
+        # Give the swept locks relief so the part catches light in profile.
+        flow=phi+.49*(1-v)*np.sin(phi-.24)+.35*np.sin(np.pi*v)
+        relief=(.0017*np.cos(14*flow)+.0009*np.cos(27*flow+.6))*np.sin(np.pi*v)**.8
+        xyz[...,0]+=np.sin(phi)*relief
+        xyz[...,2]+=np.cos(phi)*relief
+        xyz+=(dx[...,None]*camera.rotation[0]-(sy-y)[...,None]*camera.rotation[1])/camera.scale
+        pixels=camera.project(xyz)
+        scalp=sample(skin_depth,pixels)
+        facing=np.sin(phi)*camera.rotation[2,0]+np.cos(phi)*camera.rotation[2,2]
+        root=np.clip((v-.48)/.45,0,1)**1.2*np.clip((facing+.28)/.67,0,1)
+        depth=xyz@camera.rotation[2]
+        offset=np.where(scalp>-.19,np.clip(scalp+.0009-depth,-.038,.015),0)
+        return xyz+(root*offset)[...,None]*camera.rotation[2]
 
     def braid(u,v):
         phi=2*np.pi*u
@@ -118,7 +156,17 @@ def bake_hair(sex, likeness):
         y=np.interp(v,t,[-.052,-.075,-.100,-.139,-.173,-.203,-.226,-.234])
         z=np.interp(v,t,[-.104,-.120,-.138,-.151,-.157,-.166,-.178,-.187])
         r=np.interp(v,t,[.019,.016,.031,.034,.032,.026,.013,.001])
-        return np.stack([-.008-.014*v+r*np.sin(phi),y,z+r*.83*np.cos(phi)],axis=-1)
+        r*=1+.10*np.cos(7*phi+3*v)+.045*np.sin(13*phi-5*v)
+        xyz=np.stack([-.009-.020*v+r*np.sin(phi),y,z+r*.83*np.cos(phi)],axis=-1)
+        photo=camera.project(xyz)
+        mid=camera.project(np.stack([-.009-.020*v,y,z],axis=-1))
+        reference_y=[751,771,794,816,839,865,903]
+        left=np.interp(photo[...,1],reference_y,[196,185,171,158,154,153,151])
+        right=np.interp(photo[...,1],reference_y,[217,215,212,210,205,192,174])
+        side=(photo[...,0]-mid[...,0])/np.maximum(1,r*camera.scale)
+        observed=(left+right)/2+side*(right-left)*.50
+        shift=np.clip(observed-photo[...,0],-31,31)*np.clip((mid[...,1]-750)/32,0,1)
+        return xyz+shift[...,None]*camera.rotation[0]/camera.scale
 
     def texels(u,v,pos,tail):
         phi=(u-.5)*2*np.pi
@@ -134,7 +182,21 @@ def bake_hair(sex, likeness):
         basic=np.array([40,34,30] if female else [38,32,28])
         rgb=basic+(strand+sheen)[...,None]
         if tail:
-            rgb=rgb*(.9+.10*np.cos(phi))[...,None]
+            # Wrap the photographed bundle around the ponytail. All angles
+            # keep the same root-to-tip flow and the clumps rotate at the tie.
+            path_y=772+80*v
+            axis=np.interp(path_y,[772,796,825,852],[199,186,175,162])
+            path_x=axis+8*np.sin(phi+.72*v)+1.3*np.sin(3*phi-2*v)
+            gathered=sample(src,np.stack([path_x,path_y],axis=-1)).astype(float)
+            rgb=rgb*.40+np.clip(gathered,14,70)*.60
+            xy=camera.project(pos)
+            # The close view records the gathering below the ear and the loose
+            # upper tail. The source stops at the shoulder.
+            pix=sample(src,xy).astype(float)
+            valid=np.clip((86-pix.max(axis=-1))/23,0,1)*np.clip((884-xy[...,1])/18,0,1)
+            valid*=np.clip((np.cos(phi)+.35)/.9,0,1)
+            rgb=rgb*(1-valid[...,None])+pix*valid[...,None]
+            rgb+=3.5*np.cos(37*flow+1.6*np.sin(v*4))[...,None]
         else:
             xy=camera.project(pos)
             face=np.sin(phi)*camera.rotation[2,0]+np.cos(phi)*camera.rotation[2,2]
@@ -146,14 +208,32 @@ def bake_hair(sex, likeness):
         tips=.009*(np.sin(47*phi+2*np.sin(6*phi))+1)+.007*(np.sin(117*phi+.9)+1)
         tips+=.005*(np.sin(257*phi+3*v)+1)
         opacity=np.clip((1-v-tips)*130+.6,0,1)
+        if not tail:
+            edge_distance=sample(hair_distance,xy)
+            # The observed hairline has small skin gaps even inside its silhouette.
+            coverage=np.clip((edge_distance+1.8)/3.6,0,1)
+            strength=np.clip((face+.06)/.53,0,1)*np.clip((v-.50)/.24,0,1)
+            opacity*=1-strength*(1-coverage)
+            # Let the photographed fine hair on the skin show between locks
+            # at the temple and along the forehead. Cull even the far rim if
+            # its projection would cover the visible pinna in the close view.
+            scalp=sample(skin_depth,xy)
+            toward=camera.rotation[2]
+            near_skin=(scalp>-.19)&(np.abs(pos@toward-scalp)<.042)
+            strength=np.clip((v-.65)/.25,0,1)*near_skin
+            opacity*=1-strength*(1-coverage)
+            roots=np.clip((v-.77)/.23,0,1)
+            spacing=.5+.5*np.cos(179*flow+3*np.sin(23*flow))
+            opacity*=1-roots*spacing*near_skin*.53
         return np.uint8(np.dstack([np.clip(rgb,0,255),opacity*255]))
 
-    width,height=768,384
+    width,height=1024,448
     atlas=np.zeros((height,width,4),np.uint8)
-    islands=[(2,600 if female else width-3,hairstyle,113,56)]
+    islands=[(2,782 if female else width-3,hairstyle,113,56)]
     if female:
-        islands.append((604,width-3,braid,49,30))
+        islands.append((786,width-3,braid,49,30))
     vertices,uvs,indices=[],[],[]
+    sway=None
     for start,end,model,ring,levels in islands:
         u,v=np.meshgrid(np.linspace(0,1,end-start+1),np.linspace(0,1,height))
         atlas[:,start:end+1]=texels(u,v,model(u,v),model is braid)
@@ -163,6 +243,11 @@ def bake_hair(sex, likeness):
         coords=model(u,v)
         base=len(vertices)
         vertices.extend(coords.reshape(-1,3))
+        if model is braid:
+            # Only the free length below the tie participates in the walk cycle.
+            ids=base+np.arange(v.size,dtype=np.uint16)
+            weight=np.clip((v.ravel()-.11)/.89,0,1)**1.65
+            sway=(ids,np.column_stack([.034*weight,.002*weight,-.008*weight]))
         uvs.extend(np.stack([(start+.5+(end-start)*u)/width,(.5+(height-1)*v)/height],axis=-1).reshape(-1,2))
         for j in range(levels-1):
             for i in range(ring-1):
@@ -174,31 +259,43 @@ def bake_hair(sex, likeness):
             bottom=base+(levels-1)*ring
             for i in range(1,ring-2):
                 indices.extend([bottom,bottom+i+1,bottom+i])
-    # Tapered sections of hair lift from the temple and sweep over the ear.
-    # They share the cap material and remain attached through the turn to profile.
-    start,end=islands[0][:2]
-    for sign in (-1,1):
-        for lock in range(13):
-            t=np.linspace(0,1,21)
-            angle=sign*(.79+.087*lock+(.22 if female else .11)*t+
-                        .035*np.sin(t*np.pi*1.8+lock*.62))
-            v=.57+t*.42
-            thickness=(.013+.008*np.sin(lock*.4)**2)*(1-.93*t**2)
-            phi=np.stack([angle-thickness,angle+thickness],axis=1)
-            u=.5+phi/(2*np.pi)
-            levels=np.broadcast_to(v[:,None],u.shape)
-            patch=hairstyle(u,levels)
-            length=(.011 if female else .006)*(1+.65*np.sin(lock*1.79))
-            lift=.0011+.0015*np.sin(t*np.pi)
-            patch[:,:,0]+=np.sin(phi)*lift[:,None]
-            patch[:,:,2]+=np.cos(phi)*lift[:,None]
-            patch[:,:,1]-=length*t[:,None]**3
+    # Follow the loose locks visible in the casting photo. Each ribbon has
+    # a real root depth sampled from the fitted scalp at that image position.
+    u,v=np.meshgrid(np.linspace(.18,.80,230),np.linspace(.1,1,100))
+    scalp=hairstyle(u,v).reshape(-1,3)
+    projected=camera.project(scalp)
+    nearest=cKDTree(projected)
+    locks=([
+        [(175,587),(147,631),(138,676),(144,708),(152,729)],
+        [(154,639),(138,672),(144,709),(151,737),(166,755)],
+        [(163,657),(151,686),(151,720),(163,754),(182,774)],
+        [(180,663),(163,688),(166,716),(177,741),(193,750)],
+        [(355,610),(374,639),(376,665),(372,691),(376,710)],
+        [(364,635),(379,658),(377,682),(379,714),(370,740)],
+    ] if female else [
+        [(170,63),(152,86),(149,111),(155,131),(164,146)],
+        [(182,65),(164,95),(163,120),(166,137),(172,153)],
+        [(322,48),(348,73),(355,98),(351,117),(348,137)],
+    ])
+    rng=np.random.default_rng(419)
+    for path in locks:
+        for strand in range(3):
+            stations=np.array(path,float)+rng.normal(0,1.6,(len(path),2))
+            t=np.linspace(0,1,17)
+            px=PchipInterpolator(np.linspace(0,1,len(path)),stations)(t)
+            _,ids=nearest.query(px,k=4)
+            depth=gaussian_filter1d(np.mean(scalp[ids]@camera.rotation[2],axis=1),2)
+            center=(px-camera.center)/[camera.scale,-camera.scale]
+            xyz=np.column_stack([center,depth+.0017])@camera.rotation
+            tangent=np.gradient(px,axis=0)
+            normal=np.stack([-tangent[:,1],tangent[:,0]],axis=1)
+            normal/=np.maximum(1e-9,np.linalg.norm(normal,axis=1,keepdims=True))
+            wide=(.00018+.00022*rng.random())*(1-t**2)
+            arm=(normal[:,0,None]*camera.rotation[0]-normal[:,1,None]*camera.rotation[1])*wide[:,None]
             base=len(vertices)
-            vertices.extend(patch.reshape(-1,3))
-            uvs.extend(np.stack([(start+.5+(end-start)*u)/width,
-                                 (.5+(height-1)*np.minimum(levels,.92))/height],axis=-1).reshape(-1,2))
-            for j in range(len(t)-1):
-                k=base+2*j
+            vertices.extend(np.stack([xyz-arm,xyz+arm],axis=1).reshape(-1,3))
+            uvs.extend(np.column_stack([np.full(34,.18+strand*.006),np.repeat(.38+t*.27,2)]))
+            for k in range(base,base+32,2):
                 indices.extend([k,k+2,k+1,k+1,k+2,k+3])
     vertices=np.array(vertices)
     tri=np.array(indices).reshape(-1,3)
@@ -207,4 +304,4 @@ def bake_hair(sex, likeness):
     for column in tri.T:
         np.add.at(normals,column,n)
     normals/=np.maximum(1e-12,np.linalg.norm(normals,axis=1,keepdims=True))
-    return vertices,normals,np.array(uvs),np.array(indices),Image.fromarray(atlas)
+    return vertices,normals,np.array(uvs),np.array(indices),Image.fromarray(atlas),sway

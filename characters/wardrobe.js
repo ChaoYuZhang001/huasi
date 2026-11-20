@@ -1,46 +1,28 @@
+import {jacketSurface,mapCloth,sewnJacket,solidTrim} from './tailoring.js';
 import {points,faces} from './portrait-data.js';
 
 const unpack=(data,Type)=>new Type(Uint8Array.from(atob(data),ch=>ch.charCodeAt(0)).buffer);
 const coordinates=Float32Array.from(unpack(points,Int16Array),value=>value/10000),indices=unpack(faces,Uint16Array);
 export const schools={daoist:[0x4c5461,0x777f84],temple:[0x91663c,0x694131],wudang:[0x465c69,0xabb4ab],emei:[0x839785,0xd0c7ae],huashan:[0x44546e,0x937a58],kunlun:[0x586877,0xe3dccc],kongtong:[0x73614e,0x433d38],ming:[0x683b38,0xe1a253],beggar:[0x656249,0x96745a]};
 
-export function contour(THREE,rows,segments=24){
+export function contour(THREE,rows,segments=24,seam=0){
  const geo=new THREE.LatheGeometry(rows.map(row=>new THREE.Vector2(1,row[0])),segments),pos=geo.attributes.position;
  for(let column=0;column<=segments;column++)for(let ring=0;ring<rows.length;ring++){
-  const index=column*rows.length+ring,[height,width,depth,forward=0,lateral=0]=rows[ring],angle=2*Math.PI*column/segments;
+  const index=column*rows.length+ring,[height,width,depth,forward=0,lateral=0]=rows[ring],angle=seam+2*Math.PI*column/segments;
   pos.setXYZ(index,lateral+width*Math.sin(angle),height,forward+depth*Math.cos(angle));
  }geo.computeVertexNormals();return geo;
 }
 
-// Add fine woven variation in metres, shared across the jacket, sleeves and skirt.
-export function visitorFabric(THREE,base){
- const weaveMap=new THREE.TextureLoader().load(new URL('./visitor-cloth.webp',import.meta.url).href);
- weaveMap.wrapS=weaveMap.wrapT=THREE.RepeatWrapping;
- const material=base.clone();
- material.onBeforeCompile=shader=>{
-  shader.uniforms.travelWeave={value:weaveMap};
-  shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 clothPoint;')
-   .replace('#include <begin_vertex>','#include <begin_vertex>\nclothPoint = position;');
-  shader.fragmentShader=shader.fragmentShader.replace('#include <common>','#include <common>\nuniform sampler2D travelWeave;\nvarying vec3 clothPoint;')
-   .replace('#include <color_fragment>', `#include <color_fragment>
-    vec2 thread=vec2(clothPoint.x+.57*clothPoint.z,clothPoint.y)*1640.;
-    vec2 visibleThread=1.-smoothstep(vec2(.45),vec2(3.),fwidth(thread));
-    float weave=dot(sin(thread),visibleThread*vec2(.028,.025));
-    float slub=.016*sin(33.*clothPoint.y+2.*sin(48.*clothPoint.x));
-    if(vColor.b>vColor.r){
-      vec2 surface=vec2(clothPoint.x+.66*clothPoint.z,clothPoint.y);
-      float grain=texture2D(travelWeave,surface*9.).r*2.-1.;
-      float crease=.5+.5*cos(dot(surface,vec2(64.,21.))+2.*sin(surface.y*21.));
-      diffuseColor.rgb*=1.+weave+slub+.11*grain-.027*pow(crease,8.);
-    }`);
- };
- return material;
-}
-
 export function tailoredArm(THREE,part,color,skin,side,female){
  const size=female?.89:1,section=(tone,rows)=>part(contour(THREE,rows),tone,0,0,0,size,1,size);
- const sleeve=section(color,[[-.277,.049,.051],[-.242,.051,.055],[-.15,.061,.067],[-.086,.064,.069],[-.035,.06,.066,0,-side*.006],[.014,.047,.056,0,-side*.019],[.036,.022,.031,0,-side*.035],[.04,.002,.003,0,-side*.043]]);
- const wrist=section(color,[[-.246,.041,.044],[-.242,.045,.046],[-.227,.044,.046],[-.22,.042,.045],[-.134,.049,.054],[-.045,.052,.055],[.009,.047,.049],[.021,.031,.038]]);
+ const fabric=(rows,elbow=false)=>{
+  const geo=contour(THREE,rows,32,-Math.PI);
+  const reach=female?.39:.546;
+  mapCloth(geo,'sleeve',y=>(.039-y+(elbow?.26:0))/reach);
+  return part(geo,0xffffff,0,0,0,size,1,size);
+ };
+ const sleeve=fabric([[-.277,.049,.051],[-.242,.051,.055],[-.15,.061,.067],[-.086,.064,.069],[-.035,.06,.066,0,-side*.006],[.014,.047,.056,0,-side*.026],[.036,.022,.031,0,-side*.045],[.04,.002,.003,0,-side*.055]]);
+ const wrist=fabric([[-.246,.041,.044],[-.242,.045,.046],[-.227,.044,.046],[-.22,.042,.045],[-.134,.049,.054],[-.045,.052,.055],[.009,.047,.049],[.021,.031,.038]],true);
  const palm=section(skin,[[-.311,.009,.025,.006],[-.300,.015,.031,.004],[-.280,.019,.035],[-.258,.021,.028],[-.232,.018,.024]]);
  const fingers=[-.019,-.004,.011,.026].map((z,i)=>{
   const length=[.032,.042,.045,.039][i];
@@ -51,11 +33,11 @@ export function tailoredArm(THREE,part,color,skin,side,female){
  if(female){
   wrist.dispose();
   const forearm=section(skin,[[-.256,.020,.024],[-.213,.025,.031],[-.14,.033,.041],[-.064,.043,.048],[-.035,.042,.047]]);
-  const shortCuff=section(color,[[-.091,.053,.056],[-.089,.057,.058],[-.07,.056,.059],[-.035,.054,.057],[.018,.051,.053]]);
+  const shortCuff=fabric([[-.091,.053,.056],[-.089,.057,.058],[-.07,.056,.059],[-.035,.054,.057],[.018,.051,.053]],true);
   const binding=section(0x394253,[[-.092,.054,.057],[-.087,.0575,.059]]);
-  return [[sleeve],[shortCuff,binding,forearm,palm,...fingers,thumb]];
+  return [[sleeve],solidTrim([shortCuff,binding,forearm,palm,...fingers,thumb])];
  }
- return [[sleeve],[wrist,palm,...fingers,thumb]];
+ return [[sleeve],solidTrim([wrist,palm,...fingers,thumb])];
 }
 
 export function footwear(THREE,part,female,skin){
@@ -110,71 +92,30 @@ export function garments(THREE,part,look,color,skin){
  const shell=(tone,rows,depth)=>part(new THREE.LatheGeometry(rows.map(([r,y])=>new THREE.Vector2(r,y)),32),tone,0,0,0,1,1,depth);
  const box=(tone,x,y,z,w,h,d,angle=0)=>part(new THREE.BoxGeometry(w,h,d),tone,x,y,z,1,1,1,0,0,angle);
  const oval=(tone,x,y,z,w,h,d,angle=0)=>part(new THREE.SphereGeometry(1,16,10),tone,x,y,z,w,h,d,0,0,angle);
- if(look.player){const female=look.player==='f',trim=female?0x303746:0x252932;
-  const profile=female?[[.034,.172,.128],[.055,.173,.13],[.13,.151,.117],[.23,.158,.126],[.345,.182,.142,.006],[.435,.186,.133],[.478,.194,.114],[.502,.179,.099],[.531,.12,.082],[.552,.065,.061]]:[[-.11,.204,.152],[-.09,.205,.154],[.035,.191,.148],[.15,.174,.139],[.32,.19,.151],[.425,.205,.15],[.48,.212,.133],[.506,.193,.115],[.537,.124,.087],[.554,.07,.067]];
-  const body=[part(contour(THREE,profile,48),color),oval(skin,0,.584,0,.044,.042,.041)];
-  const front=(x,y,lift=0)=>{let index=1;while(index<profile.length-1&&profile[index][0]<y)index++;const low=profile[index-1],high=profile[index],ratio=Math.max(0,Math.min(1,(y-low[0])/(high[0]-low[0]))),at=column=>(low[column]||0)*(1-ratio)+(high[column]||0)*ratio;return [x,y,at(3)+at(2)*Math.sqrt(Math.max(0,1-(x/at(1))**2))+lift];};
-  const piping=(tone,points,radius)=>part(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points.map(point=>new THREE.Vector3(...point))),18,radius,5,false),tone);
-  const panel=(tone,left,right,bottom,top,lift)=>{const geo=new THREE.PlaneGeometry(1,1,10,4),pos=geo.attributes.position;for(let index=0;index<pos.count;index++){const across=pos.getX(index)+.5,up=pos.getY(index)+.5;pos.setXYZ(index,...front(left+(right-left)*across,bottom(across)*(1-up)+top(across)*up,lift));}geo.computeVertexNormals();return part(geo,tone);};
-  const welt=new THREE.Color(color).multiplyScalar(.74).getHex(),line=(tone,path,radius,lift)=>piping(tone,path.map(([x,y])=>front(x,y,lift)),radius);
-  // The collar opens at the centre front. Its turned points sit on the jacket.
-  const collarRows=4,collarGeom=new THREE.PlaneGeometry(1,1,64,collarRows);
-  const cp=collarGeom.attributes.position,rim=[];
-  for(let row=0;row<=collarRows;row++){
-   const t=row/collarRows;
-   for(let col=0;col<=64;col++){
-    const a=.025+(2*Math.PI-.05)*col/64,frontAngle=Math.min(a,2*Math.PI-a);
-    const point=female?0:.028*Math.exp(-((frontAngle-.55)**2)/.13);
-    const radius=.063+.017*t+.024*t*Math.exp(-((frontAngle-.6)**2)/.25);
-    const top=.584-(female?.028:.022)*Math.exp(-(frontAngle**2)/.1);
-    const xyz=[radius*Math.sin(a),top*(1-t)+(.532-point)*t,(.95*radius+.018*t)*Math.cos(a)];
-    cp.setXYZ(row*65+col,...xyz);
-    if(row===0)rim.push(new THREE.Vector3(...xyz));
-   }
-  }
-  collarGeom.computeVertexNormals();body.push(part(collarGeom,color));
-  body.push(part(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(rim),64,female?.0027:.0017,5,false),female?trim:0xc5c2b5));
-  if(!female){
-   body.push(panel(welt,-.012,.009,()=>-.106,()=>.554,.0025));
-   for(const side of [-1,1]){
-    for(const height of [-.008,.34]){
-     const center=side*.107,left=center-.054,right=center+.054;
-     body.push(panel(welt,left,right,a=>height-.077+.01*(2*a-1)**4,()=>height+.029,.0035),
-      panel(color,left-.002,right+.002,a=>height+.019-.019*Math.sin(Math.PI*a),()=>height+.041,.007));
-     body.push(oval(trim,...front(center,height+.014,.009),.006,.006,.003));
-    }
-   }
-   for(const side of [-1,1]){
-    const flap=new THREE.PlaneGeometry(1,1,20,5),position=flap.attributes.position;
-    for(let i=0;i<position.count;i++){
-     const t=position.getX(i)+.5,up=position.getY(i)+.5;
-     const x=side*(.003+.088*t),y=.550-.041*Math.sin(Math.PI*t*.88);
-     const bottom=front(x,y,.008),rimY=.558+.018*Math.sin(Math.PI*t);
-     position.setXYZ(i,x,y+(rimY-y)*up,bottom[2]*(1-up)+(.067-.032*t)*up);
-    }
-    flap.computeVertexNormals();
-    if(side<0){
-     const index=flap.index.array;
-     for(let i=0;i<index.length;i+=3)[index[i+1],index[i+2]]=[index[i+2],index[i+1]];
-     flap.computeVertexNormals();
-    }
-    body.push(part(flap,new THREE.Color(color).multiplyScalar(.90).getHex()));
-   }
-   for(const height of [-.078,.049,.176,.303,.431,.535])body.push(oval(trim,...front(0,height,.007),.008,.008,.005));
-   body.push(piping(welt,[[-.17,.425,-.08],[-.09,.417,-.136],[0,.414,-.151],[.09,.417,-.136],[.17,.425,-.08]],.0018));
-  }else{
-   const overlap=[[-.004,.554],[-.028,.516],[-.063,.478],[-.099,.426],[-.131,.37],[-.16,.272]];
-   body.push(line(trim,overlap,.0034,.004));
-   for(const [x,y] of [[-.022,.532],[-.074,.463],[-.121,.388]]){
-    body.push(line(trim,[[x-.022,y+.013],[x-.013,y+.008],[x+.019,y-.010],[x+.022,y-.009],[x+.014,y-.003]],.0025,.008),
-     oval(trim,...front(x,y,.009),.005,.005,.004));
-   }
-   body.push(shell(0x303440,[[.176,.041],[.177,.046],[.17,.075]],.78));
+ if(look.player){const female=look.player==='f';
+  const surface=jacketSurface(female),body=sewnJacket(THREE,part,female,surface);
+  if(female){
+   body.push(shell(0x303440,[[.154,.194],[.156,.203],[.152,.226]],.78));
    // The flat sling crosses the wearer's chest and returns across her back.
    const leather=0x694735,edge=0x4c372e;
-   const path=new THREE.CatmullRomCurve3([[.119,.512,-.070],[.122,.542,.002],[.114,.510,.089],
-    ...[[.082,.438],[.014,.335],[-.07,.205],[-.136,.086]].map(([x,y])=>front(x,y,.011)),
-    [-.183,-.019,.086],[-.198,-.01,-.039],[-.139,.096,-.10],[-.064,.235,-.135],[.031,.374,-.147],[.119,.512,-.070]].map(v=>new THREE.Vector3(...v)));
+   // Sample the same sewn surface as the blouse. Over the crest of the
+   // shoulder the leather needs clearance upwards as well as outwards.
+   function onShirt(angle,y){
+    const at=(a,h)=>new THREE.Vector3(...surface(a,h));
+    const point=at(angle,y),along=at(angle+.004,y).sub(at(angle-.004,y));
+    const up=at(angle,y+.001).sub(at(angle,y-.001));
+    return point.addScaledVector(along.cross(up).normalize(),.0045);
+   }
+   const v=(x,y,z)=>new THREE.Vector3(x,y,z);
+   const path=new THREE.CatmullRomCurve3([
+    ...[[2.17,.521],[1.90,.537],[1.57,.541],[1.27,.537],[1.04,.526],[.82,.511],
+     [.70,.488],[.66,.452],[.69,.385],[.55,.303],[.20,.225]]
+     .map(([a,h])=>onShirt(a,h)),
+    v(-.050,.162,.122),v(-.113,.119,.115),v(-.157,.084,.094),v(-.208,.084,-.043),
+    v(-.149,.108,-.092),v(-.084,.169,-.113),
+    ...[[-2.72,.222],[-2.98,.303],[2.95,.377],[2.63,.455],[2.38,.501]]
+     .map(([a,h])=>onShirt(a,h))
+   ],true);
    const strap=new THREE.PlaneGeometry(1,1,1,64),sp=strap.attributes.position;
    for(let i=0;i<=64;i++){
     const v=path.getPointAt(i/64),tangent=path.getTangentAt(i/64);
@@ -186,7 +127,10 @@ export function garments(THREE,part,look,color,skin){
    const underside=strap.clone(),si=underside.index.array;
    for(let k=0;k<si.length;k+=3)[si[k+1],si[k+2]]=[si[k+2],si[k+1]];
    underside.computeVertexNormals();body.push(part(underside,edge));
-   const bagAngle=-.77;
+   function mountBag(geo,tone,x,y,z){
+    geo.translate(x,y,z);
+    return part(geo,tone,-.184,.007,.025,1,1,1,0,-1.06,.035);
+   }
    function satchel(tone,w,h,d,x,y,z,round){
     const shape=new THREE.Shape(),l=-w/2,r=w/2,b=-h/2,t=h/2;
     shape.moveTo(l+round,b);shape.lineTo(r-round,b);shape.quadraticCurveTo(r,b,r,b+round);
@@ -194,14 +138,22 @@ export function garments(THREE,part,look,color,skin){
     shape.quadraticCurveTo(l,t,l,t-round);shape.lineTo(l,b+round);shape.quadraticCurveTo(l,b,l+round,b);
     const geo=new THREE.ExtrudeGeometry(shape,{depth:d,bevelEnabled:true,bevelSize:.003,bevelThickness:.003,bevelSegments:2,curveSegments:4});
     geo.setIndex(Array.from({length:geo.attributes.position.count},(_,i)=>i));
-    return part(geo,tone,x,y,z,1,1,1,0,bagAngle,.035);
+    return mountBag(geo,tone,x,y,z);
    }
-   body.push(satchel(edge,.173,.162,.041,-.165,-.083,.061,.014),
-    satchel(0x79533c,.172,.081,.007,-.198,-.052,.096,.010),
-    satchel(0x50382d,.019,.037,.006,-.206,-.095,.104,.003),
-    satchel(0xab8860,.015,.011,.004,-.212,-.092,.109,.002));
+   body.push(satchel(edge,.173,.162,.041,0,0,0,.014),
+    satchel(0x79533c,.172,.081,.007,0,.031,.044,.010),
+    satchel(0x50382d,.019,.037,.006,0,-.012,.052,.003),
+    satchel(0xab8860,.015,.011,.004,0,-.009,.060,.002));
+   // A single welt follows the flap. The buckle and tongue remain legible
+   // when seen from the side where the clasp is silhouetted against leather.
+   const flapSeam=new THREE.CatmullRomCurve3([
+    [-.080,.028,.009],[-.080,-.021,.009],[-.074,-.033,.009],
+    [-.040,-.034,.009],[0,-.035,.009],[.040,-.034,.009],[.074,-.033,.009],
+    [.080,-.021,.009],[.080,.028,.009]].map(v=>new THREE.Vector3(...v)));
+   body.push(mountBag(new THREE.TubeGeometry(flapSeam,32,.0013,5,false),0x5d402e,0,.031,.044));
+   body.push(satchel(0x65442f,.006,.015,.002,0,-.01,.064,.001));
   }
-  return body;
+  return solidTrim(body);
  }
  const trim=schools[look.school][1],pieces=[];
  if(['daoist','wudang','kunlun','huashan','emei'].includes(look.school))pieces.push(shell(trim,[[.245,look.school==='kunlun'?.31:.42],[.251,.46],[.20,.51],[.084,.559]],.81));

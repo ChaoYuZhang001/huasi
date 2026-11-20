@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from PIL import Image
 from scipy.interpolate import RBFInterpolator
+from scipy.ndimage import distance_transform_edt
 from scipy.optimize import least_squares
 from scipy.spatial.transform import Rotation
 
@@ -46,6 +47,7 @@ class Likeness:
         portrait, side = (controls[sex+'_'+key][:, :2] for key in ('ref','side'))
         self.camera = PortraitCamera(base, portrait)
         self.profile = PortraitCamera(base, side, sex)
+        self.sex=sex
         self.reference = np.array(reference.convert('RGB'))
         # Express each observed displacement in metres on the two camera planes.
         # The profile is small. Trust it mainly for the depth of the nose and jaw.
@@ -64,14 +66,20 @@ class Likeness:
         fixed = np.array([[x,y,z] for x in (-.075,0,.075) for y in (-.14,-.04,.07) for z in (-.085,-.04)])
         self.warp = RBFInterpolator(np.vstack([base,fixed])*10,
                                     np.vstack([offsets,np.zeros_like(fixed)]),smoothing=.0015,neighbors=48)
-        self.neck_outline = np.array(
-            [[204,222],[237,238],[293,242],[323,224],[322,259],[309,281],[287,305],
-             [257,294],[218,275],[204,260]] if sex=="male" else
-            [[214,765],[249,775],[318,783],[339,780],[338,825],[326,849],[314,864],
-             [289,844],[254,826],[217,811]], dtype=np.int32)
-        upper = [103,67,109,10,338,297,332]
-        forehead = portrait[upper]-[0,39 if sex == "female" else 29]
-        self.face_outline = cv2.convexHull(np.vstack([portrait[:468],forehead]).astype(np.float32))
+        # A continuous matte extends into the hair roots and both ears. Separate
+        # face and neck cutouts leave a colour change directly under the chin.
+        self.outline = np.int32([
+            (149,85),(158,41),(195,13),(246,6),(291,8),(331,21),(355,52),(356,102),
+            (350,124),(354,135),(352,166),(346,181),(340,182),(337,209),(329,230),
+            (326,258),(321,275),(300,301),(291,307),(246,284),(213,268),(210,252),
+            (201,215),(198,198),(183,198),(172,184),(165,157),(163,141)
+        ] if sex=="male" else [
+            (136,637),(145,583),(168,546),(202,514),(248,501),(276,502),(321,513),
+            (351,539),(370,574),(376,615),(374,648),(371,674),(374,694),(371,724),
+            (357,755),(337,784),(328,798),(326,829),(328,845),(315,861),(304,881),
+            (298,879),(281,859),(240,842),(208,824),(202,809),(207,774),(196,747),
+            (178,742),(162,726),(152,701),(140,678)
+        ])
         self.source_tone = np.median(self.reference[round(portrait[1,1])-7:round(portrait[1,1])+2,
                                                     round(portrait[1,0])-10:round(portrait[1,0])+8], axis=(0,1))
 
@@ -85,9 +93,10 @@ class Likeness:
             result[mask]+=self.warp(p*10)*gain[:,None]
         return result
 
-    def paint(self, image, uv, faces, xyz):
+    def paint(self, image, uv, faces, xyz, normals):
         width,height=image.size
         coord=np.zeros((height,width,3),np.float32)
+        shading_normals=np.zeros_like(coord)
         used=np.zeros((height,width),bool)
         pixels=uv*[width,height]-.5
         for tri in np.asarray(faces).reshape(-1,3):
@@ -101,6 +110,7 @@ class Likeness:
             inside=(weights.min(axis=-1)>=-1e-5)&(weights.sum(axis=-1)<=1.00001)
             i,j=y[inside],x[inside]
             coord[i,j]=xyz[tri[0]]+weights[inside]@(xyz[tri[1:]]-xyz[tri[0]])
+            shading_normals[i,j]=normals[tri[0]]+weights[inside]@(normals[tri[1:]]-normals[tri[0]])
             used[i,j]=True
         mapped=self.camera.project(coord)
         mapped=mapped.astype('float32')
@@ -111,7 +121,7 @@ class Likeness:
         corrected=np.clip(src.astype(float)-.22*(soft-self.source_tone),0,255).astype(np.uint8)
         sample=cv2.remap(corrected,mapped,None,cv2.INTER_LINEAR)
         mask=np.zeros(src.shape[:2],np.uint8)
-        cv2.fillConvexPoly(mask,self.face_outline.astype(int),255)
+        cv2.fillPoly(mask,[self.outline],255)
         distance=cv2.distanceTransform(mask,cv2.DIST_L2,5)
         margin=cv2.remap(distance,mapped,None,cv2.INTER_LINEAR)
         # Suppress self-occluded projections at the temples and under the jaw.
@@ -123,11 +133,41 @@ class Likeness:
         closest=cv2.dilate(closest,np.ones((3,3),np.uint8))
         overlap=cv2.remap(closest,mapped,None,cv2.INTER_NEAREST)-depth
         clear=np.clip((.030-overlap)/.015,0,1)
-        face=np.clip(margin/17,0,1)*np.clip((coord[:,:,2]-.018)/.045,0,1)
-        neck_region=np.zeros_like(mask)
-        cv2.fillConvexPoly(neck_region,self.neck_outline,255)
-        neck_margin=cv2.remap(cv2.distanceTransform(neck_region,cv2.DIST_L2,5),mapped,None,cv2.INTER_LINEAR)
-        neck=np.clip(neck_margin/12,0,1)*np.clip((coord[:,:,2]+.021)/.060,0,1)
-        alpha=np.maximum(face,neck)*clear*used
+        n=shading_normals@self.camera.rotation.T
+        n/=np.maximum(np.linalg.norm(n,axis=-1,keepdims=True),1e-6)
+        facing=np.clip((n[:,:,2]+.14)/.45,0,1)
+        alpha=np.clip(margin/6,0,1)*facing*clear*used
+        # The collar cuts a V into the photographed neck. Extend skin from
+        # just above that seam down the actual neck, including exposed skin
+        # when a player turns or nods. Otherwise the base albedo shows a V.
+        female=self.sex=='female'
+        upper=np.array([(212,815),(230,829),(256,843),(279,856),(298,873),
+                        (305,872),(315,849),(323,836)] if female else
+                       [(213,255),(225,268),(250,283),(274,292),(292,300),
+                        (304,295),(316,278),(323,265)])
+        px,py=np.moveaxis(mapped,-1,0)
+        sx=np.clip(px,upper[0,0],upper[-1,0])
+        sy=np.interp(sx,upper[:,0],upper[:,1])-6
+        extend=np.clip((py-sy+8)/13,0,1)
+        neck_uv=np.stack([sx,np.minimum(py,sy)],axis=-1).astype('float32')
+        neck=cv2.remap(corrected,neck_uv,None,cv2.INTER_LINEAR)
+        sample=sample*(1-extend[:,:,None])+neck*extend[:,:,None]
+        neck_face=np.clip((n[:,:,2]+.55)/.75,0,1)
+        alpha=np.maximum(alpha,extend*neck_face*used)
+
+        # Estimate the broad diffuse shading already present in the source.
+        # Removing it from albedo lets the real sun illuminate the cheek and
+        # eye sockets once, while freckles, lashes and lips retain their contrast.
+        key=np.array([-.36,.48,.80])
+        irradiance=.69+.32*np.maximum(0,n@key)+.09*n[:,:,1]
+        gain=np.clip(irradiance,.62,1.08)**(-.46)
+        # Measured neutral-studio response at the cheeks, brow and chin.
+        # The baked skin otherwise picks up the warm diffuse cast twice.
+        balance=np.array([1.035,1.078,1.108])
+        sample=np.clip(((sample.astype(float)+5)*gain[:,:,None]-4)*balance,0,255)
         base=np.array(image.convert('RGB'),float)
-        return Image.fromarray(np.clip(base+(sample-base)*alpha[:,:,None],0,255).astype('uint8'))
+        albedo=np.clip(base+(sample-base)*alpha[:,:,None],0,255).astype('uint8')
+        distance,indices=distance_transform_edt(~used,return_indices=True)
+        bleed=(distance>0)&(distance<=7)
+        albedo[bleed]=albedo[indices[0,bleed],indices[1,bleed]]
+        return Image.fromarray(albedo)

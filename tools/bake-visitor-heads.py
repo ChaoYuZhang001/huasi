@@ -144,14 +144,15 @@ def build(source, sex, dest, reference):
             rgb[iris] = rgb[iris]*[.40,.62,.70]+[3,3,3]
             eye[:,:,:3] = rgb.astype(np.uint8)
             original = Image.fromarray(eye)
-            image = likeness.paint(original, uv, corners, points[vertex_ids]).convert("RGBA")
+            image = likeness.paint(original, uv, corners, points[vertex_ids],normals[vertex_ids]).convert("RGBA")
             image.putalpha(original.getchannel("A"))
         if name == "skin":
-            image = likeness.paint(image, uv, corners, points[vertex_ids])
+            skin_surface=(points[vertex_ids],corners)
+            image = likeness.paint(image, uv, corners, skin_surface[0],normals[vertex_ids])
         stream = io.BytesIO()
         opaque = name == "skin"
         if opaque:
-            image.convert("RGB").save(stream, format="JPEG", quality=90, optimize=True)
+            image.convert("RGB").save(stream, format="JPEG", quality=94, optimize=True)
         else:
             image.convert("RGBA").quantize(colors=256).save(stream, format="PNG", optimize=True)
         slot = len(doc["meshes"])
@@ -173,9 +174,17 @@ def build(source, sex, dest, reference):
         doc["nodes"].append(dict(name=name, mesh=slot))
         doc["scenes"][0]["nodes"].append(slot)
     from visitor_hair import bake_hair
-    points,normals,uv,indices,hair_image=bake_hair(sex,likeness)
+    points,normals,uv,indices,hair_image,sway=bake_hair(sex,likeness,*skin_surface)
     stream=io.BytesIO()
-    hair_image.save(stream,format="PNG",optimize=True)
+    palette=hair_image.convert("RGB").quantize(colors=242,method=Image.Quantize.MEDIANCUT)
+    indices_image=np.array(palette)
+    indices_image[np.asarray(hair_image)[:,:,3]<120]=255
+    indexed=Image.frombytes("P",palette.size,indices_image.tobytes())
+    # Pillow truncates the tRNS chunk to the number of palette entries.
+    # Reserve slot 255 in PLTE as well as in the index image.
+    colours=palette.getpalette()
+    indexed.putpalette(colours+[0]*(3*256-len(colours)))
+    indexed.save(stream,format="PNG",transparency=255,optimize=True)
     slot=len(doc["images"])
     doc["images"].append(dict(bufferView=buffer(stream.getvalue()),mimeType="image/png"))
     doc["textures"].append(dict(source=slot))
@@ -184,6 +193,15 @@ def build(source, sex, dest, reference):
         pbrMetallicRoughness=dict(baseColorTexture=dict(index=slot),metallicFactor=0,roughnessFactor=.76)))
     attrs=dict(POSITION=accessor(points),NORMAL=accessor(normals),TEXCOORD_0=accessor(uv))
     doc["meshes"].append(dict(primitives=[dict(attributes=attrs,indices=accessor(indices,True),material=slot)]))
+    if sway is not None:
+        moving,delta=sway
+        target=len(doc["accessors"])
+        doc["accessors"].append(dict(componentType=5126,type="VEC3",count=len(points),
+            min=np.minimum(0,delta.min(axis=0)).tolist(),max=np.maximum(0,delta.max(axis=0)).tolist(),
+            sparse=dict(count=len(moving),indices=dict(componentType=5123,bufferView=buffer(moving.astype("<u2").tobytes())),
+                        values=dict(bufferView=buffer(delta.astype("<f4").tobytes())))))
+        doc["meshes"][-1]["primitives"][0]["targets"]=[dict(POSITION=target)]
+        doc["meshes"][-1].update(weights=[0],extras=dict(targetNames=["tailSway"]))
     doc["nodes"].append(dict(name=style,mesh=slot))
     doc["scenes"][0]["nodes"].append(slot)
     while len(data)%4:

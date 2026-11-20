@@ -18,7 +18,10 @@ export async function dressPortrait(THREE,figure){
   if(!figure.g.parent)return;
   const portrait=template.clone(true);
   figure.eyelids=[];
-  portrait.traverse(node=>{if(node.morphTargetDictionary?.blink===0)figure.eyelids.push(node);});
+  portrait.traverse(node=>{
+   if(node.morphTargetDictionary?.blink===0)figure.eyelids.push(node);
+   if(node.morphTargetDictionary?.tailSway===0)figure.ponytail=node;
+  });
   figure.head.children[0].visible=false;
   figure.eyes.forEach(eye=>eye.visible=false);
   portrait.position.y=figure.head.userData.eyeHeight;
