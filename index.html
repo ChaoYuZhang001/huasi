@@ -394,6 +394,9 @@ const $=id=>document.getElementById(id),lb=$('langBtn');if(lb){lb.textContent=L=
 const $=id=>document.getElementById(id),SK='huashan-temple-v1';
 window.loadSave=function(){try{return JSON.parse(localStorage.getItem(SK)||'{}')||{};}catch(e){return{};}};
 window.saveKV=function(o){try{const s=loadSave();Object.assign(s,o);localStorage.setItem(SK,JSON.stringify(s));}catch(e){}};
+const visitorPicker=$('entryCharacter');
+visitorPicker.querySelector(loadSave().gender==='m'?'[value="m"]':'[value="f"]').checked=true;
+visitorPicker.onchange=event=>saveKV({gender:event.target.value});
 let ac=null;
 window.getAC=function(){if(!ac){try{ac=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}}if(ac.state==='suspended')ac.resume();return ac;};
 const out=()=>window.fxOut||ac.destination;
@@ -1233,7 +1236,7 @@ function nextTod(){if(tod.k<1)return;tod.from=tod.i;tod.i=(tod.i+1)%TOD.length;t
 const SV=(window.loadSave?loadSave():{})||{};
 const NAMES=['松间客','听雨人','云中客','拾叶人','看山人','煮茶客','晚钟客','问月人','踏雪人','观云客','栖霞客','抱琴人','扫阶人','闻香客','渡溪人','守灯人'];
 const P={pos:new V3(0,0,54),vel:new V3(),yaw:0,pitch:0,onG:true,eye:1.65,camY:0,bob:0,stepAcc:0,inc:0,mode:'walk',
- merit:SV.merit|0,sat:+SV.sat||0,bows:SV.bows|0,gongde:SV.gongde|0,name:SV.name||NAMES[Math.random()*NAMES.length|0],gender:SV.gender==='m'?'m':SV.gender==='f'?'f':'f',view:SV.view==='first'?'first':'third',
+ merit:SV.merit|0,sat:+SV.sat||0,bows:SV.bows|0,gongde:SV.gongde|0,name:SV.name||NAMES[Math.random()*NAMES.length|0],gender:$('entryCharacter').querySelector(':checked').value,view:SV.view==='first'?'first':'third',
  prK:0,prT:0,autoBow:false,greetT:0,greetK:0,avYaw:Math.PI,fish:false,sbT:0};
 // A manual pick (T) holds for two hours, then the local clock takes over again.
 if(SV.tod>=0&&SV.tod<TOD.length&&Date.now()-(SV.todAt||0)<72e5){tod.i=tod.from=SV.tod|0;}
@@ -2016,7 +2019,11 @@ const MP=(()=>{
    sendT-=dt;if(sendT<=0){sendT=world?.4:.25;sendPose();}}};
 })();
 function fillSelf(){document.querySelectorAll('#entryCharacter input').forEach(input=>input.checked=input.value===P.gender);$('nmIn').value=P.name;}
-window.fillSelf=fillSelf;fillSelf();document.querySelectorAll('#entryCharacter input').forEach(input=>input.addEventListener('change',()=>setSelf(P.name,input.value)));
+window.fillSelf=fillSelf;
+const visitorPicker=$('entryCharacter'),chosenVisitor=visitorPicker.querySelector(':checked').value;
+visitorPicker.onchange=event=>setSelf(P.name,event.target.value);
+if(chosenVisitor!==P.gender)setSelf(P.name,chosenVisitor);
+else fillSelf();
 function setSelf(name,g){
   const n=String(name||'').replace(/[\u0000-\u001f<>]/g,'').trim().slice(0,12);if(n)P.name=n;
   if(g==='m'||g==='f')P.gender=g;
