@@ -9,7 +9,9 @@ function figure(player){
  const g=new T.Group(),upper=new T.Group(),head=new T.Group(),feet=new T.Group(),mat=new T.MeshStandardMaterial({vertexColors:true});
  const piece=()=>new T.Mesh(new T.BoxGeometry(.1,.1,.1),mat),limb=()=>{const a=new T.Group();a.add(piece());return a;};
  const armL=limb(),armR=limb(),elbL=limb(),elbR=limb();armL.add(elbL);armR.add(elbR);head.add(piece());upper.add(piece(),head,armL,armR);feet.add(piece(),piece());
- const skirt=new T.Mesh(new T.LatheGeometry([new T.Vector2(.24,.02),new T.Vector2(.22,.45),new T.Vector2(.178,1)],20),mat);g.add(upper,skirt,feet);
+ const profile=player==='f'?Array.from({length:15},(_,i)=>new T.Vector2(.25-.072*i/14,.32+.68*i/14)):
+  [new T.Vector2(.24,.02),new T.Vector2(.22,.45),new T.Vector2(.178,1)];
+ const skirt=new T.Mesh(new T.LatheGeometry(profile,20),mat);g.add(upper,skirt,feet);
  const f={player,g,upper,head,feet,skirt,armL,armR,elbL,elbR,sit:0,bow:0,palms:0,swing:0,bob:0,moving:false};return motion.attach(f,0x6a4a5c);
 }
 test('two-bone solver keeps bone lengths and finite values at reachable and unreachable targets',()=>{
@@ -124,4 +126,30 @@ test('both visitors transfer weight over the supporting shoe and keep the sole p
   assert(heightError<.014,`sole height ${heightError}`);
   motion.dispose(f);
  }
+});
+
+test('walking skirt covers both knees and the trailing shin at full travel speed',()=>{
+ const f=figure('f'),p=f.skirt.geometry.attributes.position,rest=p.array.slice();
+ const skin=f.motion.mesh,point=new T.Vector3(),rings=15;
+ const min=new Float32Array(rings),max=new Float32Array(rings);
+ motion.step(f,1/24);f.moving=true;
+ let samples=0;
+ for(let step=0;step<50;step++){
+  f.g.position.z+=5.1/24;motion.step(f,1/24);motion.pose(f);f.g.updateMatrixWorld(true);
+  min.fill(Infinity);max.fill(-Infinity);
+  for(let i=0;i<p.count;i++){
+   const r=i%rings;min[r]=Math.min(min[r],p.getZ(i));max[r]=Math.max(max[r],p.getZ(i));
+  }
+  for(let i=0;i<skin.geometry.attributes.position.count;i+=5){
+   skin.getVertexPosition(i,point);
+   if(point.y<=p.getY(0)||point.y>.75)continue;
+   let r=0;while(p.getY(r+1)<point.y)r++;
+   const t=(point.y-p.getY(r))/(p.getY(r+1)-p.getY(r));
+   assert(point.z>=min[r]*(1-t)+min[r+1]*t-.006);
+   assert(point.z<=max[r]*(1-t)+max[r+1]*t+.006);samples++;
+  }
+ }
+ assert(samples>1000);
+ f.sit=1;f.bench=1;motion.pose(f);assert.deepEqual(p.array,rest);
+ motion.dispose(f);
 });

@@ -21,6 +21,7 @@ export async function dressPortrait(THREE,figure){
   portrait.traverse(node=>{if(node.morphTargetDictionary?.blink===0)figure.eyelids.push(node);});
   figure.head.children[0].visible=false;
   figure.eyes.forEach(eye=>eye.visible=false);
+  portrait.position.y=figure.head.userData.eyeHeight;
   figure.head.add(portrait);
  }catch(error){console.warn('Using the local fallback portrait',error);}
 }

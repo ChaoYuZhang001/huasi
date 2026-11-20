@@ -40,6 +40,8 @@ def fit(path, points, body):
 
 
 def build(source, sex, dest, reference):
+    from visitor_likeness import Likeness
+    likeness = Likeness(sex, reference)
     base, base_uv, base_faces = obj(source / "base.obj")
     delta = np.zeros_like(base)
     target = np.loadtxt(source / (sex+".target"))
@@ -69,30 +71,30 @@ def build(source, sex, dest, reference):
         doc["accessors"].append(record)
         return len(doc["accessors"])-1
 
-    hair, brow = ("short01" if sex == "male" else "ponytail01"), "eyebrow009"
-    for name in ("skin", "eyes", hair, brow, "eyelashes01"):
+    for name in ("skin", "eyes", "eyelashes01"):
         morph = None
         if name == "skin":
             points, texels = base + delta, base_uv
             morph = blink
-            faces = [face for group, face in base_faces if group == "body" and all(base[vertex, 1] > 5.88 for vertex, _ in face)]
+            faces = [face for group, face in base_faces if group == "body" and all(base[vertex, 1] > 5.16 for vertex, _ in face)]
         else:
             proxy = "hi-eyes" if name == "eyes" else name
             points, texels, polygons = obj(source / (proxy+".obj"))
             points = fit(source / (proxy+".mhclo"), points, base+delta)
             if name == "eyelashes01":
                 morph = fit(source / (proxy+".mhclo"), points, base+delta+blink)-points
-            if name == brow:
-                points[:, 1] += .053
-                points[:, 2] += .042
-                if sex == "female":
-                    points[:, 1] = points[:, 1].mean()+.72*(points[:, 1]-points[:, 1].mean())+.022*np.sin(np.abs(points[:, 0])*6)
             faces = [face for _, face in polygons]
         points = (points-origin)*[.111, .108, .111]
         if name == "skin":
             neck = np.clip((-.105-points[:, 1])/.037, 0, 1)
-            points[:, 0] *= 1-.32*neck
-            points[:, 2] *= 1-.29*neck
+            points[:, 0] *= 1-.15*neck
+            points[:, 2] = points[:, 2]*(1-.16*neck)+.023*neck
+            # Continue the actual neck through the collar, including when the
+            # head tilts. Tuck the clavicle portion underneath the shirt.
+            below = np.clip((-.108-points[:,1])/.031,0,1)
+            ellipse = np.hypot(points[:,0]/.048,points[:,2]/.042)
+            factor = 1-below*(1-1/np.maximum(1,ellipse))
+            points[:,[0,2]] *= factor[:,None]
             corner = np.exp(-((np.abs(points[:, 0])-.026)/.013)**2-((points[:, 1]+.064)/.014)**2)*np.clip((points[:, 2]-.05)/.03, 0, 1)
             points[:, 1] += .0025*corner
         x, y, z = points.T.copy()
@@ -102,23 +104,11 @@ def build(source, sex, dest, reference):
             points[:, 0] *= 1+(.012 if sex == "male" else -.042)*jaw
             cheek = np.exp(-((np.abs(x)-.053)/.028)**2-((y+.035)/.026)**2)
             points[:, 2] += (.0027 if sex == "male" else .0036)*cheek
-        elif name == hair:
-            if sex == "male":
-                crown = np.clip((y-.020)/.070,0,1)
-                part = np.exp(-((x-.037)/.011)**2)*np.clip((z+.035)/.08,0,1)
-                points[:, 0] -= .013*crown*(1-part)
-                points[:, 1] += crown*(.012-.020*part)
-                fringe = np.exp(-((x+.033)/.044)**2)*np.clip((z-.033)/.053,0,1)
-                points[:, 1] -= .023*fringe
-                points[:, 2] += .007*fringe
-            else:
-                # Draw the hanging length back from the collar and ease the tie low.
-                tail = np.clip((-y-.01)/.12,0,1)*np.clip((-z-.035)/.052,0,1)
-                points[:, 1] -= .019*tail
-                points[:, 2] -= .035*tail
-                points[:, 0] += .012*tail**2
-        if name == hair:
-            hair_points = points.copy()
+        if morph is not None:
+            blink_points = likeness.deform(points+morph*[.111,.108,.111])
+        points = likeness.deform(points)
+        if morph is not None:
+            morph = blink_points-points
         normals = np.zeros_like(points)
         lookup, vertices, corners = {}, [], []
         for face in faces:
@@ -145,16 +135,19 @@ def build(source, sex, dest, reference):
             bounds = mask.getbbox()
             image = Image.composite(image, Image.new(image.mode, image.size, (174, 129, 102)), mask).crop(bounds)
             uv = (pixels-np.array(bounds[:2]))/np.array(image.size)
-        image.thumbnail((1024, 1024) if name in ("skin", hair) else (384, 384), Image.Resampling.LANCZOS)
+        image.thumbnail((1024, 1024) if name == "skin" else (384, 384), Image.Resampling.LANCZOS)
+        if name == "eyes":
+            # Dark brown irises and a retained limbal ring match both portraits.
+            eye = np.array(image.convert("RGBA"))
+            rgb = eye[:,:,:3].astype(float)
+            iris = (rgb[:,:,0] > 1.40*rgb[:,:,1]) & (rgb[:,:,1] < 104)
+            rgb[iris] = rgb[iris]*[.40,.62,.70]+[3,3,3]
+            eye[:,:,:3] = rgb.astype(np.uint8)
+            original = Image.fromarray(eye)
+            image = likeness.paint(original, uv, corners, points[vertex_ids]).convert("RGBA")
+            image.putalpha(original.getchannel("A"))
         if name == "skin":
-            from visitor_likeness import paint
-            image = paint(image, uv, corners, points[vertex_ids], reference, sex)
-        if name == hair:
-            light = np.asarray(image.convert("L"), dtype=float)
-            toned = np.array(image.convert("RGBA"))
-            for channel, gain in enumerate([.48, .40, .36]):
-                toned[:, :, channel] = np.clip(11+gain*light, 0, 255)
-            image = Image.fromarray(toned)
+            image = likeness.paint(image, uv, corners, points[vertex_ids])
         stream = io.BytesIO()
         opaque = name == "skin"
         if opaque:
@@ -164,70 +157,35 @@ def build(source, sex, dest, reference):
         slot = len(doc["meshes"])
         doc["images"].append(dict(bufferView=buffer(stream.getvalue()), mimeType="image/jpeg" if opaque else "image/png"))
         doc["textures"].append(dict(source=slot))
-        tint = [.56,.53,.52,1] if name == hair else [1,1,1,1]
-        material = dict(name=name, pbrMetallicRoughness=dict(baseColorTexture=dict(index=slot), baseColorFactor=tint, metallicFactor=0, roughnessFactor=.45 if name == "eyes" else .86))
-        if name == "eyes" or name == hair:
-            material.update(alphaMode="MASK", alphaCutoff=.28, doubleSided=name == hair)
+        material = dict(name=name, pbrMetallicRoughness=dict(baseColorTexture=dict(index=slot), metallicFactor=0, roughnessFactor=.45 if name == "eyes" else .86))
+        if name == "eyes":
+            material.update(alphaMode="MASK", alphaCutoff=.28, doubleSided=False)
         elif not opaque:
+            # Fine photographed lash roots already sit on the eyelids.
+            material["pbrMetallicRoughness"]["baseColorFactor"]=[1,1,1,.17]
             material.update(alphaMode="BLEND", doubleSided=True)
         doc["materials"].append(material)
         attrs = dict(POSITION=accessor(points[vertex_ids]), NORMAL=accessor(normals[vertex_ids]), TEXCOORD_0=accessor(uv))
-        if name == hair:
-            px, py, pz = points[vertex_ids].T
-            front = np.clip((pz+.040)/.1,0,1)
-            height = np.clip((py-.018)/.080,0,1)
-            division = .037 if sex == "male" else .022
-            swept = px-division + .17*(py-.087) + (pz-.035)**2*1.8
-            groove = np.exp(-(swept/.005)**2)
-            locks = .5+.5*np.cos(410*swept + 11*py)
-            light = .78 + front*height*(.16*locks - .46*groove)
-            attrs["COLOR_0"] = accessor(np.repeat(light[:,None],3,axis=1))
         doc["meshes"].append(dict(primitives=[dict(attributes=attrs, indices=accessor(corners, True), material=slot)]))
         if morph is not None:
-            doc["meshes"][-1]["primitives"][0]["targets"] = [dict(POSITION=accessor(morph[vertex_ids]*[.111, .108, .111]))]
+            doc["meshes"][-1]["primitives"][0]["targets"] = [dict(POSITION=accessor(morph[vertex_ids]))]
             doc["meshes"][-1].update(weights=[0], extras=dict(targetNames=["blink"]))
         doc["nodes"].append(dict(name=name, mesh=slot))
         doc["scenes"][0]["nodes"].append(slot)
-    # Lay shallow, tapered locks over the cap along the part. Use the convex
-    # scalp surface to fit the strips individually to the baked hair volume.
-    from scipy.spatial import ConvexHull
-    scalp = hair_points[hair_points[:,1]>-.038]
-    center = np.array([0,.028,-.013])
-    planes = ConvexHull(scalp-center).equations
-    def scalp_point(angle, drop):
-        limit = 1.54-.38*np.cos(angle)+.065*np.sin(2*angle)
-        theta = .12+drop*(limit-.12)
-        turn = angle + (.52 if sex=="male" else .37)*(1-drop)**2
-        direction = np.array([np.sin(theta)*np.sin(turn), np.cos(theta), np.sin(theta)*np.cos(turn)])
-        direction[0] += (.34 if sex=="male" else .23)*(1-drop)**2
-        direction /= np.linalg.norm(direction)
-        dots = planes[:,:3] @ direction
-        valid = dots>1e-6
-        radius = np.min(-planes[valid,3]/dots[valid])
-        inset = .0025 if sex == "male" else .0013
-        return center+(radius-inset)*direction,direction
-    strands, normals, shades, triangles = [],[],[],[]
-    for k in range(82):
-        angle=(k+.37*np.sin(k*5))*2*np.pi/82
-        start=.055+.14*(.5+.5*np.sin(k*7))
-        stop=.78+.17*(.5+.5*np.cos(k*4))
-        for j in range(20):
-            v=j/19
-            width=(.007+.011*np.sin(v*np.pi))*(.3+.7*np.sin(np.pi*v)**.4)
-            for side in [-1,0,1]:
-                position,normal=scalp_point(angle+side*width,start+v*(stop-start))
-                strands.append(position+normal*(.00065 if side==0 else 0))
-                normals.append(normal)
-                light=(.019 if side==0 else .012)*(.84+.24*np.sin(k*2.4))*(.85+.15*np.sin(v*np.pi))
-                shades.append([light*1.14,light,light*.89])
-            a=len(strands)-3
-            if j:
-                for c in [0,1]:
-                    triangles.extend([a-3+c,a+c,a-2+c,a-2+c,a+c,a+1+c])
-    material=len(doc["materials"])
-    doc["materials"].append(dict(name="combed locks",doubleSided=True,pbrMetallicRoughness=dict(metallicFactor=0,roughnessFactor=.62)))
-    doc["meshes"][2]["primitives"].append(dict(material=material,indices=accessor(triangles,True),
-        attributes=dict(POSITION=accessor(strands),NORMAL=accessor(normals),COLOR_0=accessor(shades))))
+    from visitor_hair import bake_hair
+    points,normals,uv,indices,hair_image=bake_hair(sex,likeness)
+    stream=io.BytesIO()
+    hair_image.save(stream,format="PNG",optimize=True)
+    slot=len(doc["images"])
+    doc["images"].append(dict(bufferView=buffer(stream.getvalue()),mimeType="image/png"))
+    doc["textures"].append(dict(source=slot))
+    style="side-part" if sex=="male" else "low-ponytail"
+    doc["materials"].append(dict(name=style,doubleSided=True,alphaMode="MASK",alphaCutoff=.48,
+        pbrMetallicRoughness=dict(baseColorTexture=dict(index=slot),metallicFactor=0,roughnessFactor=.76)))
+    attrs=dict(POSITION=accessor(points),NORMAL=accessor(normals),TEXCOORD_0=accessor(uv))
+    doc["meshes"].append(dict(primitives=[dict(attributes=attrs,indices=accessor(indices,True),material=slot)]))
+    doc["nodes"].append(dict(name=style,mesh=slot))
+    doc["scenes"][0]["nodes"].append(slot)
     while len(data)%4:
         data.append(0)
     doc["buffers"].append(dict(byteLength=len(data)))
@@ -236,7 +194,18 @@ def build(source, sex, dest, reference):
     dest.write_bytes(struct.pack("<4sII", b"glTF", 2, 28+len(header)+len(data))+struct.pack("<I4s", len(header), b"JSON")+header+struct.pack("<I4s", len(data), b"BIN\0")+data)
 
 
+def fabric_swatch(reference, destination):
+    # Isolate the actual jacket weave from the broad shoulder shadow.
+    swatch = reference.crop((74,403,138,467)).convert("L")
+    fine = np.array(swatch,dtype=float)-np.array(swatch.filter(ImageFilter.GaussianBlur(5)),dtype=float)
+    grain = np.uint8(np.clip(127+19*fine,0,255))
+    # A mirrored tile meets at all four edges under repeating texture lookup.
+    row=np.hstack([grain,grain[:,::-1]])
+    Image.fromarray(np.vstack([row,row[::-1]])).save(destination,lossless=True)
+
+
 if __name__ == "__main__":
     reference = Image.open(sys.argv[2])
+    fabric_swatch(reference,Path(__file__).resolve().parents[1]/"characters"/"visitor-cloth.webp")
     for sex in ("male", "female"):
         build(Path(sys.argv[1]), sex, Path(__file__).resolve().parents[1]/"characters"/("visitor-"+sex+".glb"), reference)
