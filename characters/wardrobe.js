@@ -40,33 +40,102 @@ export function tailoredArm(THREE,part,color,skin,side,female){
  return [[sleeve],solidTrim([wrist,palm,...fingers,thumb])];
 }
 
-export function footwear(THREE,part,female,skin){
- const form=(tone,rows)=>part(contour(THREE,rows,32),tone);
- const leather=female?0x403a36:0x272727,sole=0x272523;
- // Leave the waist of the sole off the ground between the heel and toe.
- const heel=form(sole,[[-.035,.001,.001,-.055],[-.034,female?.026:.036,.033,-.055],
-  [-.009,female?.029:.038,.039,-.052],[-.006,.03,.04,-.052]]);
- const tread=form(sole,[[-.035,.001,.001,.085],[-.034,.041,.065,.083],
-  [-.028,.045,.067,.082],[-.023,.044,.066,.081]]);
- const upper=form(leather,[[-.025,.044,.066,.081],[-.018,.047,.113,.037],
-  [-.008,.049,.121,.028],[.006,.046,.116,.028],[.019,.044,.099,.011],
-  [.035,.039,.065,-.009],[.045,.036,.051,-.022],[.049,.001,.001,-.027]]);
- if(female){
-  // The low-cut vamp reveals the instep from the ankle to the ball of the foot.
-  const instep=form(skin,[[.010,.025,.080,.019],[.019,.035,.077,.014],
-   [.035,.032,.058,.001],[.050,.028,.043,-.010],[.066,.024,.030,-.013],[.077,.018,.021,-.015]]);
-  return [heel,tread,upper,instep];
+const pumpOpening=[.024,.034,-.080,.073];
+function shoePoint(T,row,angle,side,female,collar=0){
+ // Last sections give height, width, heel and toe. Draw in the arch and
+ // bring the big-toe side slightly toward the midline on each foot.
+ const [y,w,back,front]=row,c=Math.cos(angle),s=Math.sin(angle);
+ const waist=1-.20*Math.exp(-((c+.30)**2)/.13)-.12*Math.max(0,-c)+.17*Math.max(0,c);
+ return new T.Vector3(w*waist*s-side*.005*Math.max(0,c)**2,
+  y+collar*((female?.029:.012)*Math.max(0,-c)**2-(female?.006:0)*Math.max(0,c)),
+  (back+front)/2+(front-back)*c/2);
+}
+
+export function studentLeg(T,side){
+ // The lowest loop is the actual opening of the pump. Its vertices follow
+ // the shoe. The four rings above it transfer smoothly back to the shin.
+ const ankleLevels=[0,.22,.48,.72,.90],calf=[
+  [-.780,.026,.034,-.010],[-.73,.029,.038,-.012],[-.67,.039,.049,-.015],[-.61,.050,.058,-.015],
+  [-.57,.053,.060,-.012],[-.535,.050,.057,-.006],[-.495,.044,.052,.002],
+  [-.458,.044,.050,.007],[-.432,.049,.054,.011],[-.410,.052,.056,.012],
+  [-.389,.054,.057,.009],[-.356,.055,.060,.004],[-.30,.058,.066],
+  [-.22,.066,.074],[-.13,.069,.079],[-.04,.075,.088]
+ ];
+ const rows=[...ankleLevels.map(t=>[-.85+.069*t,.026,.032]),...calf];
+ const g=contour(T,rows,40),p=g.attributes.position;
+ for(let col=0;col<=40;col++){
+  const angle=col*Math.PI/20,rim=shoePoint(T,pumpOpening,angle,side,true,1);
+  rim.y-=.875;rim.z+=.025;
+  const ankle=new T.Vector3(calf[0][1]*Math.sin(angle),calf[0][0],calf[0][3]+calf[0][2]*Math.cos(angle));
+  for(const [ring,t] of ankleLevels.entries()){
+   const v=rim.clone().lerp(ankle,t);
+   // The instep runs low over the metatarsals before it rises to the ankle.
+   v.z=ankle.z+(rim.z-ankle.z)*(1-t)**1.6;
+   p.setXYZ(col*rows.length+ring,v.x,v.y,v.z);
+  }
  }
- const tongue=form(leather,[[.029,.034,.060,.002],[.043,.031,.052,-.003],
-  [.057,.028,.041,-.013],[.065,.022,.030,-.017],[.067,.003,.003,-.018]]);
- const pieces=[heel,tread,upper,tongue];
- for(let i=0;i<3;i++){
-  const y=.042+i*.005,z=.047-i*.011;
-  const lace=new THREE.CatmullRomCurve3([new THREE.Vector3(-.018,y,z-.003),
-   new THREE.Vector3(0,y+.003,z+.001),new THREE.Vector3(.018,y,z+.003)]);
-  pieces.push(part(new THREE.TubeGeometry(lace,8,.0015,4,false),0x423f3b));
+ g.computeVertexNormals();
+ g.userData.ankleWeights=[1,.94,.67,.30,.08];
+ g.userData.rings=rows.length;
+ return g;
+}
+
+export function footwear(T,part,female,side){
+ const leather=female?0x453e39:0x2b2928,welt=female?0x382f2a:0x383431;
+ const pieces=[],point=(row,angle,collar=0)=>shoePoint(T,row,angle,side,female,collar);
+ function loft(rows,tone,shape){
+  const geo=contour(T,rows.map(([y])=>[y,1,1]),40),p=geo.attributes.position;
+  for(let i=0;i<=40;i++)for(let j=0;j<rows.length;j++){
+   const angle=i*Math.PI/20;
+   const v=shape(rows[j],angle,j);
+   p.setXYZ(i*rows.length+j,v.x,v.y,v.z);
+  }
+  geo.computeVertexNormals();pieces.push(part(geo,tone));
+ }
+ const heel=[[-.035,.001,-.060,-.058],[-.035,female?.025:.033,-.088,-.024],
+  [-.032,female?.026:.034,-.09,-.022],[female?-.009:-.014,.035,-.091,-.018]];
+ loft(heel,0x302b28,(row,angle)=>point(row,angle));
+ const sole=[[-.033,.001,-.057,.100],[-.035,.045,-.089,.151],[-.031,.047,-.091,.154],
+  [-.024,.048,-.092,.155],[-.021,.047,-.090,.153]];
+ loft(sole,welt,(row,angle)=>{
+  const v=point(row,angle);
+  const arch=1-smoothstep((v.z+.015)/.082),toe=smoothstep((v.z-.127)/.026);
+  v.y+=arch*(female?.025:.016)+toe*.005;
+  return v;
+ });
+ const upper=[[-.023,.047,-.091,.153],[-.016,.049,-.092,.154],[-.003,.050,-.092,.151],
+  [.009,.047,-.090,.143],female?[.016,.041,-.086,.122]:[.022,.045,-.088,.124],
+  female?[.023,.035,-.082,.075]:[.038,.040,-.084,.094],
+  female?pumpOpening:[.054,.036,-.078,.047]];
+ function upperPoint(row,angle,j){
+  const v=point(row,angle,(j/(upper.length-1))**2);
+  const arch=1-smoothstep((v.z+.015)/.082);
+  v.y+=arch*(female?.025:.016)*(1-j/(upper.length-1))**2;
+  return v;
+ }
+ loft(upper,leather,upperPoint);
+ const last=upper.length-1;
+ const rim=Array.from({length:40},(_,i)=>upperPoint(upper[last],i*Math.PI/20,last));
+ function seam(points,tone,radius,closed=false){
+  const curve=new T.CatmullRomCurve3(points,closed);
+  pieces.push(part(new T.TubeGeometry(curve,closed?40:12,radius,5,closed),tone));
+ }
+ seam(rim,female?0x362e2a:0x242322,.0018,true);
+ if(!female){
+  const tongue=contour(T,[[.031,.032,.053,.029],[.042,.029,.045,.016],
+   [.060,.025,.033,.004],[.069,.020,.026,-.008],[.069,.001,.001,-.008]],32);
+  pieces.push(part(tongue,leather));
+  for(let n=0;n<3;n++){
+   const y=.041+n*.005,z=.061-n*.012;
+   for(const hand of [-1,1])seam([new T.Vector3(hand*.019,y,z),
+    new T.Vector3(0,y+.003,z-.004),new T.Vector3(-hand*.019,y+.006,z-.009)],0x4a4340,.0014);
+  }
  }
  return pieces;
+}
+
+function smoothstep(value){
+ const t=Math.max(0,Math.min(1,value));return t*t*(3-2*t);
 }
 
 export function portrait(THREE,part,look,skin,hair){
@@ -111,7 +180,7 @@ export function garments(THREE,part,look,color,skin){
     ...[[2.17,.521],[1.90,.537],[1.57,.541],[1.27,.537],[1.04,.526],[.82,.511],
      [.70,.488],[.66,.452],[.69,.385],[.55,.303],[.20,.225]]
      .map(([a,h])=>onShirt(a,h)),
-    v(-.050,.162,.122),v(-.113,.119,.115),v(-.157,.084,.094),v(-.208,.084,-.043),
+    v(-.050,.162,.122),v(-.113,.119,.115),v(-.155,.070,.091),v(-.225,.071,-.068),
     v(-.149,.108,-.092),v(-.084,.169,-.113),
     ...[[-2.72,.222],[-2.98,.303],[2.95,.377],[2.63,.455],[2.38,.501]]
      .map(([a,h])=>onShirt(a,h))
@@ -127,31 +196,30 @@ export function garments(THREE,part,look,color,skin){
    const underside=strap.clone(),si=underside.index.array;
    for(let k=0;k<si.length;k+=3)[si[k+1],si[k+2]]=[si[k+2],si[k+1]];
    underside.computeVertexNormals();body.push(part(underside,edge));
-   function mountBag(geo,tone,x,y,z){
-    geo.translate(x,y,z);
-    return part(geo,tone,-.184,.007,.025,1,1,1,0,-1.06,.035);
+   const bagWidth=.203,bagHeight=.188,r=.012,hw=bagWidth/2,hh=bagHeight/2;
+   const outline=new THREE.Shape();
+   outline.moveTo(-hw+r,-hh);outline.lineTo(hw-r,-hh);outline.quadraticCurveTo(hw,-hh,hw,-hh+r);
+   outline.lineTo(hw,hh-r);outline.quadraticCurveTo(hw,hh,hw-r,hh);outline.lineTo(-hw+r,hh);
+   outline.quadraticCurveTo(-hw,hh,-hw,hh-r);outline.lineTo(-hw,-hh+r);outline.quadraticCurveTo(-hw,-hh,-hw+r,-hh);
+   const bagShell=new THREE.ExtrudeGeometry(outline,{depth:.041,bevelEnabled:true,bevelSize:.003,
+    bevelThickness:.003,bevelSegments:2,curveSegments:5});
+   bagShell.setIndex(Array.from({length:bagShell.attributes.position.count},(_,i)=>i));
+   const mount=(geo,tone)=>part(geo,tone,-.193,-.021,.008,1,1,1,0,-1.17,.035);
+   body.push(mount(bagShell,edge));
+   // A curved front gives the photographed flap a raised edge and keeps
+   // the gusset visible as the visitor turns away from the camera.
+   const panel=new THREE.PlaneGeometry(1,1,24,28);
+   mapCloth(panel,'satchel',y=>.5-y);
+   const pos=panel.attributes.position;
+   for(let i=0;i<pos.count;i++){
+    const u=pos.getX(i),v=.5-pos.getY(i),y=(.5-v)*bagHeight;
+    const inset=Math.max(0,Math.abs(y)-hh+r);
+    const width=hw-r+Math.sqrt(Math.max(0,r*r-inset*inset));
+    const dome=(1-4*u*u)*Math.sin(Math.PI*v);
+    const flap=1-smoothstep((v-.46-.035*Math.cos(2*Math.PI*u))/.04);
+    pos.setXYZ(i,u*2*width,y,.0445+.004*dome+.004*flap);
    }
-   function satchel(tone,w,h,d,x,y,z,round){
-    const shape=new THREE.Shape(),l=-w/2,r=w/2,b=-h/2,t=h/2;
-    shape.moveTo(l+round,b);shape.lineTo(r-round,b);shape.quadraticCurveTo(r,b,r,b+round);
-    shape.lineTo(r,t-round);shape.quadraticCurveTo(r,t,r-round,t);shape.lineTo(l+round,t);
-    shape.quadraticCurveTo(l,t,l,t-round);shape.lineTo(l,b+round);shape.quadraticCurveTo(l,b,l+round,b);
-    const geo=new THREE.ExtrudeGeometry(shape,{depth:d,bevelEnabled:true,bevelSize:.003,bevelThickness:.003,bevelSegments:2,curveSegments:4});
-    geo.setIndex(Array.from({length:geo.attributes.position.count},(_,i)=>i));
-    return mountBag(geo,tone,x,y,z);
-   }
-   body.push(satchel(edge,.173,.162,.041,0,0,0,.014),
-    satchel(0x79533c,.172,.081,.007,0,.031,.044,.010),
-    satchel(0x50382d,.019,.037,.006,0,-.012,.052,.003),
-    satchel(0xab8860,.015,.011,.004,0,-.009,.060,.002));
-   // A single welt follows the flap. The buckle and tongue remain legible
-   // when seen from the side where the clasp is silhouetted against leather.
-   const flapSeam=new THREE.CatmullRomCurve3([
-    [-.080,.028,.009],[-.080,-.021,.009],[-.074,-.033,.009],
-    [-.040,-.034,.009],[0,-.035,.009],[.040,-.034,.009],[.074,-.033,.009],
-    [.080,-.021,.009],[.080,.028,.009]].map(v=>new THREE.Vector3(...v)));
-   body.push(mountBag(new THREE.TubeGeometry(flapSeam,32,.0013,5,false),0x5d402e,0,.031,.044));
-   body.push(satchel(0x65442f,.006,.015,.002,0,-.01,.064,.001));
+   panel.computeVertexNormals();body.push(mount(panel,0xffffff));
   }
   return solidTrim(body);
  }

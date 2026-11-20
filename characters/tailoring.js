@@ -1,5 +1,5 @@
-// The cloth atlas is arranged in four sewn panels, with the UV seam at the back.
-const panels={body:[0,0,1024,570],collar:[0,578,1024,706],sleeve:[0,714,504,1020],lower:[510,714,1014,1020]};
+// The cylindrical cloth panels meet at the back. The student atlas also holds the satchel front.
+const panels={body:[0,0,1024,570],collar:[0,578,1024,706],pipedCollar:[0,578,800,706],satchel:[808,578,1016,706],sleeve:[0,714,504,1020],lower:[510,714,1014,1020]};
 const tau=2*Math.PI;
 const clamp=(v,lo,hi)=>Math.min(hi,Math.max(lo,v));
 
@@ -114,7 +114,7 @@ export function sewnJacket(T,part,female,surface=jacketSurface(female)){
  // keep their thickness in profile. Their lower edge follows the chest.
  for(const side of [-1,1]){
   const edges=[],rimPoints=[];
-  const leaf=swatch('collar',56,12,(u,v)=>{
+  const leaf=swatch(female?'pipedCollar':'collar',56,12,(u,v)=>{
    const phi=side<0?-Math.PI+(Math.PI-.001)*u:.001+(Math.PI-.001)*u;
    const a=Math.abs(phi),front=Math.max(0,Math.cos(phi));
    const rim=(female?.630:.619)-(female?.061:.047)*front**1.7;

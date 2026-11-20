@@ -1,7 +1,7 @@
 // The existing figure keeps its face, clothing profile and upper-body controls.
 // This module adds a leg rig, planted steps and GPU cloth morphs underneath it.
 import {mapCloth} from './tailoring.js';
-import {contour} from './wardrobe.js';
+import {contour,studentLeg} from './wardrobe.js';
 const TAU=Math.PI*2,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const mix=(a,b,t)=>a+(b-a)*t,smooth=t=>t*t*(3-2*t);
 
@@ -14,22 +14,22 @@ export function footCycle(phase,stride) {
 
 // A visitor rolls onto the heel, spends the middle of stance flat-footed,
 // then pivots on the ball of the foot. Swing joins stance at the same speed.
-export function visitorFootCycle(phase,stride){
+export function visitorFootCycle(phase,stride,toeOff=.52){
   const u=((phase/TAU)%1+1)%1,stance=.58,travel=stride*stance;
   if(u<stance){
     const heel=1-smooth(clamp(u/.105,0,1));
     const toe=smooth(clamp((u-.36)/(stance-.36),0,1));
-    return {z:stride*(stance/2-u),lift:0,pitch:-.19*heel+.38*toe,stance:true};
+    return {z:stride*(stance/2-u),lift:0,pitch:-.19*heel+toeOff*toe,stance:true};
   }
   const t=(u-stance)/(1-stance),arc=Math.sin(Math.PI*t);
   return {z:travel*(smooth(t)-.5)-stride*(1-stance)*t*(1-t)*(1-2*t),
-    lift:.077*arc*arc,pitch:mix(.38,-.19,smooth(t))-.13*arc,stance:false};
+    lift:.077*arc*arc,pitch:mix(toeOff,-.19,smooth(t))-.13*arc,stance:false};
 }
 
 export function createFigureMotion(T,h) {
   const V=T.Vector3,down=new V(0,-1,0),L1=.42,L2=.41;
   const d=new V(),pole=new V(),knee=new V(),end=new V(),dir=new V();
-  const qa=new T.Quaternion(),qb=new T.Quaternion();
+  const qa=new T.Quaternion(),qb=new T.Quaternion(),shoeToAnkle=new V();
 
   // Keep a reachable end point and a consistent knee side, including folded legs.
   function solve(hip,target,bend) {
@@ -144,6 +144,7 @@ export function createFigureMotion(T,h) {
     const position=geometry.attributes.position,rest=position.array.slice();
     const restNormals=geometry.attributes.normal.array.slice();
     const directions=32,rows=18,bottom=.32,top=.93;
+    const hemHeight=position.getY(0);
     const support=new Float32Array(directions*rows);
     const dx=Array.from({length:directions},(_,i)=>Math.cos(i*TAU/directions));
     const dz=Array.from({length:directions},(_,i)=>Math.sin(i*TAU/directions));
@@ -153,12 +154,17 @@ export function createFigureMotion(T,h) {
       if(y>=top||radius<.001)continue;
       const angle=((Math.atan2(z,x)/TAU+1)%1)*directions;
       const row=clamp((y-bottom)/(top-bottom)*(rows-1),0,rows-1.001);
+      const fall=clamp((top-y)/(top-hemHeight),0,1);
+      const pleat=((18*angle/directions)%1);
+      const ridge=pleat<.2?1-pleat/.2:(pleat-.2)/.8;
       vertices.push({i,ring:Math.floor(row),up:row%1,col:Math.floor(angle),along:angle%1,
-        x:x/radius,z:z/radius,radius,pleat:.014*(1-y)*((18*angle/directions)%1)});
+        x:x/radius,z:z/radius,y,radius,fall:fall*fall,pleat:.025*fall*ridge});
     }
     let active=false;
-    return (legs,amount)=>{
-      if(amount<.002){
+    return (legs,amount,velocity,phase,allowDrape)=>{
+      const speed=Math.hypot(velocity.x,velocity.y);
+      const drape=Math.min(1,speed/1.7)*allowDrape;
+      if(amount<.002&&drape<.005){
         if(active){
           position.array.set(rest);position.needsUpdate=true;
           geometry.attributes.normal.array.set(restNormals);geometry.attributes.normal.needsUpdate=true;
@@ -187,13 +193,24 @@ export function createFigureMotion(T,h) {
           }
         }
       }
+      // The upper pleats follow the knees; only the free lower cloth trails.
+      // Its filtered direction stays in world space when a walker turns.
+      const dirX=speed>0?velocity.x/speed:0,dirZ=speed>0?velocity.y/speed:0;
+      const stepRise=Math.cos(2*phase-.85),crossStep=Math.sin(phase-.50);
       for(const v of vertices){
-        const column=v.col,next=(column+1)%directions,k=v.ring*directions;
+        const rear=smooth(clamp(.5-.5*(v.x*dirX+v.z*dirZ),0,1));
+        const free=v.fall*rear*drape;
+        const lift=free*(.103+.022*stepRise+.018*crossStep*v.x);
+        // Sample support at the displaced height as well as the original ring.
+        const raised=clamp(v.ring+v.up+lift*(rows-1)/(top-bottom),0,rows-1.001);
+        const colRow=Math.floor(raised),vertical=raised-colRow;
+        const column=v.col,next=(column+1)%directions,k=colRow*directions;
         const low=mix(support[k+column],support[k+next],v.along);
         const high=mix(support[k+directions+column],support[k+directions+next],v.along);
-        const needed=mix(low,high,v.up)+v.pleat;
-        const width=Math.max(v.radius,needed);
-        position.setXYZ(v.i,v.x*width,rest[v.i*3+1],v.z*width);
+        const needed=mix(low,high,vertical)+v.pleat;
+        const width=v.radius+Math.max(0,needed-v.radius)*Math.min(1,amount*2)
+          +free*(.125+.021*stepRise+.025*v.x*crossStep);
+        position.setXYZ(v.i,v.x*width,v.y+lift,v.z*width);
       }
       position.needsUpdate=true;geometry.computeVertexNormals();
     };
@@ -209,26 +226,41 @@ export function createFigureMotion(T,h) {
       bones[0].add(hip);hip.add(shin);shin.add(ankle);bones.push(hip,shin,ankle);
       const trousers=f.player==='m';
       const shapes=trousers?[
-        [contour(T,[[-.847,.063,.070],[-.833,.067,.075,.005],[-.81,.062,.068],[-.75,.063,.07,-.004],
+        [contour(T,[[-.847,.064,.073],[-.838,.067,.076],[-.823,.066,.075],[-.812,.064,.073],
+          [-.800,.066,.075],[-.786,.066,.075],[-.773,.064,.071],[-.75,.062,.070],
           [-.61,.066,.073],[-.50,.069,.078],[-.455,.073,.080],[-.427,.072,.078,.004],
-          [-.405,.074,.081],[-.37,.074,.08],[-.29,.077,.086],[-.13,.083,.093],[-.02,.092,.106],[.04,.094,.108]]),.9,idx]
-      ]:f.player?[
-        [contour(T,[[-.43,.049,.052],[-.37,.055,.061],[-.27,.066,.075],[-.13,.064,.075]]),.9,idx],
-        [new T.SphereGeometry(.065,16,10),.9-L1,idx+1],
-        [contour(T,[[-.42,.032,.04],[-.35,.031,.039],[-.28,.036,.043,-.003],[-.18,.049,.055,-.009],[-.12,.053,.063,-.01],[-.065,.047,.055],[.012,.05,.055]]),.9-L1,idx+1]
+          [-.405,.074,.081],[-.37,.074,.08],[-.29,.077,.086],[-.13,.083,.093],[-.02,.092,.106],[.04,.094,.108]],32),.9,idx]
+      ]:f.player==='f'?[
+        [studentLeg(T,side),.9,idx]
       ]:[
         [new T.CylinderGeometry(.07,.058,L1,10,2),.9-L1/2,idx],
         [new T.SphereGeometry(.062,10,6),.9-L1,idx+1],
         [new T.CylinderGeometry(.057,.046,L2,10,2),.9-L1-L2/2,idx+1]
       ];
       for(const [geo,y,bone] of shapes){
-        if(trousers){geo.rotateY(Math.PI);mapCloth(geo,'lower',localY=>-localY/.85);}
+        if(trousers){
+          geo.rotateY(Math.PI);
+          const p=geo.attributes.position;
+          for(let k=0;k<p.count;k++){
+            const x=p.getX(k),y=p.getY(k),z=p.getZ(k),phi=Math.atan2(x,z);
+            // A trouser break is deepest over the lacing and fades around the back.
+            const ankle=clamp((-.73-y)/.075,0,1),front=.5+.5*Math.cos(phi);
+            const ridge=.009*Math.exp(-(((y+.794+.018*Math.sin(phi*side))/.012)**2));
+            const valley=.006*Math.exp(-(((y+.814+.015*Math.sin(phi*side))/.011)**2));
+            const fold=(ridge-valley)*(.3+.7*front);
+            p.setXYZ(k,x+Math.sin(phi)*fold,y+ankle*.008*Math.cos(phi+.6*side),
+              z+Math.cos(phi)*fold+.014*front*ankle);
+          }
+          geo.computeVertexNormals();mapCloth(geo,'lower',localY=>-localY/.85);
+        }
         geo.translate(side*.10,y,0);pieces.push(geo);
         const pos=geo.attributes.position;
         for(let k=0;k<pos.count;k++){
-          const shinWeight=trousers?smooth(clamp((.56-pos.getY(k))/.16,0,1)):0;
+          const shinWeight=f.player?smooth(clamp((.56-pos.getY(k))/.16,0,1)):0;
           colors.push(tint.r,tint.g,tint.b);
-          indices.push(bone,trousers?idx+1:0,0,0);weights.push(1-shinWeight,shinWeight,0,0);
+          const ankleWeight=geo.userData.ankleWeights?.[k%geo.userData.rings]||0;
+          indices.push(bone,f.player?idx+1:0,ankleWeight?idx+2:0,0);
+          weights.push(1-shinWeight,shinWeight-ankleWeight,ankleWeight,0);
         }
       }
       legs.push({hip,shin,ankle,side,kneePoint:new V(),anklePoint:new V(),target:new V(),bend:new V(),anchor:null,stance:false,foot:f.feet.children[i]});
@@ -241,6 +273,10 @@ export function createFigureMotion(T,h) {
     const owned=[f.skirt,f.upper.children[0],f.head.children[0],f.armL.children[0],f.armR.children[0],f.elbL.children[0],f.elbR.children[0]].map(o=>o.geometry);
     if(f.player)owned.push(...f.feet.children.map(foot=>foot.geometry));
     f.motion={mesh,legs,owned,fitSkirt:f.player==='f'?walkingSkirt(f.skirt.geometry):null,phase:0,blend:0,stride:1.15,previous:null,speed:0};
+    if(f.motion.fitSkirt){
+      f.motion.clothVelocity=new T.Vector2();
+      f.motion.localClothVelocity=new T.Vector2();
+    }
     if(f.player){
       f.motion.dt=1/60;
       pose(f);
@@ -266,10 +302,19 @@ export function createFigureMotion(T,h) {
       f.swing=-Math.cos(m.phase-.16)*.41*m.blend;
       f.bob=(1-Math.cos(m.phase*2-.65))*.011*m.blend;
     }
+    if(m.clothVelocity){
+      const velocity=m.clothVelocity;
+      if(reset)velocity.set(0,0);
+      const gain=1-Math.exp(-dt*(moving?7:10));
+      const rate=moving?m.speed/(scale*distance):0;
+      velocity.x+=((pos.x-m.previous.x)*rate-velocity.x)*gain;
+      velocity.y+=((pos.z-m.previous.z)*rate-velocity.y)*gain;
+      if(!moving&&velocity.lengthSq()<.00007)velocity.set(0,0);
+    }
     m.previous.copy(pos);m.dt=dt;m.walking=moving;
   }
 
-  function standingYaw(f){return f.player==='f'?.28:.19;}
+  function standingYaw(f){return f.player==='f'?.50:-.40;}
 
   function pose(f) {
     const m=f.motion;if(!m)return;
@@ -285,17 +330,32 @@ export function createFigureMotion(T,h) {
     if(!m.fitSkirt){weights[4+step%8]=(1-blend)*walk;weights[4+(step+1)%8]=blend*walk;}
     f.upper.position.y=.95-.45*s+.13*bench+f.bob;
     f.upper.rotation.y=Math.sin(m.phase)*.035*walk;f.upper.rotation.z=Math.sin(m.phase)*.018*walk;
-    f.upper.rotation.x+=.055*walk;
+    f.upper.rotation.x=f.bow*(s>.5?1.15:.75)+.055*walk;
     const standing=f.player?(1-walk)*(1-s)*(1-f.palms)*(1-f.bow):0;
+    const maleRest=f.player==='m'?standing:0;
     const load=f.player?-Math.sin(m.phase-.13)*walk:0;
     if(f.player){
-      f.upper.position.x=.023*load-.014*standing;
+      f.upper.position.x=.023*load-.014*standing-.035*maleRest;
+      f.upper.position.y-=.012*maleRest;
       f.skirt.position.x=m.fitSkirt?0:.017*load;
       f.skirt.rotation.y=m.fitSkirt?0:.042*Math.cos(m.phase)*walk;
       f.upper.rotation.y=standingYaw(f)*standing-.062*Math.cos(m.phase)*walk;
-      f.upper.rotation.z=-.018*load+.012*standing;
+      f.upper.rotation.z=-.018*load+.012*standing-.035*maleRest;
       f.head.rotation.y=-standingYaw(f)*standing-.54*(f.upper.rotation.y-standingYaw(f)*standing);
       f.head.position.x=(f.player==='f'?.015:.009)*standing;
+      if(maleRest){
+        // His weight rests on the turned-out rear foot, with the near hand
+        // slightly forward and the other elbow hanging farther from the ribs.
+        f.armR.rotation.x=mix(f.armR.rotation.x,-.085,maleRest);
+        f.armL.rotation.x=mix(f.armL.rotation.x,.075,maleRest);
+        f.elbR.rotation.x=mix(f.elbR.rotation.x,-.17,maleRest);
+      }
+      const armSwing=walk*(1-f.palms)*(1-f.bow);
+      if(armSwing){
+        const lead=Math.cos(m.phase-.16);
+        f.elbR.rotation.x=mix(f.elbR.rotation.x,-.07-.22*Math.max(0,lead),armSwing);
+        f.elbL.rotation.x=mix(f.elbL.rotation.x,-.07-.22*Math.max(0,-lead),armSwing);
+      }
       if(f.ponytail)f.ponytail.morphTargetInfluences[0]=.76*walk*Math.sin(m.phase-.82);
     }
     if(bench){
@@ -307,9 +367,11 @@ export function createFigureMotion(T,h) {
       }
     }
     for(let i=0;i<2;i++){
-      const l=m.legs[i],cy=(f.player?visitorFootCycle:footCycle)(m.phase+i*Math.PI,m.stride),side=l.side;
-      const restingZ=side*(f.player==='m'?.082:.059)*standing;
-      let x=side*.10,z=cy.z*walk+restingZ,y=.035+cy.lift*walk;
+      const l=m.legs[i],phase=m.phase+i*Math.PI,side=l.side;
+      const cy=f.player?visitorFootCycle(phase,m.stride,f.player==='f'?.64:.52):footCycle(phase,m.stride);
+      const restingZ=side*(f.player==='m'?.112:.059)*standing;
+      const restingX=side*.10+(f.player==='f'?-side*.018*standing:(.025+.012*side)*maleRest);
+      let x=restingX,z=cy.z*walk+restingZ,y=.035+cy.lift*walk;
       const world=toWorld(x,z);
       if(m.walking&&cy.stance){
         if(!l.stance||!l.anchor)l.anchor={x:world[0],z:world[1],y:h.floor(world[0],world[1],pos.y,f)};
@@ -329,21 +391,34 @@ export function createFigureMotion(T,h) {
         y+=.04*bench+.035*(Math.cos(pitch)-1)+pivot*Math.sin(pitch);
         z+=pivot*(1-Math.cos(pitch))+.035*Math.sin(pitch);
       }else y+=.04*bench+.1*Math.abs(Math.sin(cy.pitch*walk));
-      l.target.set(x,y+.045,z-.025);
-      l.hip.position.set(side*.10+.020*load,.9-.45*s+.13*bench-(f.player?.068:.12)*walk+f.bob*.45,
-        f.player?-side*.009*Math.cos(m.phase)*walk:0);
+      const restingYaw=f.player==='f'?.55+side*.13:side*.54-.48;
+      l.foot.rotation.set(cy.pitch*walk,side*(s-bench)*.95+restingYaw*standing,0);
+      shoeToAnkle.set(0,.045,-.025);
+      if(f.player)shoeToAnkle.applyQuaternion(l.foot.quaternion);
+      l.target.set(x,y,z).add(shoeToAnkle);
+      l.hip.position.set(side*.10+.020*load-.042*maleRest,
+        .9-.45*s+.13*bench-(f.player?.068:.12)*walk+f.bob*.45-(.014+.007*side)*maleRest,
+        f.player?side*(.036*maleRest-.009*Math.cos(m.phase)*walk):0);
       l.bend.set(side*(s-bench),0,1-(s-bench)*.65);
       const result=solve(l.hip.position,l.target,l.bend);
       if(m.fitSkirt){l.kneePoint.copy(result.knee);l.anklePoint.copy(result.end);}
       dir.copy(result.knee).sub(l.hip.position).normalize();qa.setFromUnitVectors(down,dir);l.hip.quaternion.copy(qa);
       dir.copy(result.end).sub(result.knee).normalize();qb.setFromUnitVectors(down,dir);l.shin.quaternion.copy(qa).invert().multiply(qb);
       // Use the reachable ankle, never stretch a shin to match an impossible step.
-      l.foot.position.copy(result.end);l.foot.position.y-=.045;l.foot.position.z+=.025;
-      const restingYaw=f.player==='f'?.38+side*.12:side*.32-.21;
-      l.foot.rotation.set(cy.pitch*walk,side*(s-bench)*.95+restingYaw*standing,0);
-      if(!m.walking&&s<.01){l.foot.position.lerp(new V(side*.1,.035,restingZ),1-Math.exp(-m.dt*10));}
+      l.foot.position.copy(result.end).sub(shoeToAnkle);
+      if(f.player){
+        // The ankle bone and shoe share the same local frame all the way
+        // from heel strike through toe-off, including a turned-out stance.
+        l.ankle.quaternion.copy(qb).invert().multiply(l.foot.quaternion);
+      }else if(!m.walking&&s<.01){
+        l.foot.position.lerp(new V(restingX,.035,restingZ),1-Math.exp(-m.dt*10));
+      }
     }
-    m.fitSkirt?.(m.legs,walk);
+    if(m.fitSkirt){
+      const v=m.clothVelocity;
+      m.localClothVelocity.set(cs*v.x-sn*v.y,sn*v.x+cs*v.y);
+      m.fitSkirt(m.legs,walk,m.localClothVelocity,m.phase,Math.max(0,1-4*s));
+    }
   }
 
   function dispose(f){if(!f?.motion)return;f.motion.mesh.skeleton.dispose();f.motion.mesh.geometry.dispose();for(const g of f.motion.owned)g.dispose();f.motion=null;}

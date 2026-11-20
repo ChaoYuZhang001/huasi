@@ -190,8 +190,20 @@ def bake(source,female):
         reverse=cloth(source,patch,306,504,(47,46,48))
     blend=np.clip((np.cos(u)+.5)/.9,0,1)[...,None]
     atlas[714:1020,510:1014]=np.clip(blend*lower+(1-blend)*reverse,0,255)
+    if female:
+        # The walking profile gives the panel, flap and brass tongue. Extend
+        # only the thin strip of leather hidden by her fingers on the left.
+        atlas[578:706,:800]=cv2.resize(atlas[578:706],(800,128),interpolation=cv2.INTER_AREA)
+        u,v=np.meshgrid(np.linspace(0,1,208),np.linspace(0,1,128))
+        x=(1251-9*v)+(49-2*v)*u
+        y=719+48*v-1.3*u
+        visible=np.interp(v,[0,.35,.65,1],[1265,1262,1260,1259])
+        x=np.where(x<visible,visible+(visible-x)*.28,x)
+        leather=cv2.remap(source,x.astype('f'),y.astype('f'),cv2.INTER_CUBIC)
+        atlas[578:706,808:1016]=leather
+    collar_islands=[(578,706,0,800),(578,706,808,1016)] if female else [(578,706,0,1024)]
     # Extend each island into its gutter to avoid dark lines in mipmaps.
-    for a,b,l,r in ((0,570,0,1024),(578,706,0,1024),(714,1020,0,504),(714,1020,510,1014)):
+    for a,b,l,r in [(0,570,0,1024),*collar_islands,(714,1020,0,504),(714,1020,510,1014)]:
         if a:atlas[a-2:a,l:r]=atlas[a:a+1,l:r]
         atlas[b:b+2,l:r]=atlas[b-1:b,l:r]
         if l:atlas[a:b,l-2:l]=atlas[a:b,l:l+1]

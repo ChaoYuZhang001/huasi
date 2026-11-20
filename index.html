@@ -1281,6 +1281,7 @@ const FG={skirt:new THREE.CylinderGeometry(.19,.33,.95,14).translate(0,.475,0),f
  sleeve:new THREE.CylinderGeometry(.065,.1,.5,10).translate(0,-.25,0),hand:new THREE.SphereGeometry(.045,8,6),mala:new THREE.TorusGeometry(.16,.014,6,24)};
 Object.assign(FM,{lapel:mat(null,1,{c:0xf2ede2,r:1}),bagM:mat(null,1,{c:0xd9b23a,r:1})});Object.assign(FG,{shoulder:new THREE.SphereGeometry(.2,12,8),lapel:new THREE.BoxGeometry(.034,.3,.02),cuff:new THREE.CylinderGeometry(.104,.11,.06,10),bag:new THREE.BoxGeometry(.07,.19,.17),strap:new THREE.TorusGeometry(.2,.011,5,16)});
 const VM=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.92}),eyeM2=new THREE.MeshBasicMaterial({color:0x17110e}),eyeG2=new THREE.SphereGeometry(.0125,8,6),shoeG=new THREE.SphereGeometry(.06,8,6).scale(.8,.5,1.7),shoeM=new THREE.MeshStandardMaterial({color:0x1d1b19,roughness:1});
+const shoeLeather=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.54});
 const outfits={m:clothingMaterial(THREE,VM,false),f:clothingMaterial(THREE,VM,true)};
 function cg(g,hex){const c=new THREE.Color(hex),n=g.attributes.position.count,a=new Float32Array(n*3);for(let i=0;i<n;i++){a[i*3]=c.r;a[i*3+1]=c.g;a[i*3+2]=c.b;}g.setAttribute('color',new THREE.BufferAttribute(a,3));return g;}
 function mergeC(arr){const m=mergeGeometries(arr);let nv=0;for(const g of arr)nv+=g.attributes.position.count;const c=new Float32Array(nv*3);let o=0;for(const g of arr){c.set(g.attributes.color.array,o*3);o+=g.attributes.position.count;}m.setAttribute('color',new THREE.BufferAttribute(c,3));arr.forEach(g=>g.dispose());return m;}
@@ -1310,7 +1311,7 @@ function mkFigure(o){const g=new THREE.Group(),rc=o.school?new THREE.Color(schoo
  for(let i=0;i<sp.count;i++)if(sp.getY(i)<.065)skc.setXYZ(i,hemColor.r,hemColor.g,hemColor.b);
  skirtG.userData.travelCut=o.player||'robe';
  const skirt=new THREE.Mesh(skirtG,o.player?outfits[o.player]:VM);skirt.castShadow=true;skirt.visible=o.player!=='m';g.add(skirt);
- const feet=new THREE.Group();g.add(feet);for(const s of[-1,1]){const m=o.player?new THREE.Mesh(mergeC(footwear(THREE,P_,o.player==='f',SK)),VM):new THREE.Mesh(shoeG,shoeM);m.position.set(s*.1,.035,0);feet.add(m);}
+ const feet=new THREE.Group();g.add(feet);for(const s of[-1,1]){const m=o.player?new THREE.Mesh(mergeC(footwear(THREE,P_,o.player==='f',s)),shoeLeather):new THREE.Mesh(shoeG,shoeM);m.position.set(s*.1,.035,0);feet.add(m);}
  const upper=new THREE.Group();upper.position.y=.95;g.add(upper);
  const T=[P_(new Cy(.172,.2,.56,16,2),rc,0,.28,0,1,1,.74),P_(new Sp(.2,14,8),rc,0,.5,0,1.25,.4,.8),P_(new Cy(.208,.208,.075,16,1),DK,0,.035,0,1,1,.76),P_(new Bx(.05,.2,.02),DK,.03,-.07,.156),P_(new Bx(.04,.16,.02),DK,-.03,-.05,.156),
   P_(new Cy(.05,.056,.1,8,1),SK,0,.6,0),P_(new THREE.TorusGeometry(.075,.017,6,14),WH,0,.585,.008,1,1,1,Math.PI/2-.3)];
@@ -2058,7 +2059,7 @@ try {
   builders:{THREE,M,at,B,C,G,S,solo,point:wpv,col,roof,headFig,limb,lathe,seatedFig,standFig,hall,plaque,pine,bamboo,boulder,crate,sacks,cushion,lantern,rail,plight,ginkgo,shrub,lstring,wall,
    palette(overrides,fn){const old={};for(const k in overrides){old[k]=M[k];M[k]=overrides[k];}try{return fn();}finally{Object.assign(M,old);}}},
   shared:o=>o===sun||o===sun.target||o===hemi||o===sky||o===sky2||o===av.g||o===ring||parts.some(p=>p.s===o)||cloudM.includes(o.material)||[...MP.peers.values()].some(p=>p.f.g===o),
-  sharedResources:()=>[...Object.values(M),...Object.values(T),...portraitResources,...Object.values(outfits),VM,eyeM2,shoeM,hatM,blobM,stickM,tipM,...robeMs,...skirtMs,eyeG2,shoeG,hatG,blobG,stickG,tipG],
+  sharedResources:()=>[...Object.values(M),...Object.values(T),...portraitResources,...Object.values(outfits),shoeLeather,VM,eyeM2,shoeM,hatM,blobM,stickM,tipM,...robeMs,...skirtMs,eyeG2,shoeG,hatG,blobG,stickG,tipG],
   captureNav:()=>({road:xStep===2,nearbyBoxes,h:navH,nb,list:navList,flow,lastCell}),
   restoreNav:n=>{navLayout(n.road);nearbyBoxes=n.nearbyBoxes;NC=cols.length;navH=n.h;nb=n.nb;navList=n.list;flow=n.flow;lastCell=n.lastCell;},
   rebuildNav:(spawn,id)=>{navLayout(id==='roads');rebuildNav(spawn);lastCell=cellOf(spawn[0],spawn[2]);},safePose:s=>{const[x,y,z]=s.p,c=cellOf(x,z);return c>=0&&Number.isFinite(navH[c])&&Math.abs(y-navH[c])<1.2&&!blocked(x,z,y+.5,y+1.7,.34);},updateCollisionCount:()=>{NC=cols.length;nearbyBoxes=collisionGrid(cols);},flush,

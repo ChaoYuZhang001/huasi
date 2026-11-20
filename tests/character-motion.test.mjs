@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from '../three.module.min.js';
+import {footwear} from '../characters/wardrobe.js';
 import {createFigureMotion,footCycle,visitorFootCycle} from '../characters/motion.js';
 globalThis.__SHANSI_THREE=T;
 const {mergeGeometries}=await import('../vendor/BufferGeometryUtils.js');
@@ -152,4 +153,86 @@ test('walking skirt covers both knees and the trailing shin at full travel speed
  assert(samples>1000);
  f.sit=1;f.bench=1;motion.pose(f);assert.deepEqual(p.array,rest);
  motion.dispose(f);
+});
+
+
+test('standing traveller rests over the turned-out back shoe with both soles grounded',()=>{
+ const f=figure('m'),[back,front]=f.motion.legs;
+ assert(back.foot.position.z<front.foot.position.z-.19);
+ assert(back.foot.rotation.y<-.85&&Math.abs(front.foot.rotation.y)<.15);
+ const middle=(back.foot.position.x+front.foot.position.x)/2;
+ assert(f.upper.position.x<middle-.055&&f.upper.rotation.y<-.3);
+ for(const l of [back,front])assert(Math.abs(l.foot.position.y-.035)<.003);
+ f.bench=1;f.sit=1;motion.pose(f);
+ assert(Math.abs(f.upper.rotation.y)<1e-8);
+ assert(f.motion.legs.every(l=>l.foot.position.z>.4&&Math.abs(l.foot.rotation.y)<.001));
+ motion.dispose(f);
+});
+
+test('free hem trails travel in world space, clears the waist and settles on stopping or teleport',()=>{
+ const f=figure('f'),g=f.skirt.geometry,p=g.attributes.position,rest=p.array.slice();
+ const rings=15,front=0,back=10*rings,right=5*rings,left=15*rings;
+ function step(dx,dz){
+  f.g.position.x+=dx;f.g.position.z+=dz;f.moving=!!(dx||dz);
+  motion.step(f,1/60);motion.pose(f);
+ }
+ step(0,0);
+ for(let i=0;i<70;i++)step(0,.03);
+ assert(p.getY(back)>p.getY(front)+.065);
+ assert(p.getZ(back)<rest[back*3+2]-.065);
+ for(let i=rings-1;i<p.count;i+=rings){
+  assert.deepEqual(Array.from(p.array.subarray(i*3,i*3+3)),Array.from(rest.subarray(i*3,i*3+3)));
+ }
+ // A turn in place doesn't instantly rotate the cloth's stored momentum.
+ f.g.rotation.y=Math.PI/2;step(0,0);
+ assert(p.getY(right)>p.getY(left)+.04);
+ for(let i=0;i<90;i++)step(0,0);
+ assert.deepEqual(p.array,rest);
+ for(let i=0;i<30;i++)step(.03,0);
+ step(5,0);assert.deepEqual(p.array,rest);
+ motion.dispose(f);
+});
+
+test('the skin spans each bending knee with continuous weights between thigh and shin',()=>{
+ const f=figure('f'),g=f.motion.mesh.geometry;
+ const p=g.attributes.position,w=g.attributes.skinWeight,b=g.attributes.skinIndex;
+ const mixed=[0,0];
+ for(let i=0;i<p.count;i++){
+  if(w.getX(i)===0||w.getX(i)===1)continue;
+  assert.equal(b.getY(i),b.getX(i)+1);
+  assert(Math.abs(w.getX(i)+w.getY(i)-1)<1e-6);
+  mixed[p.getX(i)<0?0:1]++;
+ }
+ assert(mixed.every(n=>n>70));motion.dispose(f);
+});
+
+
+test('the bare instep stays sewn to both leather openings through a complete step',()=>{
+ const f=figure('f'),mesh=f.motion.mesh,g=mesh.geometry;
+ const pos=g.attributes.position,w=g.attributes.skinWeight,contact=[];
+ for(const leg of f.motion.legs){
+  const pieces=footwear(T,geo=>geo,true,leg.side),shoePoints=[];
+  for(const geo of pieces){
+   for(let i=0;i<geo.attributes.position.count;i++)shoePoints.push(new T.Vector3().fromBufferAttribute(geo.attributes.position,i));
+   geo.dispose();
+  }
+  for(let i=0;i<pos.count;i++){
+   if(w.getZ(i)!==1||Math.sign(pos.getX(i))!==leg.side)continue;
+   const local=new T.Vector3(pos.getX(i)-leg.side*.10,pos.getY(i)-.025,pos.getZ(i)-.025);
+   assert(shoePoints.some(p=>p.distanceToSquared(local)<1e-12));
+   contact.push({i,local,foot:leg.foot});
+  }
+ }
+ assert(contact.length>=80);
+ const a=new T.Vector3(),b=new T.Vector3();let pitch=0;
+ motion.step(f,1/60);f.moving=true;
+ for(let frame=0;frame<85;frame++){
+  f.g.position.z+=.028;motion.step(f,1/60);motion.pose(f);f.g.updateMatrixWorld(true);
+  for(const {i,local,foot} of contact){
+   mesh.localToWorld(mesh.getVertexPosition(i,a));foot.localToWorld(b.copy(local));
+   assert(a.distanceToSquared(b)<1e-9);
+   pitch=Math.max(pitch,foot.rotation.x);
+  }
+ }
+ assert(pitch>.62);motion.dispose(f);
 });

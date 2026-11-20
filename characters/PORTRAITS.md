@@ -6,7 +6,7 @@
 
 头颈基体、青年男女形变、表情与眼球来自 [MakeHuman 模型库](https://github.com/makehumancommunity/makehuman/tree/a8bc2d54ff0ac92e78ff71431b1023eda42bf482/makehuman/data)。肤色底图、棕色眼图及 eyelashes01 睫毛使用其系统素材。[CC0 素材清单](https://github.com/makehumancommunity/makehuman-static-website/blob/master/content/Assets/AssetPacks/makehuman_system_assets.md) · [使用的素材版本](https://github.com/dmaugis/makehuman-py3-assets/tree/2f4033a364a7e97479e17ed630ccb999395730c6/base)
 
-人物外观依据项目提供的 1536 × 1024 像素双人六格参考图。近景提供肤色、眉眼、唇形、发际和前额发纹。行走侧影用于约束鼻尖、下颌和发量。头发遮住的区域和背部发流由建模补足。上衣正面、口袋、盘扣、袖片和下装布纹取自同一张参考图。背部衣片使用参考图中的布料重建。女装的包带绕过右肩，接到左胯的皮包。
+人物外观依据项目提供的 1536 × 1024 像素双人六格参考图。近景提供肤色、眉眼、唇形、发际和前额发纹。行走侧影用于约束鼻尖、下颌和发量。头发遮住的区域和背部发流由建模补足。上衣正面、口袋、盘扣、袖片和下装布纹取自同一张参考图。背部衣片使用参考图中的布料重建。女装的包带绕过右肩，接到左胯的皮包。包盖和搭扣取自行走侧影，手指遮住的一小段包面用相邻皮纹补齐。
 
 ## 重新烘焙
 
